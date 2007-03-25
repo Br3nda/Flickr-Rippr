@@ -1,30 +1,59 @@
 <?php
 function flickrrippr_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      break;
+    case 'pgsql':
   $ret[] = db_query("CREATE TABLE {flickrphotos} (
                       flickrphoto_id integer UNIQUE NOT NULL,
                       nid integer UNIQUE NOT NULL,
                       lastfetched timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                       PRIMARY KEY (flickrphoto_id)
                       )");
-  return $ret;
+    break;
+  }
+
 }
 function flickrrippr_update_5() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+      case 'mysqli':
+      break;
+    case 'pgsql':
   $ret[] = update_sql("CREATE TABLE {flickrusers} (
                       uid INTEGER NOT NULL REFERENCES {users} (uid),
                       flickrusername TEXT NOT NULL,
                       PRIMARY KEY (uid)
                       );");
+    break;
+  }
+  
   return $ret;
 }
 
 function flickrrippr_update_1() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+      case 'mysqli':
+      break;
+    case 'pgsql':
   $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN  cachejpegs BOOLEAN");
   $ret[] = update_sql("UPDATE {flickrusers} SET cachejpegs = false;");
   $ret[] = update_sql("ALTER TABLE {flickrusers} ALTER COLUMN cachejpegs SET NOT NULL");
+    break;
+  }
   return $ret;
 }
 function flickrrippr_update_2() {  
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+      case 'mysqli':
+      break;
+    case 'pgsql':
   $ret[] = update_sql("ALTER TABLE {flickrusers} ALTER COLUMN cachejpegs SET DEFAULT false");
+    break;
+  }
   return $ret;
 }
 
