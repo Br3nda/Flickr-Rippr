@@ -490,18 +490,16 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
     if (!is_array($photos['photo'])) return 'None found';
     
     foreach($photos['photo'] as $p) {
-      $result = db_query("SELECT nid from {flickrphotos} where flickrphoto_id = %d", $p['id'] );
-      $img = flickrrippr_show_photo($p, false, null, $cache);
-      if (db_num_rows($result)) {
-        $node = db_fetch_object($result,0);
-        $s .= '<a href="' . url('node/' . $node->nid)  . '">';
-        $s .= $img;
-        $s .= '</a>';
-      } else {
-        //$s .= '<a href="/flickr_photo?photo=' . $p['id'] . '">';
-        $s .= $img;
-        //$s .= '</a>';
+      $nid = flickrrippr_photo_get_nid($p['id']);
+      if (!$nid) {
+        flickrrippr_makenode($p['id'], $p);
+        $nid = flickrrippr_photo_get_nid($p['id']);
       }
+      
+      $img = flickrrippr_show_photo($p, false, null, $cache);
+      $s .= '<a href="' . url('node/' . $nid)  . '">';
+      $s .= $img;
+      $s .= '</a>';
       $photo_list[] = $p['id'];
       $row++;
   }
