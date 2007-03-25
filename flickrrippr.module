@@ -15,15 +15,15 @@ function flickrrippr_menu($cache) {
   $items = array();
   if ($cache) {
     $items[] = array(
-                      'title' => 'Flickr photos settings', 
-                      'path' => 'admin/settings/blogfickrphoto',
+                      'title' => t('Flickr Rippr Settings'), 
+                      'path' => 'admin/settings/flickrrippr',
                       'access' => user_access('Administer global flickr api settings'),
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrrippr_admin'
                     );
     $items[] = array(
-                      'title' => 'refresh', 
-                      'path' => 'admin/settings/blogfickrphoto/refresh', 
+                      'title' => t('Refresh'), 
+                      'path' => 'admin/content/refresh', 
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrrippr_check_latest',
                       'callback arguments' => $user->uid,
@@ -51,8 +51,10 @@ function flickrrippr_menu($cache) {
 */
 function flickrrippr_phpFlickr() {
   require_once(drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php');
+  
   $flickr = new phpFlickr(variable_get('flickrapikey', ''));
   $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
+  
   return $flickr;
 }
 /**
@@ -60,12 +62,12 @@ function flickrrippr_phpFlickr() {
 */
 function flickrrippr_get_user_by_flickruser($fuser) {
   if (!$fuser) {
-    drupal_set_message("Refusing to search for blank username");
+    drupal_set_message(t("Refusing to search for blank username"));
     return;
   }
   $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername = '%s'", $fuser));
   if (!$flickruser) {
-    drupal_set_message("Flickeruser %flickrusername is not a registered user of this site");
+    drupal_set_message(t("Flickruser %flickrusername is not a registered user of this site", array('%flickrusername' => $fuser)));
     return;
   }
   
@@ -144,7 +146,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
       
   //If we've already go it, then we dont' need to get it
   if (file_exists($filename)) {
-    return  "$filename";
+    return  $filename;
   }
   
   
@@ -159,7 +161,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
     //file handle to save the jpeg into
   $contents = $req->getResponseBody();
   if (file_put_contents($filename, $contents)) { 
-    return "/$filename";
+    return $filename;
   } 
   else {
     return $src;
@@ -200,7 +202,7 @@ function flickrrippr_photo_get_nid($photo_id) {
 */
 function flickrrippr_makenode($photo_id) {
   if (!$photo_id) {
-    drupal_set_message("Photo_id required");
+    drupal_set_message(t("Photo_id required"));
     return;
   }
   
@@ -214,19 +216,19 @@ function flickrrippr_makenode($photo_id) {
   
   //flickr username
   $flickrusername = $flickr_info['owner']['username'];
-  drupal_set_message("Making a node for photo by $flickrusername");
+  drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)));
   
   //get user details
   $user = flickrrippr_get_user_by_flickruser($flickrusername);
     if (!$user) {
-    drupal_set_message("User doesn't exist, unable to save photo $photo_id");
+      drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)));
     return false;
   }
   
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . $path  . '" alt="' . htmlentities($info['title']) . '" width="' . $width . '" height="' . $height . '"/>';
+  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '"/>';
   
   
   //thumbnail version
@@ -249,7 +251,7 @@ function flickrrippr_makenode($photo_id) {
   //$content .= '<p>' . t('photo by %name', array('%name' => $realname)) ."</p>\n";
   //$content .= '<!--break-->';
   
-  $content .= '<p>' . t('This is a ' . l(t('flickr photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
+  $content .= '<p>' . t('This is a ' . l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
   
   $node->body = $content;
   
@@ -265,10 +267,10 @@ function flickrrippr_makenode($photo_id) {
   
   if ($node->is_new) {
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid) VALUES (%d, %d)", $photo_id, $node->nid);
-    drupal_set_message("New photo found, " . $photo_id);
+    drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   } 
   else {
-    drupal_set_message("Updated photo $photo_id, ". l($node->title, 'node/' . $node->nid));
+    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid)), array('%photo_id' => $photo_id));
   }
   
   return $node->is_new;
@@ -406,13 +408,14 @@ function flickrphoto_node_form($node) {
 /**
 * After pressing the refresh button, a node is updated from flickr.com
 */
-function flickrrippr_node_form_submit($form_id, $form_values) {
+function flickrphoto_node_form_submit($form_id, $form_values) {
   if ($form_values['refresh']) {
-    $photo =  db_fetch_object(db_query("SELECT function flickrphoto_id as id FROM {flickrnodess} WHERE nid = %d", $form_values['nid'] )); 
+    $photo =  db_fetch_object(db_query("SELECT flickrphoto_id as id FROM {flickrphotos} WHERE nid = %d", $form_values['nid'] )); 
     if (!$photo) {
-      drupal_set_message("No {flickrnodess} record for node" . $form_values['nid']);
+      drupal_set_message("No flickrphotos record for node" . $form_values['nid']);
     }
     flickrrippr_makenode($photo->id);
+    drupal_goto('node/'. $form_values['nid']);
   }
 }
 
