@@ -51,10 +51,8 @@ function flickrrippr_menu($cache) {
 */
 function flickrrippr_phpFlickr() {
   require_once(drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php');
-  
   $flickr = new phpFlickr(variable_get('flickrapikey', ''));
   $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
-  
   return $flickr;
 }
 /**
@@ -408,16 +406,119 @@ function flickrphoto_node_form($node) {
 /**
 * After pressing the refresh button, a node is updated from flickr.com
 */
-function flickrphoto_node_form_submit($form_id, $form_values) {
+function flickrrippr_node_form_submit($form_id, $form_values) {
   if ($form_values['refresh']) {
-    $photo =  db_fetch_object(db_query("SELECT flickrphoto_id as id FROM {flickrphotos} WHERE nid = %d", $form_values['nid'] )); 
+    $photo =  db_fetch_object(db_query("SELECT function flickrphoto_id as id FROM {flickrnodess} WHERE nid = %d", $form_values['nid'] )); 
     if (!$photo) {
-      drupal_set_message("No flickrphotos record for node" . $form_values['nid']);
+      drupal_set_message("No {flickrnodess} record for node" . $form_values['nid']);
     }
     flickrrippr_makenode($photo->id);
-    drupal_goto('node/'. $form_values['nid']);
   }
 }
 
+function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) { 
+  $result = db_query("SELECT * FROM {flickrusers} INNER JOIN {users} ON {flickrusers}.uid = {users}.uid ORDER BY name");
+  while ($user = db_fetch_object($result)) {
+    $users[] = $user;
+  }
+  
+  if ($op == 'list') { 
+    foreach($users as $user) {
+      $blocks[] = array('info' => t($user->name .'\'s Newest Flickr Photos'), 
+                        'weight' => 0, 
+                        'enabled' => 0, 
+                        'region' => 'left'); 
 
+    }
+    return $blocks; 
+  } 
+  else if ($op == 'configure' && $delta == 0) { 
+    /*
+    $form['items'] = array( 
+                            '#type' => 'select', 
+                            '#title' => t('Number of items'), 
+                            '#default_value' => variable_get('mymodule_block_items', 0), 
+                            '#options' => array('1', '2', '3'), 
+                          ); 
+    return $form; 
+    */
+  } 
+  else if ($op == 'save' && $delta == 0) { 
+    //variable_set('mymodule_block_items', $edit['items']); 
+  } 
+  else if ($op == 'view') { 
+    $user = $users[$delta];
+    $block = array(
+                    'subject' => $user->name,
+                    'content' => flickrrippr_block_newest_photos($user)
+                  );
+    return $block;
+    /*
+    switch($delta) { 
+      case 0: 
+        $block = array('subject' => t('Title of block #1'), 
+                       'content' => mymodule_display_block_1()); 
+      break; 
+      case 1: 
+        $block = array('subject' => t('Title of block #2'), 
+                       'content' => mymodule_display_block_2()); 
+      break; 
+    } 
+    return $block; 
+    */
+  }
+}
+
+function flickrrippr_block_newest_photos($user) {
+  $output = '';
+  
+  $flickr = @flickrrippr_phpFlickr();
+  $flickruser = $flickr->people_findByUsername($user->flickrusername);
+
+  $photos = $flickr->people_getPublicPhotos($flickruser['id'], null, 18, 1);
+  $output .= flickrrippr_thumbnail_table($photos, $photo_list);
+  
+  //$output .= l('more photos', 'flickr_newest'); 
+  return $output;
+}
+
+function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
+    $row=0;
+#$s = '<table><tr>';
+    if (!is_array($photos['photo'])) return 'None found';
+    
+    foreach($photos['photo'] as $p) {
+      $result = db_query("SELECT nid from {flickrphotos} where flickrphoto_id = %d", $p['id'] );
+      $img = flickrrippr_show_photo($p, false, null, $cache);
+      if (db_num_rows($result)) {
+        $node = db_fetch_object($result,0);
+        $s .= '<a href="' . url('node/' . $node->nid)  . '">';
+        $s .= $img;
+        $s .= '</a>';
+      } else {
+        //$s .= '<a href="/flickr_photo?photo=' . $p['id'] . '">';
+        $s .= $img;
+        //$s .= '</a>';
+      }
+      $photo_list[] = $p['id'];
+      $row++;
+  }
+  return $s;
+}
+function flickrrippr_show_photo($photo, $link=true, $owner="", $cache=true) {
+  $src = flickrrippr_path($photo, $cache, 's');
+  $alt = $photo['title'];
+  if (!$photo['owner']) $photo['owner'] = $owner;
+  //if ($link)    {
+  //  $s .= '<a href="http://www.flickr.com/photos/' . $photo['owner'] . '/' . $photo['id'] . '">';
+  //}
+  
+  $s .= '<img src="' . $src . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
+  //if ($link) {
+  //  $s .= '</a>';
+  //}
+  return $s;
+  
+}  
+  
 ?>
