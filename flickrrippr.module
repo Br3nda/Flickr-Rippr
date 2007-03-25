@@ -1,0 +1,419 @@
+<?php
+//$Id ;
+
+/**
+* Implementation of hook_perm
+*/
+function flickrrippr_perm() {
+  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', 'Cache own Flickr Photos on this server');
+}
+/**
+* Implementation of hook_menu
+*/
+function flickrrippr_menu($cache) {
+  GLOBAL $user;
+  $items = array();
+  if ($cache) {
+    $items[] = array(
+                      'title' => 'Flickr photos settings', 
+                      'path' => 'admin/settings/blogfickrphoto',
+                      'access' => user_access('Administer global flickr api settings'),
+                      'type' => MENU_NORMAL_ITEM,
+                      'callback' => 'flickrrippr_admin'
+                    );
+  } else {
+    $items[] = array(
+                     'title' => t('Flickr Photo settings'),
+                     'path' => 'user/' . $user->uid . '/flickr',
+                     'type' => MENU_NORMAL_ITEM,
+                     'callback' => 'flickrrippr_user_settings',
+                      'callback arguments' => array($user),
+                     'access' => user_access('Configure own blogged flickr stream'),
+                      
+    );
+    $items[] = array(
+                      'title' => 'refresh', 
+                      'path' => 'refresh', 
+                      'type' => MENU_NORMAL_ITEM,
+                      'callback' => 'flickrrippr_check_latest',
+                      'callback arguments' => $user->uid,
+                      'access' => 1
+                    );
+  }
+  return $items;
+}
+
+/**
+* returns the phpFlickr object.
+* If we need to change anything, such as making the cache configuration,
+* then it'll all be done here.
+*/
+function flickrrippr_phpFlickr() {
+  require_once(drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php');
+  $flickr = new phpFlickr(variable_get('flickrapikey', ''));
+  $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
+  return $flickr;
+}
+/**
+* Helper function, to get drupal user details for a flickr user
+*/
+function flickrrippr_get_user_by_flickruser($fuser) {
+  if (!$fuser) {
+    drupal_set_message("Refusing to search for blank username");
+    return;
+  }
+  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername = '%s'", $fuser));
+  if (!$flickruser) {
+    drupal_set_message("Flickeruser %flickrusername is not a registered user of this site");
+    return;
+  }
+  
+  $user = user_load(array('uid' => $flickruser->uid));
+  return $user;
+}
+
+/**
+* Called by cron, this check for new photos for each user
+*/
+function flickrrippr_check_latest($user_id, $pagenum=1) {
+  //TODO, don't run every time.
+  
+  $num_photos = 10;
+  
+  //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
+  //maximum of 5 fetches.
+  if ($pagenum > 5) {
+    return 'done';
+  }
+  
+  
+  
+  //fetches defails from our database
+  $flickr_settings = flickrrippr_user_settings_get($user_id);
+  
+  
+  //fetches from api.flickr.com
+  $flickruser = flickrrippr_flickruser($flickr_settings->flickrusername);
+  
+  //search flickr for latest photos from that user.
+  $flickr = @flickrrippr_phpFlickr();
+  $photos = $flickr->photos_search(
+                                    array(
+                                           'user_id'=>$flickruser['id'],
+                                           'per_page' => $num_photos,
+                                           'page' =>  $pagenum
+                                         )
+                                  );
+  $output = '';
+  
+  
+  
+  $new = true;
+  foreach($photos['photo'] as $p) {
+    $new = (flickrrippr_makenode($p['id'], $p) && $new);
+    //drupal_set_message(print_r($new, 1));
+  }
+  //if we found a photo that wasn't new, then don't recurse
+  if (!$new) {
+    return false;
+  }
+  //recursive - call this function again to get the next 10;
+  //flickrrippr_check_latest($user_id, $pagenum +1);
+  return $output;
+  
+}
+/**
+* Work out the path to a photo - also handles the cache on the local filesystem
+*/
+function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
+    
+  $src =  'http://static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  
+  $folder =  file_directory_path() . '/flickr';
+
+  if (!file_check_directory($folder)) {
+    if (! mkdir ($folder) ) {
+      drupal_set_message('Files directory not set, unable to cache flickr photos', 'error');
+      return ;
+    }
+
+  }
+      
+  $filename =  url($folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg');
+      
+  //If we've already go it, then we dont' need to get it
+  if (file_exists($filename)) {
+    return  "$filename";
+  }
+  
+  
+  require_once "HTTP/Request.php";
+  $req =& new HTTP_Request( $src);
+    //Something went wrong?
+  if (PEAR::isError($req->sendRequest())) {
+      //use flickr hosted jpeg
+    return $src;
+  }
+  
+    //file handle to save the jpeg into
+  $contents = $req->getResponseBody();
+  if (file_put_contents($filename, $contents)) { 
+    return "/$filename";
+  } 
+  else {
+    return $src;
+  }
+  
+}
+/**
+* used in flickrripper_path
+*/
+if (!function_exists('file_put_contents')) {
+  function file_put_contents($n, $d, $flag = false) {
+    $mode = ($flag == FILE_APPEND || strtoupper($flag) == 'FILE_APPEND') ? 'a' : 'w';
+    $f = @fopen($n, $mode);
+    if ($f === false) {
+      return 0;
+    } else {
+      if (is_array($d)) $d = implode($d);
+      $bytes_written = fwrite($f, $d);
+      fclose($f);
+      return $bytes_written;
+    }
+  }
+}
+
+/**
+* get the node id for a flickr photo id
+*/
+function flickrrippr_photo_get_nid($photo_id) {
+  $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id );   
+  if (db_num_rows($result)){
+    $photo_rec = db_fetch_object($result);
+    return $photo_rec->nid;
+  }
+  
+}
+/**
+* Makes a node for a flickr photo - or updates if it already exists
+*/
+function flickrrippr_makenode($photo_id) {
+  if (!$photo_id) {
+    drupal_set_message("Photo_id required");
+    return;
+  }
+  
+  $node->nid = flickrrippr_photo_get_nid($photo_id) ;
+  
+  $flickr = @flickrrippr_phpFlickr();
+  
+  //Info to put into the node
+  $flickr_info = $flickr->photos_getInfo($photo_id);
+  $flickr_context = $flickr->photos_getContext($photo_id);
+  
+  //flickr username
+  $flickrusername = $flickr_info['owner']['username'];
+  drupal_set_message("Making a node for photo by $flickrusername");
+  
+  //get user details
+  $user = flickrrippr_get_user_by_flickruser($flickrusername);
+    if (!$user) {
+    drupal_set_message("User doesn't exist, unable to save photo $photo_id");
+    return false;
+  }
+  
+  //Full (normal) sized image
+  $path =  flickrrippr_path($flickr_info);
+  list($width, $height, $type, $attr) = getimagesize($path);
+  $img = '<img src="' . $path  . '" alt="' . htmlentities($info['title']) . '" width="' . $width . '" height="' . $height . '"/>';
+  
+  
+  //thumbnail version
+  $path =  flickrrippr_path($flickr_info, $cache, 'm');
+  list($width, $height, $type, $attr) = getimagesize($path);
+  $thumb = '<img src="' . $path . '" style="clear: left" align="left"  width="' . $width . '" height="' . $height . '"/>';
+  
+  $node->title = t($flickr_info['title']);
+  
+  $node->created = strtotime($flickr_info['dates']['taken']);
+  
+  $node->teaser = '<p>'  . $thumb . '</p>';
+  
+  $node->teaser .= '<p>' . t(html_entity_decode($flickr_info['description'])) . '</p>';
+  $node->format = 3;
+  
+  $content = '<p>' . t(html_entity_decode($flickr_info['description'])) . '</p>';
+  $content .= $img;
+  
+  //$content .= '<p>' . t('photo by %name', array('%name' => $realname)) ."</p>\n";
+  //$content .= '<!--break-->';
+  
+  $content .= '<p>' . t('This is a ' . l(t('flickr photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
+  
+  $node->body = $content;
+  
+  $node->name = $user->name;
+  $node->uid = $user->uid;
+  $node->type = 'flickrphoto';
+  $node->published = 1;
+  $node->status =1;
+  $node->comment = 0;
+  $node->promote = 1;
+  
+  node_save($node);
+  
+  if ($node->is_new) {
+    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid) VALUES (%d, %d)", $photo_id, $node->nid);
+    drupal_set_message("New photo found, " . $photo_id);
+  } 
+  else {
+    drupal_set_message("Updated photo $photo_id, ". l($node->title, 'node/' . $node->nid));
+  }
+  
+  return $node->is_new;
+}
+/**
+* helper function, returns the flickr_id for a flickr username
+*/
+function flickrrippr_flickruser($username) {
+  $flickr = @flickrrippr_phpFlickr();
+  return $flickr->people_findByUsername($username);
+}
+/**
+* Implementation of hook_cron
+*/
+function flickrrippr_cron() {
+  $result = db_query("SELECT * from {flickrusers} ORDER BY uid");
+  while ($fuser = db_fetch_object($result)) {
+    flickrrippr_check_latest($fuser->uid);
+  }
+}
+
+
+/**
+* administer global settings
+*/
+function flickrrippr_admin() {
+  $output = '';
+  $output .= drupal_get_form('flickrrippr_admin_form');
+  return $output;
+}
+
+function flickrrippr_admin_form() {
+  $form = array();
+  $form['api_key'] = array(
+                            '#title' => 'Flickr Api Key',
+                            '#required' => true,
+                            '#type' => 'textfield',
+                            '#default_value' => variable_get('flickrapikey', '')
+                          );
+  $form['save'] = array(
+                         '#type' => 'submit',
+                         '#value' => t('Save'),
+                       );
+  return $form;
+}
+function flickrrippr_admin_form_validate() {
+}
+function flickrrippr_admin_form_submit($form_id, $form_values) {
+  variable_set('flickrapikey', $form_values['api_key']);
+  drupal_set_message('Flickrs API key saved');
+}
+
+
+/**
+* Where a user defines their username
+*/
+function flickrrippr_user_settings($user) {
+  $output = '';
+  $output .= drupal_get_form('flickrrippr_user_settings_form', $user);
+  return $output;
+}
+
+function flickrrippr_user_settings_form($user) {
+  GLOBAL $user;
+  $settings = flickrrippr_user_settings_get($user->uid);
+  $form = array();
+  $form['flickr_username'] = array(
+                                    '#type' => 'textfield',
+                                    '#title'=> t('Flickr Username'),
+                                    '#default_value' => $settings->flickrusername,
+                                    '#required' => true
+                                  );
+  /*
+  $form['promote'] = array(
+                            '#type' => 'checkbox',
+                            '#title' => 'Promote new photos to front page?',
+                          );
+  if (user_access('Cache own Flickr Photos on this server')) {
+    $form['cache'] = array(
+                            '#title' => t('Cache photos on this server?'),
+                            '#type' => 'checkbox'
+                          );
+  }
+  
+  /**/
+  
+  $form['save'] = array(
+                         '#type' => 'submit',
+                         '#value' => t('Save'),
+                       );
+  return $form;
+}
+/**
+* Get a user's flickr settings from our database
+*/
+function flickrrippr_user_settings_get($uid) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid));
+}
+
+function flickrrippr_user_settings_form_validate($form_id, $form_values) {
+  
+}
+function flickrrippr_user_settings_form_submit($form_id, $form_values) {
+  GLOBAL $user;
+  
+  $settings = flickrrippr_user_settings_get($user->uid);
+  
+  if (isset($settings)) {
+    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s' WHERE uid = %d", $form_values['flickr_username'], $user->uid);
+  }
+  else {
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, uid) VALUES ('%s', %s)", $form_values['flickr_username'], $user->uid);
+  }
+}
+/**
+* Used when attempting to edit a flickrphoto node.
+*/
+function flickrphoto_node_form($node) {
+  $form = array();
+  $form['refresh'] = array(
+                            '#type' => 'submit',
+                            '#value' => t('Refresh data from flickr.com'),
+                          );
+  $form['nid'] = array(
+                        '#type' => 'hidden',
+                        '#value' => $node->nid,
+                      );
+  $form['content'] = array(
+                            '#type' => 'markup',
+                            '#value' => $node->content
+                          );
+  
+  return $form;
+}
+/**
+* After pressing the refresh button, a node is updated from flickr.com
+*/
+function flickrrippr_node_form_submit($form_id, $form_values) {
+  if ($form_values['refresh']) {
+    $photo =  db_fetch_object(db_query("SELECT function flickrphoto_id as id FROM {flickrnodess} WHERE nid = %d", $form_values['nid'] )); 
+    if (!$photo) {
+      drupal_set_message("No {flickrnodess} record for node" . $form_values['nid']);
+    }
+    flickrrippr_makenode($photo->id);
+  }
+}
+
+
+?>

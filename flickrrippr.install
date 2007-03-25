@@ -1,0 +1,31 @@
+<?php
+function flickrrippr_install() {
+  $ret[] = db_query("CREATE TABLE {flickrphotos} (
+                      flickrphoto_id integer UNIQUE NOT NULL,
+                      nid integer UNIQUE NOT NULL,
+                      lastfetched timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                      PRIMARY KEY (flickrphoto_id)
+                      )");
+  return $ret;
+}
+function flickrrippr_update_5() {
+  $ret[] = update_sql("CREATE TABLE {flickrusers} (
+                      uid INTEGER NOT NULL REFERENCES {users} (uid),
+                      flickrusername TEXT NOT NULL,
+                      PRIMARY KEY (uid)
+                      );");
+  return $ret;
+}
+
+function flickrrippr_update_1() {
+  $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN  cachejpegs BOOLEAN");
+  $ret[] = update_sql("UPDATE {flickrusers} SET cachejpegs = false;");
+  $ret[] = update_sql("ALTER TABLE {flickrusers} ALTER COLUMN cachejpegs SET NOT NULL");
+  return $ret;
+}
+function flickrrippr_update_2() {  
+  $ret[] = update_sql("ALTER TABLE {flickrusers} ALTER COLUMN cachejpegs SET DEFAULT false");
+  return $ret;
+}
+
+?>
