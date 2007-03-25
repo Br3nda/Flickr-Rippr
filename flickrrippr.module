@@ -140,7 +140,8 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
 
   }
       
-  $filename =  url($folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg');
+  $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  
       
   //If we've already go it, then we dont' need to get it
   if (file_exists($filename)) {
@@ -162,6 +163,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
     return $filename;
   } 
   else {
+    drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
     return $src;
   }
   
@@ -424,7 +426,7 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
   
   if ($op == 'list') { 
     foreach($users as $user) {
-      $blocks[] = array('info' => t($user->name .'\'s Newest Flickr Photos'), 
+      $blocks[] = array('info' => t("!username's Newest Flickr Photos", array('!username' => $user->name)), 
                         'weight' => 0, 
                         'enabled' => 0, 
                         'region' => 'left'); 
@@ -508,7 +510,9 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
 function flickrrippr_show_photo($photo, $link=true, $owner="", $cache=true) {
   $src = flickrrippr_path($photo, $cache, 's');
   $alt = $photo['title'];
-  if (!$photo['owner']) $photo['owner'] = $owner;
+  if (!$photo['owner']) {
+    $photo['owner'] = $owner;
+  }
   //if ($link)    {
   //  $s .= '<a href="http://www.flickr.com/photos/' . $photo['owner'] . '/' . $photo['id'] . '">';
   //}
