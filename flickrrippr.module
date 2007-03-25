@@ -21,6 +21,15 @@ function flickrrippr_menu($cache) {
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrrippr_admin'
                     );
+    $items[] = array(
+                      'title' => 'refresh', 
+                      'path' => 'admin/settings/blogfickrphoto/refresh', 
+                      'type' => MENU_NORMAL_ITEM,
+                      'callback' => 'flickrrippr_check_latest',
+                      'callback arguments' => $user->uid,
+                      'access' => user_access('Administer global flickr api settings'),
+                    );
+    
   } else {
     $items[] = array(
                      'title' => t('Flickr Photo settings'),
@@ -31,14 +40,6 @@ function flickrrippr_menu($cache) {
                      'access' => user_access('Configure own blogged flickr stream'),
                       
     );
-    $items[] = array(
-                      'title' => 'refresh', 
-                      'path' => 'refresh', 
-                      'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'flickrrippr_check_latest',
-                      'callback arguments' => $user->uid,
-                      'access' => 1
-                    );
   }
   return $items;
 }
