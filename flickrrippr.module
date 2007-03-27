@@ -505,7 +505,7 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
   }
   return $s;
 }
-function flickrrippr_show_photo($photo, $link=true, $owner="", $cache=true) {
+function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true) {
   $src = flickrrippr_path($photo, $cache, 's');
   $alt = $photo['title'];
   if (!$photo['owner']) {
