@@ -133,7 +133,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
   $folder =  file_directory_path() . '/flickr';
 
   if (!file_check_directory($folder)) {
-    if (! mkdir ($folder) ) {
+    if (!mkdir ($folder)) {
       drupal_set_message('Files directory not set, unable to cache flickr photos', 'error');
       return ;
     }
@@ -190,7 +190,7 @@ if (!function_exists('file_put_contents')) {
 * get the node id for a flickr photo id
 */
 function flickrrippr_photo_get_nid($photo_id) {
-  $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id );   
+  $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id);   
   if (db_num_rows($result)){
     $photo_rec = db_fetch_object($result);
     return $photo_rec->nid;
@@ -410,10 +410,8 @@ function flickrphoto_node_form($node) {
 */
 function flickrrippr_node_form_submit($form_id, $form_values) {
   if ($form_values['refresh']) {
-    $photo =  db_fetch_object(db_query("SELECT function flickrphoto_id as id FROM {flickrnodess} WHERE nid = %d", $form_values['nid'] )); 
-    if (!$photo) {
-      drupal_set_message("No {flickrnodess} record for node" . $form_values['nid']);
-    }
+    $photo =  db_fetch_object(db_query("SELECT function flickrphoto_id as id FROM {flickrnodess} WHERE nid = %d", $form_values['nid'])); 
+    assert($photo);
     flickrrippr_makenode($photo->id);
   }
 }
@@ -500,9 +498,8 @@ function flickrrippr_block_newest_photos($user) {
 * Make a html chunk of photos ready for display from a 
 * photo list as returned by phpFlickr methods
 */
-function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
+function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
     $row = 0;
-#$s = '<table><tr>';
   if (!is_array($photos['photo'])) {
     return t('None found');
   }
