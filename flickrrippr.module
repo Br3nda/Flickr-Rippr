@@ -418,6 +418,9 @@ function flickrrippr_node_form_submit($form_id, $form_values) {
   }
 }
 
+/**
+* Implementation of hook_block
+*/
 function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) { 
   $result = db_query("SELECT * FROM {flickrusers} INNER JOIN {users} ON {flickrusers}.uid = {users}.uid ORDER BY name");
   while ($user = db_fetch_object($result)) {
@@ -471,6 +474,14 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+/**
+* Returns html formated chunk 
+* of a user's newest photo
+*
+* user is the drupal user (object)
+* as returned by user_load
+* or GLOBAL $user
+*/
 function flickrrippr_block_newest_photos($user) {
   $output = '';
   
@@ -484,6 +495,10 @@ function flickrrippr_block_newest_photos($user) {
   return $output;
 }
 
+/**
+* Make a html chunk of photos ready for display from a 
+* photo list as returned by phpFlickr methods
+*/
 function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
     $row=0;
 #$s = '<table><tr>';
@@ -505,6 +520,11 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
   }
   return $s;
 }
+
+/**
+* Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
+* NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
+*/
 function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true) {
   $src = flickrrippr_path($photo, $cache, 's');
   $alt = $photo['title'];
