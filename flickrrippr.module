@@ -502,23 +502,25 @@ function flickrrippr_block_newest_photos($user) {
 function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
     $row=0;
 #$s = '<table><tr>';
-    if (!is_array($photos['photo'])) return 'None found';
-    
-    foreach ($photos['photo'] as $p) {
-      $nid = flickrrippr_photo_get_nid($p['id']);
-      if (!$nid) {
-        flickrrippr_makenode($p['id'], $p);
-        $nid = flickrrippr_photo_get_nid($p['id']);
-      }
-      
-      $img = flickrrippr_show_photo($p, false, null, $cache);
-      $s .= '<a href="' . url('node/' . $nid)  . '">';
-      $s .= $img;
-      $s .= '</a>';
-      $photo_list[] = $p['id'];
-      $row++;
+  if (!is_array($photos['photo'])) {
+    return t('None found');
   }
-  return $s;
+  
+  foreach ($photos['photo'] as $p) {
+    $nid = flickrrippr_photo_get_nid($p['id']);
+    if (!$nid) {
+      flickrrippr_makenode($p['id'], $p);
+      $nid = flickrrippr_photo_get_nid($p['id']);
+    }
+    
+    $img = flickrrippr_show_photo($p, false, null, $cache);
+    $s .= '<a href="' . url('node/' . $nid)  . '">';
+    $s .= $img;
+    $s .= '</a>';
+    $photo_list[] = $p['id'];
+    $row++;
+}
+return $s;
 }
 
 /**
