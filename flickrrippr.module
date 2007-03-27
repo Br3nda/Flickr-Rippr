@@ -30,7 +30,8 @@ function flickrrippr_menu($cache) {
                       'access' => user_access('Administer global flickr api settings'),
                     );
     
-  } else {
+  } 
+  else {
     $items[] = array(
                      'title' => t('Flickr Photo settings'),
                      'path' => 'user/' . $user->uid . '/flickr',
@@ -76,7 +77,7 @@ function flickrrippr_get_user_by_flickruser($fuser) {
 /**
 * Called by cron, this check for new photos for each user
 */
-function flickrrippr_check_latest($user_id, $pagenum=1) {
+function flickrrippr_check_latest($user_id, $pagenum = 1) {
   //TODO, don't run every time.
   
   $num_photos = 10;
@@ -100,7 +101,7 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
   $flickr = @flickrrippr_phpFlickr();
   $photos = $flickr->photos_search(
                                     array(
-                                           'user_id'=>$flickruser['id'],
+                                           'user_id' => $flickruser['id'],
                                            'per_page' => $num_photos,
                                            'page' =>  $pagenum
                                          )
@@ -126,7 +127,7 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
+function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     
   $src =  'http://static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
   
@@ -150,7 +151,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
   
   
   require_once "HTTP/Request.php";
-  $req =& new HTTP_Request( $src);
+  $req =& new HTTP_Request($src);
     //Something went wrong?
   if (PEAR::isError($req->sendRequest())) {
       //use flickr hosted jpeg
@@ -177,8 +178,11 @@ if (!function_exists('file_put_contents')) {
     $f = @fopen($n, $mode);
     if ($f === false) {
       return 0;
-    } else {
-      if (is_array($d)) $d = implode($d);
+    } 
+    else {
+      if (is_array($d)) {
+        $d = implode($d);
+      }
       $bytes_written = fwrite($f, $d);
       fclose($f);
       return $bytes_written;
@@ -191,7 +195,7 @@ if (!function_exists('file_put_contents')) {
 */
 function flickrrippr_photo_get_nid($photo_id) {
   $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id);   
-  if (db_num_rows($result)){
+  if (db_num_rows($result)) {
     $photo_rec = db_fetch_object($result);
     return $photo_rec->nid;
   }
