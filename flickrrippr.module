@@ -110,7 +110,7 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
   
   
   $new = true;
-  foreach($photos['photo'] as $p) {
+  foreach ($photos['photo'] as $p) {
     $new = (flickrrippr_makenode($p['id'], $p) && $new);
     //drupal_set_message(print_r($new, 1));
   }
@@ -428,7 +428,7 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
   }
   
   if ($op == 'list') { 
-    foreach($users as $user) {
+    foreach ($users as $user) {
       $blocks[] = array('info' => t("!username's Newest Flickr Photos", array('!username' => $user->name)), 
                         'weight' => 0, 
                         'enabled' => 0, 
@@ -504,7 +504,7 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
 #$s = '<table><tr>';
     if (!is_array($photos['photo'])) return 'None found';
     
-    foreach($photos['photo'] as $p) {
+    foreach ($photos['photo'] as $p) {
       $nid = flickrrippr_photo_get_nid($p['id']);
       if (!$nid) {
         flickrrippr_makenode($p['id'], $p);
