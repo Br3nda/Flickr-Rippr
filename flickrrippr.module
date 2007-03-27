@@ -492,6 +492,7 @@ function flickrrippr_block_newest_photos($user) {
   $output .= flickrrippr_thumbnail_table($photos, $photo_list);
   
   //$output .= l('more photos', 'flickr_newest'); 
+  //TODO, make a page where more photos can be seen
   return $output;
 }
 
@@ -500,7 +501,7 @@ function flickrrippr_block_newest_photos($user) {
 * photo list as returned by phpFlickr methods
 */
 function flickrrippr_thumbnail_table($photos, &$photo_list, $cache=true) {
-    $row=0;
+    $row = 0;
 #$s = '<table><tr>';
   if (!is_array($photos['photo'])) {
     return t('None found');
