@@ -30,7 +30,8 @@ function flickrrippr_menu($cache) {
                       'access' => user_access('Administer global flickr api settings'),
                     );
     
-  } else {
+  } 
+  else {
     $items[] = array(
                      'title' => t('Flickr Photo settings'),
                      'path' => 'user/' . $user->uid . '/flickr',
@@ -78,7 +79,7 @@ function flickrrippr_get_user_by_flickruser($fuser) {
 /**
 * Called by cron, this check for new photos for each user
 */
-function flickrrippr_check_latest($user_id, $pagenum=1) {
+function flickrrippr_check_latest($user_id, $pagenum = 1) {
   //TODO, don't run every time.
   
   $num_photos = 10;
@@ -89,11 +90,8 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
     return 'done';
   }
   
-  
-  
   //fetches defails from our database
   $flickr_settings = flickrrippr_user_settings_get($user_id);
-  
   
   //fetches from api.flickr.com
   $flickruser = flickrrippr_flickruser($flickr_settings->flickrusername);
@@ -102,7 +100,7 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
   $flickr = @flickrrippr_phpFlickr();
   $photos = $flickr->photos_search(
                                     array(
-                                           'user_id'=>$flickruser['id'],
+                                           'user_id' => $flickruser['id'],
                                            'per_page' => $num_photos,
                                            'page' =>  $pagenum
                                          )
@@ -112,7 +110,7 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
   
   
   $new = true;
-  foreach($photos['photo'] as $p) {
+  foreach ($photos['photo'] as $p) {
     $new = (flickrrippr_makenode($p['id'], $p) && $new);
     //drupal_set_message(print_r($new, 1));
   }
@@ -128,21 +126,22 @@ function flickrrippr_check_latest($user_id, $pagenum=1) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
+function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     
   $src =  'http://static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
   
   $folder =  file_directory_path() . '/flickr';
 
   if (!file_check_directory($folder)) {
-    if (! mkdir ($folder) ) {
+    if (!mkdir ($folder)) {
       drupal_set_message('Files directory not set, unable to cache flickr photos', 'error');
       return ;
     }
 
   }
       
-  $filename =  url($folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg');
+  $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  
       
   //If we've already go it, then we dont' need to get it
   if (file_exists($filename)) {
@@ -151,7 +150,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
   
   
   require_once "HTTP/Request.php";
-  $req =& new HTTP_Request( $src);
+  $req =& new HTTP_Request($src);
     //Something went wrong?
   if (PEAR::isError($req->sendRequest())) {
       //use flickr hosted jpeg
@@ -164,6 +163,7 @@ function flickrrippr_path($flickr_photo, $cache=true, $size=false) {
     return $filename;
   } 
   else {
+    drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
     return $src;
   }
   
@@ -177,8 +177,11 @@ if (!function_exists('file_put_contents')) {
     $f = @fopen($n, $mode);
     if ($f === false) {
       return 0;
-    } else {
-      if (is_array($d)) $d = implode($d);
+    } 
+    else {
+      if (is_array($d)) {
+        $d = implode($d);
+      }
       $bytes_written = fwrite($f, $d);
       fclose($f);
       return $bytes_written;
@@ -190,8 +193,8 @@ if (!function_exists('file_put_contents')) {
 * get the node id for a flickr photo id
 */
 function flickrrippr_photo_get_nid($photo_id) {
-  $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id );   
-  if (db_num_rows($result)){
+  $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id);   
+  if (db_num_rows($result)) {
     $photo_rec = db_fetch_object($result);
     return $photo_rec->nid;
   }
@@ -228,13 +231,13 @@ function flickrrippr_makenode($photo_id) {
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '"/>';
-  
+  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
   
   //thumbnail version
   $path =  flickrrippr_path($flickr_info, $cache, 'm');
   list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . $path . '" style="clear: left" align="left"  width="' . $width . '" height="' . $height . '"/>';
+  $thumb = '<img src="' . $path . '" style="clear: left" align="left"  width="' . $width . '" height="' . $height . '" />';
+
   
   $node->title = t($flickr_info['title']);
   
@@ -410,14 +413,144 @@ function flickrphoto_node_form($node) {
 */
 function flickrphoto_node_form_submit($form_id, $form_values) {
   if ($form_values['refresh']) {
+
     $photo =  db_fetch_object(db_query("SELECT flickrphoto_id as id FROM {flickrphotos} WHERE nid = %d", $form_values['nid'] )); 
-    if (!$photo) {
-      drupal_set_message("No flickrphotos record for node" . $form_values['nid']);
-    }
+    assert($photo);
     flickrrippr_makenode($photo->id);
-    drupal_goto('node/'. $form_values['nid']);
   }
 }
 
+/**
+* Implementation of hook_block
+*/
+function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) { 
+  $result = db_query("SELECT * FROM {flickrusers} INNER JOIN {users} ON {flickrusers}.uid = {users}.uid ORDER BY name");
+  while ($user = db_fetch_object($result)) {
+    $users[] = $user;
+  }
+  
+  if ($op == 'list') { 
+    foreach ($users as $user) {
+      $blocks[] = array('info' => t("!username's Newest Flickr Photos", array('!username' => $user->name)), 
+                        'weight' => 0, 
+                        'enabled' => 0, 
+                        'region' => 'left'); 
 
+
+    }
+
+    flickrrippr_makenode($photo->id);
+    drupal_goto('node/'. $form_values['nid']);
+
+    return $blocks; 
+  } 
+  else if ($op == 'configure' && $delta == 0) { 
+    /*
+    $form['items'] = array( 
+                            '#type' => 'select', 
+                            '#title' => t('Number of items'), 
+                            '#default_value' => variable_get('mymodule_block_items', 0), 
+                            '#options' => array('1', '2', '3'), 
+                          ); 
+    return $form; 
+    */
+  } 
+  else if ($op == 'save' && $delta == 0) { 
+    //variable_set('mymodule_block_items', $edit['items']); 
+  } 
+  else if ($op == 'view') { 
+    $user = $users[$delta];
+    $block = array(
+                    'subject' => $user->name,
+                    'content' => flickrrippr_block_newest_photos($user)
+                  );
+    return $block;
+    /*
+    switch($delta) { 
+      case 0: 
+        $block = array('subject' => t('Title of block #1'), 
+                       'content' => mymodule_display_block_1()); 
+      break; 
+      case 1: 
+        $block = array('subject' => t('Title of block #2'), 
+                       'content' => mymodule_display_block_2()); 
+      break; 
+    } 
+    return $block; 
+    */
+
+  }
+}
+
+/**
+* Returns html formated chunk 
+* of a user's newest photo
+*
+* user is the drupal user (object)
+* as returned by user_load
+* or GLOBAL $user
+*/
+function flickrrippr_block_newest_photos($user) {
+  $output = '';
+  
+  $flickr = @flickrrippr_phpFlickr();
+  $flickruser = $flickr->people_findByUsername($user->flickrusername);
+
+  $photos = $flickr->people_getPublicPhotos($flickruser['id'], null, 18, 1);
+  $output .= flickrrippr_thumbnail_table($photos, $photo_list);
+  
+  //$output .= l('more photos', 'flickr_newest'); 
+  //TODO, make a page where more photos can be seen
+  return $output;
+}
+
+/**
+* Make a html chunk of photos ready for display from a 
+* photo list as returned by phpFlickr methods
+*/
+function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
+    $row = 0;
+  if (!is_array($photos['photo'])) {
+    return t('None found');
+  }
+  
+  foreach ($photos['photo'] as $p) {
+    $nid = flickrrippr_photo_get_nid($p['id']);
+    if (!$nid) {
+      flickrrippr_makenode($p['id'], $p);
+      $nid = flickrrippr_photo_get_nid($p['id']);
+    }
+    
+    $img = flickrrippr_show_photo($p, false, null, $cache);
+    $s .= '<a href="' . url('node/' . $nid)  . '">';
+    $s .= $img;
+    $s .= '</a>';
+    $photo_list[] = $p['id'];
+    $row++;
+}
+return $s;
+}
+
+/**
+* Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
+* NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
+*/
+function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true) {
+  $src = flickrrippr_path($photo, $cache, 's');
+  $alt = $photo['title'];
+  if (!$photo['owner']) {
+    $photo['owner'] = $owner;
+  }
+  //if ($link)    {
+  //  $s .= '<a href="http://www.flickr.com/photos/' . $photo['owner'] . '/' . $photo['id'] . '">';
+  //}
+  
+  $s .= '<img src="' . $src . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
+  //if ($link) {
+  //  $s .= '</a>';
+  //}
+  return $s;
+  
+}  
+  
 ?>
