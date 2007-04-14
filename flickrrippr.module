@@ -426,6 +426,7 @@ function flickrrippr_node_form_submit($form_id, $form_values) {
 */
 function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) { 
   $result = db_query("SELECT * FROM {flickrusers} INNER JOIN {users} ON {flickrusers}.uid = {users}.uid ORDER BY name");
+  $users = array();
   while ($user = db_fetch_object($result)) {
     $users[] = $user;
   }
