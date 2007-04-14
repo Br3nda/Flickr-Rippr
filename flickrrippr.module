@@ -19,7 +19,8 @@ function flickrrippr_menu($cache) {
                       'path' => 'admin/settings/flickrrippr',
                       'access' => user_access('Administer global flickr api settings'),
                       'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'flickrrippr_admin'
+                      'callback' => 'drupal_get_form',
+                      'callback arguments' => array('flickrrippr_admin_form')
                     );
     $items[] = array(
                       'title' => t('Refresh'), 
@@ -301,12 +302,6 @@ function flickrrippr_cron() {
 /**
 * administer global settings
 */
-function flickrrippr_admin() {
-  $output = '';
-  $output .= drupal_get_form('flickrrippr_admin_form');
-  return $output;
-}
-
 function flickrrippr_admin_form() {
   $form = array();
   $form['api_key'] = array(
