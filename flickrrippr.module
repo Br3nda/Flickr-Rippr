@@ -107,7 +107,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   //search flickr for latest photos from that user.
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
     return $output;
   }
   $photos = $flickr->photos_search(
@@ -224,7 +224,7 @@ function flickrrippr_makenode($photo_id) {
   
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
     return $output;
   }
   
@@ -300,7 +300,7 @@ function flickrrippr_makenode($photo_id) {
 function flickrrippr_flickruser($username) {
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
     return $output;
   }
   return $flickr->people_findByUsername($username);
@@ -508,7 +508,7 @@ function flickrrippr_block_newest_photos($user) {
   
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
     return $output;
   }
   $flickruser = $flickr->people_findByUsername($user->flickrusername);
