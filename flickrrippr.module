@@ -53,7 +53,12 @@ function flickrrippr_menu($cache) {
 * then it'll all be done here.
 */
 function flickrrippr_phpFlickr() {
-  require_once(drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php');
+  $include_file = drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php';
+  if (!file_exists($include_file)) {
+    drupal_set_message(t("Missing phpFlickr - expected to find it at !file", array('!file' => $include_file)));
+    return false;
+  }
+  require_once($include_file);
   $flickr = new phpFlickr(variable_get('flickrapikey', ''));
   $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
   return $flickr;
@@ -101,6 +106,10 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   
   //search flickr for latest photos from that user.
   $flickr = @flickrrippr_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    return $output;
+  }
   $photos = $flickr->photos_search(
                                     array(
                                            'user_id' => $flickruser['id'],
@@ -214,6 +223,10 @@ function flickrrippr_makenode($photo_id) {
   $node->nid = flickrrippr_photo_get_nid($photo_id) ;
   
   $flickr = @flickrrippr_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    return $output;
+  }
   
   //Info to put into the node
   $flickr_info = $flickr->photos_getInfo($photo_id);
@@ -286,6 +299,10 @@ function flickrrippr_makenode($photo_id) {
 */
 function flickrrippr_flickruser($username) {
   $flickr = @flickrrippr_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    return $output;
+  }
   return $flickr->people_findByUsername($username);
 }
 /**
@@ -490,6 +507,10 @@ function flickrrippr_block_newest_photos($user) {
   $output = '';
   
   $flickr = @flickrrippr_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to queryy flickr.com, library missing"));
+    return $output;
+  }
   $flickruser = $flickr->people_findByUsername($user->flickrusername);
 
   $photos = $flickr->people_getPublicPhotos($flickruser['id'], null, 18, 1);
