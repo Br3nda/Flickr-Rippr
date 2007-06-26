@@ -41,9 +41,19 @@ function flickrrippr_menu($cache) {
                       'callback' => 'flickrrippr_user_settings',
                       'callback arguments' => array($user),
                       'access' => user_access('Configure own blogged flickr stream'),
-                      
+                    );
+    $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
+    while ($r = db_fetch_object($result)) {
+      $items[] = array(
+                      'title' => t('!name\'s Photos', array('!name' => $r->name)),
+                      'path' => 'flickrthumbnails_' . $r->uid,
+                      'callback arguments' => array($r->flickrusername),
+                      'type' => MENU_NORMAL_ITEM,
+                      'callback' => 'flickrphoto_thumbnails',
+                      'access' => true,
                     );
     }
+  }
   return $items;
 }
 
@@ -601,5 +611,34 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
   return $s;
   
 }
+
+/**
+menu callback, page-able screen full of thumbnails
+*/
+function flickrphoto_thumbnails($fuser, $page=1) {
+  $output = '';
+  if (!$fuser) {
+    return $output;
+  }
+  
+  $flickr = @flickrrippr_phpFlickr();
+  
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
+    return $output;
+  }
+  
+  $num_per_page = 60;
+  
+  $user = flickrrippr_flickruser($fuser);
+  $photos= $flickr->people_getPublicPhotos($user['id'], null, $num_per_page, intval($page));
+  
+  $output .= flickrrippr_thumbnail_table($photos, $photo_list);
+  
+  $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page+1));
+  
+  return $output;
+}
+
 
 ?>
