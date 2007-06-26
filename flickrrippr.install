@@ -30,6 +30,7 @@ function flickrrippr_install() {
     db_query("CREATE TABLE {flickrusers} (
                       uid INTEGER NOT NULL REFERENCES {users} (uid),
                       flickrusername TEXT NOT NULL,
+                      flickrid TEXT,
                       PRIMARY KEY (uid)
                       );");
     break;
