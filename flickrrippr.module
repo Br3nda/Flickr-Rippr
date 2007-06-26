@@ -177,8 +177,10 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
 
   //If we've already go it, then we dont' need to get it
   if (file_exists($filename)) {
-    //TODO, check mtime
-    return  $filename;
+    if (filesize($filename) > 0) {
+      //TODO, check mtime against photo info -- if possible
+      return  $filename;
+    }
   }
   
   
