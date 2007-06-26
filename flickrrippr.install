@@ -3,33 +3,39 @@ function flickrrippr_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysql':
     case 'mysqli':
+    $ret[] = db_query("CREATE TABLE {flickrusers} (
+                  uid int(11) NOT NULL,
+                  flickrusername text NOT NULL,
+                  cachejpegs tinyint(1) NOT NULL default '0',
+                  PRIMARY KEY (uid)
+                  ) ENGINE=MyISAM DEFAULT");
+
+    $ret[] = db_query("CREATE TABLE {flickrphotos} (
+                  flickrphoto_id int(11) NOT NULL,
+                  nid int(11) NOT NULL,
+                  lastfetched timestamp NOT NULL default CURRENT_TIMESTAMP,
+                  PRIMARY KEY (flickrphoto_id),
+                  UNIQUE KEY flickrphoto_id (flickrphoto_id),
+                  UNIQUE KEY nid (nid)
+                  ) ENGINE=MyISAM DEFAULT");
+
       break;
     case 'pgsql':
-  $ret[] = db_query("CREATE TABLE {flickrphotos} (
+    $ret[] = db_query("CREATE TABLE {flickrphotos} (
                       flickrphoto_id integer UNIQUE NOT NULL,
                       nid integer UNIQUE NOT NULL,
                       lastfetched timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                       PRIMARY KEY (flickrphoto_id)
                       )");
-    break;
-  }
-
-}
-function flickrrippr_update_5() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-      case 'mysqli':
-      break;
-    case 'pgsql':
-  $ret[] = update_sql("CREATE TABLE {flickrusers} (
+    db_query("CREATE TABLE {flickrusers} (
                       uid INTEGER NOT NULL REFERENCES {users} (uid),
                       flickrusername TEXT NOT NULL,
+                      flickrid TEXT,
                       PRIMARY KEY (uid)
                       );");
     break;
   }
-  
-  return $ret;
+
 }
 
 function flickrrippr_update_1() {
@@ -57,4 +63,16 @@ function flickrrippr_update_2() {
   return $ret;
 }
 
+
+function flickrrippr_update_3() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      break;
+    case 'pgsql':
+      $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid TEXT");
+      break;
+  }
+  return $ret;
+}
 ?>
