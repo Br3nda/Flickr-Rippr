@@ -62,4 +62,16 @@ function flickrrippr_update_2() {
   return $ret;
 }
 
+
+function flickrrippr_update_3() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      break;
+    case 'pgsql':
+      $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid TEXT");
+      break;
+  }
+  return $ret;
+}
 ?>
