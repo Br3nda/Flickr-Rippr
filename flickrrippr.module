@@ -43,7 +43,7 @@ function flickrrippr_menu($cache) {
                       'access' => user_access('Configure own blogged flickr stream'),
                       
                     );
-  }
+    }
   return $items;
 }
 
@@ -342,6 +342,7 @@ function flickrrippr_cron() {
 */
 function flickrrippr_admin_form() {
   $form = array();
+  $form['instructions'] = array('#type' => 'markup', '#value' => 'Get your own API key from ' . l('http://www.flickr.com/services/api/','http://www.flickr.com/services/api/'));
   $form['api_key'] = array(
                             '#title' => 'Flickr Api Key',
                             '#required' => true,
@@ -599,6 +600,6 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
   //}
   return $s;
   
-}  
+}
 
 ?>
