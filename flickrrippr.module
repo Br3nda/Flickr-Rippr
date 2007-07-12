@@ -177,7 +177,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
   if (file_exists($filename)) {
     //if (filesize($filename) > 0) {
       //TODO, check mtime against photo info -- if possible
-      return file_create_url($filename);
+      return $filename;
     //}
   }
   
@@ -193,7 +193,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     //file handle to save the jpeg into
   $contents = $req->getResponseBody();
   if (file_save_data($contents, $filename, FILE_EXISTS_REPLACE)) {
-    return file_create_url($filename);
+    return $filename;
   }
   else {
     drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
@@ -248,14 +248,14 @@ function flickrrippr_makenode($photo_id) {
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
   
   
   //thumbnail version
   $path =  flickrrippr_path($flickr_info, $cache, 'm');
   
   list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . $path . '" width="' . $width . '" height="' . $height . '" />';
+  $thumb = '<img src="' . file_create_url($path) . '" width="' . $width . '" height="' . $height . '" />';
   
   
   $node->title = t($flickr_info['title']);
@@ -599,7 +599,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
   if (!$photo['owner']) {
     $photo['owner'] = $owner;
   }
-  $s .= '<img src="' . $src . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
+  $s .= '<img src="' . file_create_url($src) . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
   return $s;
   
 }
