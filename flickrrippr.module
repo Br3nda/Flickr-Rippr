@@ -607,7 +607,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
 /**
 menu callback, page-able screen full of thumbnails
 */
-function flickrrippr_thumbnails($fuser, $page=1) {
+function flickrrippr_thumbnails($fuser, $page = 1) {
   $output = '';
   if (!$fuser) {
     return $output;
