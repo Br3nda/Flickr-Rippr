@@ -63,7 +63,7 @@ function flickrrippr_menu($cache) {
 * then it'll all be done here.
 */
 function flickrrippr_phpFlickr() {
-  $include_file = drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php';
+  $include_file = drupal_get_path('module', 'flickrrippr') .'/phpFlickr-2.1.0/phpFlickr.php';
   if (!file_exists($include_file)) {
     drupal_set_message(t("Missing phpFlickr - expected to find it at !file", array('!file' => $include_file)));
     return false;
