@@ -581,14 +581,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
   if (!$photo['owner']) {
     $photo['owner'] = $owner;
   }
-  //if ($link)    {
-  //  $s .= '<a href="http://www.flickr.com/photos/' . $photo['owner'] . '/' . $photo['id'] . '">';
-  //}
-  
   $s .= '<img src="' . $src . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
-  //if ($link) {
-  //  $s .= '</a>';
-  //}
   return $s;
   
 }
