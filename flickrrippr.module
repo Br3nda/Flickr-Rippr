@@ -196,7 +196,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     //file handle to save the jpeg into
   $contents = $req->getResponseBody();
   if (file_save_data($contents, $filename, FILE_EXISTS_REPLACE)) {
-    return $filename;
+    return '/' . url($filename);
   }
   else {
     drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
@@ -444,8 +444,9 @@ function flickrrippr_user_settings_form_submit($form_id, $form_values) {
 /**
 * Used when attempting to edit a flickrphoto node.
 */
-function flickrphoto_node_form($node) {
-  $form = array();
+/*
+function flickrphoto_node_form_alter($form_id, &$form) {
+  //$form = array();
   
   $form['content'] = array(
                             '#type' => 'markup',
@@ -456,6 +457,7 @@ function flickrphoto_node_form($node) {
                             '#type' => 'submit',
                             '#value' => t('Refresh data from flickr.com'),
                           );
+  
   $form['nid'] = array(
                         '#type' => 'hidden',
                         '#value' => $node->nid,
@@ -463,7 +465,7 @@ function flickrphoto_node_form($node) {
   
   return $form;
 }
-
+*/
 
 /**
 * After pressing the refresh button, a node is updated from flickr.com
