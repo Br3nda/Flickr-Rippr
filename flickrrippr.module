@@ -164,14 +164,12 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
   
   //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
-  
+    
   $folder =  file_directory_path() . '/flickr';
   if (!file_create_path($folder)) {
     drupal_set_message(t('Files directory not set, unable to cache flickr photos'), 'error');
     return ;
-  }
-  
-  
+  }  
   
   $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
 
@@ -182,7 +180,6 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
       return base_path() .'/'. url($filename);
     }
   }
-  
   
   require_once "HTTP/Request.php";
   $req =& new HTTP_Request($src);
@@ -203,26 +200,6 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     return $src;
   }
   
-}
-/**
-* used in flickrripper_path
-*/
-if (!function_exists('file_put_contents')) {
-  function file_put_contents($n, $d, $flag = false) {
-    $mode = ($flag == FILE_APPEND || strtoupper($flag) == 'FILE_APPEND') ? 'a' : 'w';
-    $f = @fopen($n, $mode);
-    if ($f === false) {
-      return 0;
-    }
-    else {
-      if (is_array($d)) {
-        $d = implode($d);
-      }
-      $bytes_written = fwrite($f, $d);
-      fclose($f);
-      return $bytes_written;
-    }
-  }
 }
 
 /**
