@@ -421,6 +421,24 @@ function flickrrippr_user_settings_form_submit($form_id, $form_values) {
 /**
 * Used when attempting to edit a flickrphoto node.
 */
+/**
+* Used when attempting to edit a flickrphoto node.
+*/
+function flickrrippr_node_form($node) {
+  $form = array();
+  //TODO add instructions on edit the photo on flickr.com
+  
+  $form['refresh'] = array(
+                           '#type' => 'submit',
+                           '#value' => t('Refresh data from flickr.com'),
+                          );
+  $form['nid'] = array(
+                       '#type' => 'hidden',
+                       '#value' => $node->nid,
+                      );
+  
+  return $form;
+}
 /*
 function flickrphoto_node_form_alter($form_id, &$form) {
   //$form = array();
@@ -447,7 +465,7 @@ function flickrphoto_node_form_alter($form_id, &$form) {
 /**
 * After pressing the refresh button, a node is updated from flickr.com
 */
-function flickrphoto_node_form_submit($form_id, $form_values) {
+function flickrrippr_node_form_submit($form_id, $form_values) {
 
   if ($form_values['refresh']) {
     $photo =  db_fetch_object(db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE nid = %d", $form_values['nid']));
@@ -589,7 +607,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
 /**
 menu callback, page-able screen full of thumbnails
 */
-function flickrphoto_thumbnails($fuser, $page=1) {
+function flickrrippr_thumbnails($fuser, $page=1) {
   $output = '';
   if (!$fuser) {
     return $output;
