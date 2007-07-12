@@ -627,7 +627,7 @@ function flickrrippr_thumbnails($fuser, $page = 1) {
   
   $output .= flickrrippr_thumbnail_table($photos, $photo_list);
   
-  $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page+1));
+  $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page + 1));
   
   return $output;
 }
