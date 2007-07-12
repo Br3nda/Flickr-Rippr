@@ -193,7 +193,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     //file handle to save the jpeg into
   $contents = $req->getResponseBody();
   if (file_save_data($contents, $filename, FILE_EXISTS_REPLACE)) {
-    return base_path() .'/'. url($filename);
+    return file_create_url($filename);
   }
   else {
     drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
@@ -248,14 +248,14 @@ function flickrrippr_makenode($photo_id) {
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
   
   
   //thumbnail version
   $path =  flickrrippr_path($flickr_info, $cache, 'm');
   
   list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . file_create_url($path) . '" style="clear: left" align="left"  width="' . $width . '" height="' . $height . '" />';
+  $thumb = '<img src="' . $path . '" width="' . $width . '" height="' . $height . '" />';
   
   
   $node->title = t($flickr_info['title']);
