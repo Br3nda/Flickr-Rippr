@@ -63,7 +63,7 @@ function flickrrippr_menu($cache) {
 * then it'll all be done here.
 */
 function flickrrippr_phpFlickr() {
-  $include_file = drupal_get_path('module', 'flickrrippr') . '/phpFlickr-2.1.0/phpFlickr.php';
+  $include_file = drupal_get_path('module', 'flickrrippr') .'/phpFlickr-2.1.0/phpFlickr.php';
   if (!file_exists($include_file)) {
     drupal_set_message(t("Missing phpFlickr - expected to find it at !file", array('!file' => $include_file)));
     return false;
@@ -164,25 +164,22 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
   
   //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
-  
+    
   $folder =  file_directory_path() . '/flickr';
   if (!file_create_path($folder)) {
     drupal_set_message(t('Files directory not set, unable to cache flickr photos'), 'error');
     return ;
-  }
-  
-  
+  }  
   
   $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
 
   //If we've already go it, then we dont' need to get it
   if (file_exists($filename)) {
-    if (filesize($filename) > 0) {
+    //if (filesize($filename) > 0) {
       //TODO, check mtime against photo info -- if possible
-      return  $filename;
-    }
+      return $filename;
+    //}
   }
-  
   
   require_once "HTTP/Request.php";
   $req =& new HTTP_Request($src);
@@ -203,26 +200,6 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     return $src;
   }
   
-}
-/**
-* used in flickrripper_path
-*/
-if (!function_exists('file_put_contents')) {
-  function file_put_contents($n, $d, $flag = false) {
-    $mode = ($flag == FILE_APPEND || strtoupper($flag) == 'FILE_APPEND') ? 'a' : 'w';
-    $f = @fopen($n, $mode);
-    if ($f === false) {
-      return 0;
-    }
-    else {
-      if (is_array($d)) {
-        $d = implode($d);
-      }
-      $bytes_written = fwrite($f, $d);
-      fclose($f);
-      return $bytes_written;
-    }
-  }
 }
 
 /**
@@ -278,7 +255,7 @@ function flickrrippr_makenode($photo_id) {
   $path =  flickrrippr_path($flickr_info, $cache, 'm');
   
   list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . file_create_url($path) . '" style="clear: left" align="left"  width="' . $width . '" height="' . $height . '" />';
+  $thumb = '<img src="' . file_create_url($path) . '" width="' . $width . '" height="' . $height . '" />';
   
   
   $node->title = t($flickr_info['title']);
@@ -302,7 +279,7 @@ function flickrrippr_makenode($photo_id) {
   
   $node->name = $user->name;
   $node->uid = $user->uid;
-  $node->type = 'flickrphoto';
+  $node->type = 'flickrrippr';
   $node->published = 1;
   $node->status =1;
   $node->comment = 0;
@@ -444,8 +421,27 @@ function flickrrippr_user_settings_form_submit($form_id, $form_values) {
 /**
 * Used when attempting to edit a flickrphoto node.
 */
-function flickrphoto_node_form($node) {
+/**
+* Used when attempting to edit a flickrphoto node.
+*/
+function flickrrippr_node_form($node) {
   $form = array();
+  //TODO add instructions on edit the photo on flickr.com
+  
+  $form['refresh'] = array(
+                           '#type' => 'submit',
+                           '#value' => t('Refresh data from flickr.com'),
+                          );
+  $form['nid'] = array(
+                       '#type' => 'hidden',
+                       '#value' => $node->nid,
+                      );
+  
+  return $form;
+}
+/*
+function flickrphoto_node_form_alter($form_id, &$form) {
+  //$form = array();
   
   $form['content'] = array(
                             '#type' => 'markup',
@@ -456,6 +452,7 @@ function flickrphoto_node_form($node) {
                             '#type' => 'submit',
                             '#value' => t('Refresh data from flickr.com'),
                           );
+  
   $form['nid'] = array(
                         '#type' => 'hidden',
                         '#value' => $node->nid,
@@ -463,18 +460,19 @@ function flickrphoto_node_form($node) {
   
   return $form;
 }
-
+*/
 
 /**
 * After pressing the refresh button, a node is updated from flickr.com
 */
-function flickrphoto_node_form_submit($form_id, $form_values) {
+function flickrrippr_node_form_submit($form_id, $form_values) {
 
   if ($form_values['refresh']) {
     $photo =  db_fetch_object(db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE nid = %d", $form_values['nid']));
     assert($photo);
     flickrrippr_makenode($photo->flickrphoto_id);
   }
+  drupal_goto('node/'. $form_values['nid']);
 }
 
 /**
@@ -602,14 +600,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
   if (!$photo['owner']) {
     $photo['owner'] = $owner;
   }
-  //if ($link)    {
-  //  $s .= '<a href="http://www.flickr.com/photos/' . $photo['owner'] . '/' . $photo['id'] . '">';
-  //}
-  
-  $s .= '<img src="' . $src . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
-  //if ($link) {
-  //  $s .= '</a>';
-  //}
+  $s .= '<img src="' . file_create_url($src) . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
   return $s;
   
 }
@@ -617,7 +608,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
 /**
 menu callback, page-able screen full of thumbnails
 */
-function flickrphoto_thumbnails($fuser, $page=1) {
+function flickrrippr_thumbnails($fuser, $page = 1) {
   $output = '';
   if (!$fuser) {
     return $output;
@@ -637,7 +628,7 @@ function flickrphoto_thumbnails($fuser, $page=1) {
   
   $output .= flickrrippr_thumbnail_table($photos, $photo_list);
   
-  $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page+1));
+  $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page + 1));
   
   return $output;
 }
