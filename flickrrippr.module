@@ -279,7 +279,7 @@ function flickrrippr_makenode($photo_id) {
   
   $node->name = $user->name;
   $node->uid = $user->uid;
-  $node->type = 'flickrphoto';
+  $node->type = 'flickrrippr';
   $node->published = 1;
   $node->status =1;
   $node->comment = 0;
