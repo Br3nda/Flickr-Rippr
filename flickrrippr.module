@@ -633,5 +633,13 @@ function flickrrippr_thumbnails($fuser, $page = 1) {
   return $output;
 }
 
-
+function flickrrippr_node_info() {
+return array(
+    'flickrrippr' => array(
+      'name' => t('Flickr Rippr Photo'),
+      'module' => 'flickrrippr',
+      'description' => t('Photos imported from a user\'s flickr stream'),
+    )
+  );
+}
 ?>
