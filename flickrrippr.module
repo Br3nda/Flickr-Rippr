@@ -160,15 +160,15 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
 function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
-  
-  
   //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
     
   $folder =  file_directory_path() . '/flickr';
-  if (!file_create_path($folder)) {
+  if (!file_check_directory($folder)) {
+    if (!mkdir ($folder) ){
     drupal_set_message(t('Files directory not set, unable to cache flickr photos'), 'error');
-    return ;
+    return $src;
+    }
   }  
   
   $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
