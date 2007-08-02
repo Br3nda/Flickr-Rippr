@@ -185,13 +185,19 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
   $req =& new HTTP_Request($src);
     //Something went wrong?
   if (PEAR::isError($req->sendRequest())) {
-    drupal_set_message(t("Failed to retrieve jpeg file from flick.com, url = %url", array('%url' => $src)));
+    drupal_set_message(t("Failed to retrieve jpeg file from flick.com, url = %url", array('%url' => $src)), 'error');
     //use flickr hosted jpeg
     return $src;
   }
   
+  
     //file handle to save the jpeg into
   $contents = $req->getResponseBody();
+  if (sizeof($contents) == 0) {
+    drupal_set_message(t('Zero length response to http request for jpeg on flickr.com'), 'error');
+    return $src;
+  }
+
   if (file_save_data($contents, $filename, FILE_EXISTS_REPLACE)) {
     return $filename;
   }
