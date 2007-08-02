@@ -202,7 +202,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
     return $filename;
   }
   else {
-    drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
+    drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)), 'error');
     return $src;
   }
   
