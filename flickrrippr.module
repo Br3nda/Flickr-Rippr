@@ -624,5 +624,11 @@ function flickrrippr_thumbnails($fuser, $page = 1) {
   return $output;
 }
 
+function flickrrippr_node_info() {
+  return array('name' => t('Flickr Rippr'),
+               'module' => 'flickrrippr',
+               'description' => t('Photos imported from user\'s flickr accounts'),
+               //'min_word_count' => '',
+              );
 
 ?>
