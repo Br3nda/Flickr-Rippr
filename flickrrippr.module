@@ -631,4 +631,4 @@ function flickrrippr_node_info() {
                //'min_word_count' => '',
               );
 
-?>
+}
