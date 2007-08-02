@@ -252,24 +252,14 @@ function flickrrippr_makenode($photo_id) {
   }
   
   //Full (normal) sized image
-  $path =  flickrrippr_path($flickr_info);
-  list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = flickrrippr_show_photo($flickr_info, null, $cache);
   
-  
-  //thumbnail version
-  $path =  flickrrippr_path($flickr_info, $cache, 'm');
-  
-  list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . file_create_url($path) . '" width="' . $width . '" height="' . $height . '" />';
-  
+  //thumbnail version  
+  $thumb = flickrrippr_show_photo($flickr_info, 'm', $cache);
   
   $node->title = t($flickr_info['title']);
-  
   $node->created = strtotime($flickr_info['dates']['taken']);
-  
-  $node->teaser = '<p>'  . $thumb . '</p>';
-  
+  $node->teaser = '<p>'. $thumb .'</p>';
   $node->teaser .= '<p>' . t(html_entity_decode($flickr_info['description'])) . '</p>';
   $node->format = 3;
   
