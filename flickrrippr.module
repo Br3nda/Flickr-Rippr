@@ -272,7 +272,8 @@ function flickrrippr_makenode($photo_id) {
   $content .= '<p>' . t('This is a ' . l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
   
   $node->body = $content;
-  
+  //Populate the node with stuff
+  //TODO Use default per user.
   $node->name = $user->name;
   $node->uid = $user->uid;
   $node->type = 'flickrrippr';
@@ -281,6 +282,7 @@ function flickrrippr_makenode($photo_id) {
   $node->comment = 0;
   $node->promote = 1;
   
+  //and save it
   node_save($node);
   
   if ($node->is_new) {
@@ -290,7 +292,6 @@ function flickrrippr_makenode($photo_id) {
   else {
     drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid)), array('%photo_id' => $photo_id));
   }
-  
   return $node->is_new;
 }
 /**
