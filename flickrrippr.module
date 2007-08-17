@@ -31,7 +31,6 @@ function flickrrippr_menu($cache) {
                       'callback arguments' => $user->uid,
                       'access' => user_access('Administer global flickr api settings'),
                     );
-    
   }
   else {
     $items[] = array(
@@ -42,12 +41,21 @@ function flickrrippr_menu($cache) {
                       'callback arguments' => array($user),
                       'access' => user_access('Configure own blogged flickr stream'),
                     );
+    
+
+    
+    $items[] = array('title' => t('Photos'),
+                     'path' => 'flickrthumbnails',
+                     'type' => MENU_NORMAL_ITEM,
+                     'callback' => 'flickrphoto_thumbnails',
+                     'access' => true,
+                    );
+    
     $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
     while ($r = db_fetch_object($result)) {
       $items[] = array(
                       'title' => t('!name\'s Photos', array('!name' => $r->name)),
-                      'path' => 'flickrthumbnails_' . $r->uid,
-                      'callback arguments' => array($r->flickrusername),
+                      'path' => 'flickrthumbnails/'. $r->uid,
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrphoto_thumbnails',
                       'access' => true,
@@ -615,10 +623,11 @@ function flickrrippr_thumbnails($fuser, $page = 1) {
   $num_per_page = 60;
   
   $user = flickrrippr_flickruser($fuser);
-  $photos= $flickr->people_getPublicPhotos($user['id'], null, $num_per_page, intval($page));
-  
+  //pull public photos for this user, from flickr
+  $photos = $flickr->people_getPublicPhotos($user['id'], null, $num_per_page, intval($page));
+  //turn that into a <table>
   $output .= flickrrippr_thumbnail_table($photos, $photo_list);
-  
+  //and, link to get more
   $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page + 1));
   
   return $output;

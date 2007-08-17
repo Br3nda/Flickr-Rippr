@@ -75,4 +75,5 @@ function flickrrippr_update_4() {
   $ret[] = update_sql("UPDATE {node} SET type = 'flickrrippr' WHERE type = 'flickrphoto'");
   return $ret;
 }
+
 ?>
