@@ -513,7 +513,7 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
     $user = $users[$delta];
     $block = array(
                     'subject' => $user->name,
-                    'content' => flickrrippr_block_newest_photos($user)
+                    'content' => flickrphoto_newest($user)
                   );
     return $block;
     /*
@@ -533,6 +533,27 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 /**
+Displays flickr photos, and links to nodes if caches
+*/
+function flickrphoto_thumbnails($uid=null) {
+  if($user_id) {
+    $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid WHERE uid = %d ORDER BY u.name", $uid);
+
+  }
+  else {
+    $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
+  }
+  $LIMIT = 200;
+  $flickr = @flickrrippr_phpFlickr();
+  while ($user = db_fetch_object($result)) {
+    $user->flickrid = flickrrippr_flickruser($user->flickrusername);
+    $photos = $flickr->people_getPublicPhotos($user->flickrid, null, $LIMIT, 1);
+    $output .= flickrrippr_thumbnail_table($photos, $photo_list);
+  }
+  return $output;
+}
+
+/**
 * Returns html formated chunk 
 * of a user's newest photo
 *
@@ -540,7 +561,7 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
 * as returned by user_load
 * or GLOBAL $user
 */
-function flickrrippr_block_newest_photos($user) {
+function flickrphoto_newest($user) {
   $output = '';
   
   $flickr = @flickrrippr_phpFlickr();
