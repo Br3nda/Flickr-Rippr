@@ -33,6 +33,8 @@ function flickrrippr_menu($cache) {
                       'callback arguments' => $user->uid,
                       'access' => user_access('Administer global flickr api settings'),
                     );
+    
+    //main page, that holds all the submenus
     $items[] = array('title' => t('Flickr Photos'),
                      'path' => 'flickr',
                      'type' => MENU_NORMAL_ITEM,
