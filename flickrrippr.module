@@ -15,6 +15,7 @@ function flickrrippr_menu($cache) {
   GLOBAL $user;
   $items = array();
   if ($cache) {
+    //Admin settings
     $items[] = array(
                       'title' => t('Flickr Rippr Settings'),
                       'path' => 'admin/settings/flickrrippr',
@@ -23,6 +24,7 @@ function flickrrippr_menu($cache) {
                       'callback' => 'drupal_get_form',
                       'callback arguments' => array('flickrrippr_admin_form')
                     );
+    //
     $items[] = array(
                       'title' => t('Refresh'),
                       'path' => 'admin/content/refresh',
@@ -30,6 +32,12 @@ function flickrrippr_menu($cache) {
                       'callback' => 'flickrrippr_check_latest',
                       'callback arguments' => $user->uid,
                       'access' => user_access('Administer global flickr api settings'),
+                    );
+    $items[] = array('title' => t('Flickr Photos'),
+                     'path' => 'flickr',
+                     'type' => MENU_NORMAL_ITEM,
+                     'callback' => 'flickrrippr_page',
+                     'access' => user_access('View Flickr photos')
                     );
     
   }
@@ -42,11 +50,15 @@ function flickrrippr_menu($cache) {
                       'callback arguments' => array($user),
                       'access' => user_access('Configure own blogged flickr stream'),
                     );
-    $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
-    while ($r = db_fetch_object($result)) {
+
+    
+
+      
+    $users = flickrrippr_get_all_users();
+    foreach($users as $r) {
       $items[] = array(
                       'title' => t('!name\'s Photos', array('!name' => $r->name)),
-                      'path' => 'flickrthumbnails_' . $r->uid,
+                      'path' => 'flickr/' . $r->uid,
                       'callback arguments' => array($r->flickrusername),
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrphoto_thumbnails',
@@ -55,6 +67,15 @@ function flickrrippr_menu($cache) {
     }
   }
   return $items;
+}
+
+function flickrrippr_get_all_users() {
+  $users = array();
+$result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
+while ($r = db_fetch_object($result)) {
+  $users[] = $r;
+}
+  return $users;
 }
 
 /**
@@ -96,6 +117,15 @@ function flickrrippr_get_user_by_flickruser($fuser) {
   
   $user = user_load(array('uid' => $flickruser->uid));
   return $user;
+}
+
+function flickrrippr_page() {
+  //TODO, pager query this
+  $users = flickrrippr_get_all_users();
+  foreach ($users as $u) {
+    $list[] = l(t($u->name), 'flickr/'. $u->uid);
+  }
+  return theme('item_list', $list);
 }
 
 /**
