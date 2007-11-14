@@ -26,10 +26,10 @@ function flickrrippr_menu($cache) {
                     );
     //
     $items[] = array(
-                      'title' => t('Refresh'),
+                      'title' => t('Refresh oldest'),
                       'path' => 'admin/content/refresh',
                       'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'flickrrippr_check_latest',
+                      'callback' => 'flickrrippr_refresh_oldest',
                       'callback arguments' => $user->uid,
                       'access' => user_access('Administer global flickr api settings'),
                     );
@@ -69,6 +69,17 @@ function flickrrippr_menu($cache) {
     }
   }
   return $items;
+}
+
+function flickrrippr_refresh_oldest() {
+$result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} WHERE lastfetched < CURRENT_TIMESTAMP - '1 week'::interval ORDER BY nid LIMIT 20");
+
+while($photo = db_fetch_object($result)) {
+  flickrrippr_makenode($photo->flickrphoto_id);
+  $node = node_load($photo->nid);
+  $content .= theme('node', $node, true);
+	}
+return $content;
 }
 
 function flickrrippr_get_all_users() {
