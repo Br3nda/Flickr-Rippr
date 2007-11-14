@@ -24,7 +24,6 @@ function flickrrippr_menu($cache) {
                       'callback' => 'drupal_get_form',
                       'callback arguments' => array('flickrrippr_admin_form')
                     );
-    //
     $items[] = array(
                       'title' => t('Refresh oldest'),
                       'path' => 'admin/content/refresh',
@@ -44,6 +43,14 @@ function flickrrippr_menu($cache) {
     
   }
   else {
+    if (arg(0) == 'node' && is_numeric(arg(1))) {
+      $items[] = array('path' => 'node/'. arg(1) .'/flickr-refresh', 'title' => t('Refresh'),
+          'callback' => 'flickrrippr_node_refresh', 
+	'access' => user_access('Administer global flickr api settings'),
+	'callback arguments' => arg(1),
+          'type' => MENU_IS_LOCAL_TASK);
+    }
+
     $items[] = array(
                       'title' => t('Flickr Photo settings'),
                       'path' => 'user/' . $user->uid . '/flickr',
@@ -187,8 +194,11 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   
   
   $new = true;
+  if (is_array($photos['photo'])) {
   foreach ($photos['photo'] as $p) {
     $new = (flickrrippr_makenode($p['id'], $p) && $new);
+    $output .= $p['id'];
+  }
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
@@ -266,6 +276,7 @@ function flickrrippr_makenode($photo_id) {
   }
 
   $node->nid = flickrrippr_photo_get_nid($photo_id) ;
+  $node = node_load($node->nid);
 
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
@@ -291,7 +302,7 @@ function flickrrippr_makenode($photo_id) {
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . file_create_url($path)  . '" alt="' . htmlentities($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
   
   
   //thumbnail version
@@ -307,18 +318,26 @@ function flickrrippr_makenode($photo_id) {
   
   $node->teaser = '<p>'  . $thumb . '</p>';
   
-  $node->teaser .= '<p>' . t(html_entity_decode($flickr_info['description'])) . '</p>';
+  $node->teaser .= '<p>' . htmlentities(html_entity_decode($flickr_info['description'])) . '</p>';
   $node->format = 3;
   
-  $content = '<p>' . t(html_entity_decode($flickr_info['description'])) . '</p>';
+  $content = '';
+  if ($flickr_info['description']) {
+  $content .= '<p>' . htmlentities(html_entity_decode($flickr_info['description'])) . '</p>';
+  }
   $content .= $img;
   
   //$content .= '<p>' . t('photo by %name', array('%name' => $realname)) ."</p>\n";
   //$content .= '<!--break-->';
   
-  $content .= '<p>' . t('This is a ' . l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
+  $content .= '<p>' . t('This is a !link imported via the flickr api', 
+	array(
+		'!link' => l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/'),
+		)
+	)
+ . '</p>';
   
-  $node->body = $content;
+  $node->body = "<div>$content</div>";
   
   $node->name = $user->name;
   $node->uid = $user->uid;
@@ -335,7 +354,9 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   }
   else {
-    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid)), array('%photo_id' => $photo_id));
+    drupal_set_message(t("Updated photo %photo_id, !link", array('%photo_id' => $photo_id,
+'!link' => l($node->title, 'node/' . $node->nid))));
+    $result = db_query("UPDATE {flickrphotos} set lastfetched = CURRENT_TIMESTAMP WHERE flickrphoto_id = %d AND nid = %d", $photo_id, $node->nid);
   }
   
   return $node->is_new;
@@ -556,7 +577,7 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
     $user = $users[$delta];
     $block = array(
                     'subject' => $user->name,
-                    'content' => flickrphoto_newest($user)
+                    'content' => flickrrippr_block_newest_photos($user)
                   );
     return $block;
     /*
@@ -604,7 +625,7 @@ function flickrphoto_thumbnails($uid=null) {
 * as returned by user_load
 * or GLOBAL $user
 */
-function flickrphoto_newest($user) {
+function flickrrippr_block_newest_photos($user) {
   $output = '';
   
   $flickr = @flickrrippr_phpFlickr();
@@ -664,7 +685,7 @@ function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true
   if (!$photo['owner']) {
     $photo['owner'] = $owner;
   }
-  $s .= '<img src="' . file_create_url($src) . '" title="' . t($alt) . '" alt="' . t($alt) . '" height="75" width="75">';
+  $s .= '<img src="' . file_create_url($src) . '" title="' . htmlentities($alt) . '" alt="' . htmlentities($alt) . '" height="75" width="75" />';
   return $s;
   
 }
@@ -706,4 +727,12 @@ return array(
     )
   );
 }
-?>
+function flickrrippr_get_photo_id($nid) {
+	$record = db_fetch_object(db_query("SELECT flickrphoto_id from {flickrphotos} where nid=%d", $nid));
+	return $record->flickrphoto_id;
+}
+function flickrrippr_update($node) {
+//	$photo_id = flickrrippr_get_photo_id($node->nid); 
+//	flickrrippr_makenode($photo_id);
+}
+	
