@@ -1,3 +1,3 @@
-name=Flickr Rippr
+name=FlickrRippr
 description=Reads users's Flickr photo streams, and turns into nodes. Provides a block of thumbnails per user.
-package=Brenda's Flickr Addiction
+package=Flickr Rippr
