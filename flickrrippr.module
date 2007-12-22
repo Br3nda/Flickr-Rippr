@@ -15,7 +15,6 @@ function flickrrippr_menu($cache) {
   GLOBAL $user;
   $items = array();
   if ($cache) {
-    //Admin settings
     $items[] = array(
                       'title' => t('Flickr Rippr Settings'),
                       'path' => 'admin/settings/flickrrippr',
@@ -25,20 +24,12 @@ function flickrrippr_menu($cache) {
                       'callback arguments' => array('flickrrippr_admin_form')
                     );
     $items[] = array(
-                      'title' => t('Refresh oldest'),
+                      'title' => t('Refresh'),
                       'path' => 'admin/content/refresh',
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrrippr_refresh_oldest',
                       'callback arguments' => $user->uid,
                       'access' => user_access('Administer global flickr api settings'),
-                    );
-    
-    //main page, that holds all the submenus
-    $items[] = array('title' => t('Flickr Photos'),
-                     'path' => 'flickr',
-                     'type' => MENU_NORMAL_ITEM,
-                     'callback' => 'flickrrippr_page',
-                     'access' => user_access('View Flickr photos')
                     );
     
   }
@@ -59,15 +50,11 @@ function flickrrippr_menu($cache) {
                       'callback arguments' => array($user),
                       'access' => user_access('Configure own blogged flickr stream'),
                     );
-
-    
-
-      
-    $users = flickrrippr_get_all_users();
-    foreach($users as $r) {
+    $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
+    while ($r = db_fetch_object($result)) {
       $items[] = array(
                       'title' => t('!name\'s Photos', array('!name' => $r->name)),
-                      'path' => 'flickr/' . $r->uid,
+                      'path' => 'flickrthumbnails_' . $r->uid,
                       'callback arguments' => array($r->flickrusername),
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrphoto_thumbnails',
@@ -77,7 +64,6 @@ function flickrrippr_menu($cache) {
   }
   return $items;
 }
-
 function flickrrippr_refresh_oldest() {
 $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} WHERE lastfetched < CURRENT_TIMESTAMP - '1 week'::interval ORDER BY nid LIMIT 20");
 
@@ -88,14 +74,13 @@ while($photo = db_fetch_object($result)) {
 	}
 return $content;
 }
-
-function flickrrippr_get_all_users() {
-  $users = array();
-$result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
-while ($r = db_fetch_object($result)) {
-  $users[] = $r;
-}
-  return $users;
+function flickrrippr_node_refresh($nid) {
+  $photo_id = flickrrippr_get_photo_id($nid);
+  if (!$photo_id) {
+	return t('Photo not found');
+  }
+  flickrrippr_makenode($photo_id);
+  drupal_goto('node/' . $nid);
 }
 
 /**
@@ -137,15 +122,6 @@ function flickrrippr_get_user_by_flickruser($fuser) {
   
   $user = user_load(array('uid' => $flickruser->uid));
   return $user;
-}
-
-function flickrrippr_page() {
-  //TODO, pager query this
-  $users = flickrrippr_get_all_users();
-  foreach ($users as $u) {
-    $list[] = l(t($u->name), 'flickr/'. $u->uid);
-  }
-  return theme('item_list', $list);
 }
 
 /**
@@ -194,11 +170,8 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   
   
   $new = true;
-  if (is_array($photos['photo'])) {
   foreach ($photos['photo'] as $p) {
     $new = (flickrrippr_makenode($p['id'], $p) && $new);
-    $output .= $p['id'];
-  }
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
@@ -217,6 +190,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
   
   //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  if (!$cache) return $src;
     
   $folder =  file_directory_path() . '/flickr';
   if (!file_create_path($folder)) {
@@ -276,7 +250,6 @@ function flickrrippr_makenode($photo_id) {
   }
 
   $node->nid = flickrrippr_photo_get_nid($photo_id) ;
-  $node = node_load($node->nid);
 
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
@@ -302,17 +275,17 @@ function flickrrippr_makenode($photo_id) {
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . file_create_url($path)  . '" alt="' . htmlentities($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
   
   
   //thumbnail version
-  $path =  flickrrippr_path($flickr_info, $cache, 'm');
+  $path =  flickrrippr_path($flickr_info, true, 'm');
   
   list($width, $height, $type, $attr) = getimagesize($path);
   $thumb = '<img src="' . file_create_url($path) . '" width="' . $width . '" height="' . $height . '" />';
   
   
-  $node->title = t($flickr_info['title']);
+  $node->title = htmlentities($flickr_info['title']);
   
   $node->created = strtotime($flickr_info['dates']['taken']);
   
@@ -330,21 +303,16 @@ function flickrrippr_makenode($photo_id) {
   //$content .= '<p>' . t('photo by %name', array('%name' => $realname)) ."</p>\n";
   //$content .= '<!--break-->';
   
-  $content .= '<p>' . t('This is a !link imported via the flickr api', 
-	array(
-		'!link' => l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/'),
-		)
-	)
- . '</p>';
+  $content .= '<p>' . t('This is a ' . l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
   
-  $node->body = "<div>$content</div>";
+  $node->body = $content;
   
   $node->name = $user->name;
   $node->uid = $user->uid;
   $node->type = 'flickrrippr';
   $node->published = 1;
   $node->status =1;
-  $node->comment = 0;
+  $node->comment = 2;
   $node->promote = 1;
   
   node_save($node);
@@ -354,12 +322,44 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   }
   else {
-    drupal_set_message(t("Updated photo %photo_id, !link", array('%photo_id' => $photo_id,
-'!link' => l($node->title, 'node/' . $node->nid))));
-    $result = db_query("UPDATE {flickrphotos} set lastfetched = CURRENT_TIMESTAMP WHERE flickrphoto_id = %d AND nid = %d", $photo_id, $node->nid);
+    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
+
+ flickrrippr_addcomments($photo_id, $node->nid);
   
   return $node->is_new;
+}
+function flickrrippr_addcomments($photo_id, $nid) {
+  $flickr = @flickrrippr_phpFlickr();
+    if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
+    return $output;
+  }
+  $comments = $flickr->photos_comments_getList($photo_id);
+  if (!is_array($comments['comment'])) return;
+  foreach($comments['comment'] as $c) {
+   $result = db_query("SELECT cid from {flickrcomments} where flickrcomment_id = '%s'", $c['id']);
+   if (!db_num_rows($result)) {
+    $comment = array(
+         'nid' => $nid, 
+	'status' => 1, 
+	'timestamp' => $c['datecreate'], 
+	'comment' => $c['_content'], 
+	'name' => $c['authorname'], 
+	'homepage' => 'http://flickr.com/photos/'. $c['author']);
+     	$cid = comment_save($comment);
+	if (!$cid) {
+		drupal_set_message('comment save failed', 'error');
+		return;
+	}
+
+    
+     db_query("INSERT INTO {flickrcomments} (cid, flickrcomment_id, author, authorname, datecreate, permalink, content)
+VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s')", $cid, $c['id'], $c['author'], $c['authorname'], $c['datecreate'], $c['permalink'], $c['_content']); 
+	 db_query("UPDATE {comments} set status =1, timestamp=%d where cid = %d", $c['datecreate'], $cid);
+   }
+  }
+
 }
 /**
 * helper function, returns the flickr_id for a flickr username
@@ -396,11 +396,18 @@ function flickrrippr_cron() {
 function flickrrippr_admin_form() {
   $form = array();
   $form['instructions'] = array('#type' => 'markup', '#value' => 'Get your own API key from ' . l('http://www.flickr.com/services/api/','http://www.flickr.com/services/api/'));
+  
   $form['api_key'] = array(
                             '#title' => 'Flickr Api Key',
                             '#required' => true,
                             '#type' => 'textfield',
                             '#default_value' => variable_get('flickrapikey', '')
+                          );
+  $form['jpegcache'] = array(
+                            '#title' => 'Allow Local Cache',
+                            '#type' => 'checkbox',
+                            '#default_value' => variable_get('flickrjpegcache', false),
+                            '#description' => t('Allow users to cache flickr photo jpeg files locally'),
                           );
   $form['save'] = array(
                          '#type' => 'submit',
@@ -412,7 +419,8 @@ function flickrrippr_admin_form_validate() {
 }
 function flickrrippr_admin_form_submit($form_id, $form_values) {
   variable_set('flickrapikey', $form_values['api_key']);
-  drupal_set_message(t('Flickrs API key saved'));
+  variable_set('flickrjpegcache', $form_values['jpegcache']);
+  drupal_set_message(t('Settings saved'));
 }
 
 
@@ -492,10 +500,49 @@ function flickrrippr_form(&$node) {
   $form = array();
   //TODO add instructions on edit the photo on flickr.com
   
-  $form['refresh'] = array(
-                           '#type' => 'submit',
-                           '#value' => t('Refresh data from flickr.com'),
-                          );
+  $form['flickr'] = array('#type' => 'fieldset',
+                              '#collapsible' => true,
+                          '#title' => t('Flickr API queries'),
+                         );
+  $form['flickr']['cache'] = array(
+                                    '#type' => 'checkbox',
+                                    '#title' => t('Cache jpeg locally'),
+                                  );
+  
+  $form['flickr']['refresh'] = array(
+                                      '#type' => 'checkbox',
+                                      '#title' => t('Refresh details from flickr.com'),
+                                    );
+  $form['flickr']['jpeg_refresh'] = array(
+                                           '#type' => 'checkbox',
+                                           '#title' => t('Refresh cached jpeg'),
+                                         );
+  $form['flickr']['link'] = array(
+                                           '#type' => 'checkbox',
+                                           '#title' => t('Show link to flickr photo page'),
+                                         );
+  
+  $form['size'] = array('#type' => 'fieldset',
+                        '#collapsible' => true,
+                        '#title' => t('Image sizes'),
+                       );
+  $sizes = array('t' => t('Thumbnail'),
+                 's' => t('Square'),
+                 'm' => t('Medium'),
+                 '' => t('Default')
+                );
+  $form['size']['teaser_size'] = array(
+                                          '#type' => 'select',
+                                          '#options' => $sizes,
+                                          '#title' => t('Teaser Size'),
+                                          '#description' => t('Size of jpeg shown in node teaser'),
+                                        );
+  $form['size']['page_size'] = array(
+                                          '#type' => 'select',
+                                          '#options' => $sizes,
+                                          '#title' => t('Page Size'),
+                                          '#description' => t('Size of jpeg shown in node page and rss feed'),
+                                        );  
   $form['nid'] = array(
                        '#type' => 'hidden',
                        '#value' => $node->nid,
@@ -559,7 +606,7 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
     }
     return $blocks;
   }
-  else if ($op == 'configure' && $delta == 0) {
+  elseif ($op == 'configure' && $delta == 0) {
     /*
     $form['items'] = array(
                             '#type' => 'select',
@@ -570,14 +617,14 @@ function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
     return $form;
     */
   }
-  else if ($op == 'save' && $delta == 0) {
+  elseif ($op == 'save' && $delta == 0) {
     //variable_set('mymodule_block_items', $edit['items']);
   }
-  else if ($op == 'view') {
+  elseif ($op == 'view') {
     $user = $users[$delta];
     $block = array(
                     'subject' => $user->name,
-                    'content' => flickrrippr_block_newest_photos($user)
+                    'content' => flickrphoto_newest($user)
                   );
     return $block;
     /*
@@ -625,7 +672,7 @@ function flickrphoto_thumbnails($uid=null) {
 * as returned by user_load
 * or GLOBAL $user
 */
-function flickrrippr_block_newest_photos($user) {
+function flickrphoto_newest($user) {
   $output = '';
   
   $flickr = @flickrrippr_phpFlickr();
@@ -659,14 +706,21 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
   }
   
   foreach ($photos['photo'] as $p) {
+    if ($cache) {
     $nid = flickrrippr_photo_get_nid($p['id']);
     if (!$nid) {
       flickrrippr_makenode($p['id'], $p);
       $nid = flickrrippr_photo_get_nid($p['id']);
     }
+    }
     
     $img = flickrrippr_show_photo($p, false, null, $cache);
-    $s .= '<a href="' . url('node/' . $nid)  . '">';
+    if ($cache) {
+      $s .= '<a href="' . url('node/' . $nid)  . '">';
+    }
+    else {
+      $s .= '<a href="http://flickr.com/photos/'.$p['owner'] .'/'. $p['id'] .'">';
+    }
     $s .= $img;
     $s .= '</a>';
     $photo_list[] = $p['id'];
@@ -681,11 +735,14 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
 */
 function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true) {
   $src = flickrrippr_path($photo, $cache, 's');
+  if ($cache) {
+    file_create_url($src);
+  }
   $alt = $photo['title'];
   if (!$photo['owner']) {
     $photo['owner'] = $owner;
   }
-  $s .= '<img src="' . file_create_url($src) . '" title="' . htmlentities($alt) . '" alt="' . htmlentities($alt) . '" height="75" width="75" />';
+  $s .= '<img src="' . $src . '" title="' . htmlentities($alt) . '" alt="' . htmlentities($alt) . '" height="75" width="75">';
   return $s;
   
 }
@@ -726,13 +783,9 @@ return array(
       'description' => t('Photos imported from a user\'s flickr stream'),
     )
   );
+
 }
 function flickrrippr_get_photo_id($nid) {
-	$record = db_fetch_object(db_query("SELECT flickrphoto_id from {flickrphotos} where nid=%d", $nid));
-	return $record->flickrphoto_id;
+        $record = db_fetch_object(db_query("SELECT flickrphoto_id from {flickrphotos} where nid=%d", $nid));
+        return $record->flickrphoto_id;
 }
-function flickrrippr_update($node) {
-//	$photo_id = flickrrippr_get_photo_id($node->nid); 
-//	flickrrippr_makenode($photo_id);
-}
-	
