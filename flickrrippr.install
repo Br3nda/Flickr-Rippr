@@ -19,6 +19,7 @@ function flickrrippr_install() {
                           UNIQUE KEY flickrphoto_id (flickrphoto_id),
                           UNIQUE KEY nid (nid)
                        ) ENGINE=InnoDB");
+      //TODO add flickrcomments
       break;
     case 'pgsql':
       $ret[] = db_query("CREATE TABLE {flickrphotos} (
@@ -26,14 +27,26 @@ function flickrrippr_install() {
                           nid integer UNIQUE NOT NULL,
                           lastfetched timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                           PRIMARY KEY (flickrphoto_id)
-                         )");
+                        )");
       $ret[] = db_query("CREATE TABLE {flickrusers} (
-                         uid INTEGER NOT NULL REFERENCES {users} (uid),
-                         flickrusername TEXT NOT NULL,
-                         cachejpegs integer NOT NULL default 0,
-                         flickrid TEXT,
-                         PRIMARY KEY (uid)
-                        );");
+                          uid INTEGER NOT NULL REFERENCES {users} (uid),
+                          flickrusername TEXT NOT NULL,
+                          cachejpegs integer NOT NULL default 0,
+                          flickrid TEXT,
+                          PRIMARY KEY (uid)
+                      );");
+      $ret[] = db_query("CREATE TABLE {flickrcomments} (
+                          cid INTEGER NOT NULL REFERENCES comments (cid),
+                          flickrcomment_id TEXT UNIQUE,
+                          author TEXT NOT NULL,
+                          authorname TEXT NOT NULL,
+                          datecreate INTEGER NOT NULL,
+                          permalink TEXT,
+                          content TEXT,
+                          PRIMARY KEY (cid)
+                       );");
+
+      
       break;
   }
 
@@ -74,4 +87,17 @@ function flickrrippr_update_4() {
   $ret[] = update_sql("UPDATE {node} SET type = 'flickrrippr' WHERE type = 'flickrphoto'");
   return $ret;
 }
-?>
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function flickrrippr_uninstall() {
+  db_query("DELETE FROM {comments} where cid in (SELECT cid FROM {flickrcomments})");
+  db_query("DROP TABLE {flickrcomments}");
+
+  db_query("DELETE FROM {node} where nid in (SELECT nid FROM {flickrphotos} )");
+  db_query("DROP TABLE {flickrphotos}");
+  
+  db_query("DROP TABLE {flickrusers}");
+  
+}
