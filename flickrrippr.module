@@ -1,6 +1,4 @@
 <?php
-//$Id ;
-
 /**
 * Implementation of hook_perm
 */
@@ -171,7 +169,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   
   $new = true;
   foreach ($photos['photo'] as $p) {
-    $new = (flickrrippr_makenode($p['id'], $p) && $new);
+    $new = (flickrrippr_makenode($p['id']) && $new);
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
@@ -233,17 +231,16 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
 * get the node id for a flickr photo id
 */
 function flickrrippr_photo_get_nid($photo_id) {
-  $result = db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = %d", $photo_id);
-  if (db_num_rows($result)) {
-    $photo_rec = db_fetch_object($result);
-    return $photo_rec->nid;
-  }
-  
+  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = %s", $photo_id));
+  $nid = $rec->nid;
+  return $nid;
 }
+
 /**
 * Makes a node for a flickr photo - or updates if it already exists
 */
 function flickrrippr_makenode($photo_id) {
+  drupal_set_message(t("Making node for %photo_id", array('%photo_id' => $photo_id)));
   if (!$photo_id) {
     drupal_set_message(t("Photo_id required"));
     return;
@@ -318,7 +315,7 @@ function flickrrippr_makenode($photo_id) {
   node_save($node);
   
   if ($node->is_new) {
-    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid) VALUES (%d, %d)", $photo_id, $node->nid);
+    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid) VALUES (%s, %d)", $photo_id, $node->nid);
     drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   }
   else {
@@ -357,6 +354,7 @@ function flickrrippr_addcomments($photo_id, $nid) {
      db_query("INSERT INTO {flickrcomments} (cid, flickrcomment_id, author, authorname, datecreate, permalink, content)
 VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s')", $cid, $c['id'], $c['author'], $c['authorname'], $c['datecreate'], $c['permalink'], $c['_content']); 
 	 db_query("UPDATE {comments} set status =1, timestamp=%d where cid = %d", $c['datecreate'], $cid);
+   	 db_query("UPDATE {ua_logger} SET ua='<a href=\"http://flickr.com/photos/taniwha/\">Flickr</a>' where xid=%d and type='comment'", $cid);
    }
   }
 
@@ -706,21 +704,28 @@ function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
   }
   
   foreach ($photos['photo'] as $p) {
+    unset($nid);
+    $photo_id = $p['id'];
     if ($cache) {
-    $nid = flickrrippr_photo_get_nid($p['id']);
-    if (!$nid) {
-      flickrrippr_makenode($p['id'], $p);
-      $nid = flickrrippr_photo_get_nid($p['id']);
+      $nid = flickrrippr_photo_get_nid($photo_id);
+      if (!$nid) {
+        flickrrippr_makenode($photo_id);
+        $nid = flickrrippr_photo_get_nid($photo_id);
+      }
     }
+    if (!$nid) {
+      drupal_set_message(t('Unable to get new node nid for photos %photo_id', array('%photo_id' => $photo_id)), 'error');
+      return '';
     }
     
     $img = flickrrippr_show_photo($p, false, null, $cache);
     if ($cache) {
-      $s .= '<a href="' . url('node/' . $nid)  . '">';
+      $url = url('node/' . $nid);
     }
     else {
-      $s .= '<a href="http://flickr.com/photos/'.$p['owner'] .'/'. $p['id'] .'">';
+      $url = 'http://flickr.com/photos/'.$p['owner'] .'/'. $p['id'] ;
     }
+    $s .= '<a href="' . $url .'">';
     $s .= $img;
     $s .= '</a>';
     $photo_list[] = $p['id'];
@@ -785,7 +790,9 @@ return array(
   );
 
 }
+
 function flickrrippr_get_photo_id($nid) {
         $record = db_fetch_object(db_query("SELECT flickrphoto_id from {flickrphotos} where nid=%d", $nid));
+	if (!$record) return 0;
         return $record->flickrphoto_id;
 }
