@@ -20,17 +20,17 @@ function flickrrippr_uninstall() {
 function flickrrippr_schema() {
   $schema['flickrusers'] = array(
     'fields' => array(
-      'uid' => array('type' => 'integer'),
+      'uid' => array('type' => 'int'),
       'flickrusername' => array('type' => 'text'),
       'cachejpegs' => array('type' => 'boolean'),
       'flickrusername' => array('type' => 'text', 'not null' => true),
-      )
+      ),
     'primary key' => array('uid')
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
-      'flickrphoto_id' => array('type' => 'integer'),
-      'nid' => array('type' => 'integer', 'not null' => true),
+      'flickrphoto_id' => array('type' => 'int'),
+      'nid' => array('type' => 'int', 'not null' => true),
       'lastfetched' => array('type' => 'timestamp', 'not null' => true, 'default' => 'CURRENT_TIMESTAMP'),
       ),
       'primary key' => array('flickrphoto_id'),
