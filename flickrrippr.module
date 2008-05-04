@@ -5,20 +5,19 @@
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
 
 /**
-* Implementation of hook_perm
-*/
+ * Implementation of hook_perm
+ */
 function flickrrippr_perm() {
   return array('Configure own blogged flickr stream', 'Administer global flickr api settings', 'Cache own Flickr Photos on this server');
 }
 
 /**
-* Implementation of hook_menu
-*/
-function flickrrippr_menu($cache) {
+ * Implementation of hook_menu
+ */
+function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
-  if ($cache) {
-    $items['admin/settings/flickrrippr'] = array(
+  $items['admin/settings/flickrrippr'] = array(
                       'title' => t('Flickr Rippr Settings'),
                       'path' => 'admin/settings/flickrrippr',
                       'access' => user_access('Administer global flickr api settings'),
@@ -34,8 +33,8 @@ function flickrrippr_menu($cache) {
                       'access' => user_access('Administer global flickr api settings'),
                     );
     
-  }
-  else {
+  
+  
   	//The refresh tab
     if (arg(0) == 'node' && is_numeric(arg(1))) {
       //TODO - there has gotta be a better way to work out this is a flickrrippr node
@@ -72,7 +71,7 @@ function flickrrippr_menu($cache) {
                       'access' => true,
                     );
     }
-  }
+  
   return $items;
 }
 
