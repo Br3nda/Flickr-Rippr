@@ -32,8 +32,14 @@ function flickrrippr_menu() {
                       'access arguments' => array('Administer global flickr api settings'),
                     );
     
-  
-  
+  //configure a user's account with their flickr username
+  $items['user/flickrippr'] = array(
+                      'title' => t('Flickr Photo settings'),
+                      'type' => MENU_NORMAL_ITEM,
+                      'page callback' => 'flickrrippr_user_settings',
+                      'access arguments' => array('Configure own blogged flickr stream'),
+                    );
+  /*
   	//The refresh tab
     if (arg(0) == 'node' && is_numeric(arg(1))) {
       //TODO - there has gotta be a better way to work out this is a flickrrippr node
@@ -48,15 +54,8 @@ function flickrrippr_menu() {
           'type' => MENU_IS_LOCAL_TASK);
       }
     }
-
-	//configure a user's account with their flickr username
-    $items['user/'. $user->uid .'/flickr'] = array(
-                      'title' => t('Flickr Photo settings'),
-                      'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'flickrrippr_user_settings',
-                      'callback arguments' => array($user),
-                      'access' => user_access('Configure own blogged flickr stream'),
-                    );
+    
+	
                     
     //create a page for thumbnails, of every user that has settings saved
     //TODO this really really doesn't scale
@@ -70,20 +69,27 @@ function flickrrippr_menu() {
                       'access' => true,
                     );
     }
-  
+  */
   return $items;
 }
 
-//function flickrrippr_refresh_oldest() {
-//$result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} WHERE lastfetched < CURRENT_TIMESTAMP - '1 week'::interval ORDER BY nid LIMIT 20");
-//
-//while($photo = db_fetch_object($result)) {
-//  flickrrippr_makenode($photo->flickrphoto_id);
-//  $node = node_load($photo->nid);
-//  $content .= theme('node', $node, true);
-//	}
-//return $content;
-//}
+/**
+ * This is called from admin menu, and will refresh the 20 oldest photos
+ * TODO check this work in drupal6
+ */
+function flickrrippr_refresh_oldest() {
+  $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} ORDER BY lastfetched ASC LIMIT 20");
+
+  $content = '';
+  while ($photo = db_fetch_object($result)) {
+    flickrrippr_makenode($photo->flickrphoto_id);
+    $node = node_load($photo->nid);
+    $content .= theme('node', $node, true);
+  }
+  return $content;
+}
+
+
 //function flickrrippr_node_refresh($nid) {
 //  $photo_id = flickrrippr_get_photo_id($nid);
 //  if (!$photo_id) {
@@ -92,10 +98,10 @@ function flickrrippr_menu() {
 //  flickrrippr_makenode($photo_id);
 //  drupal_goto('node/' . $nid);
 //}
-//
-//
-//
-//
+
+
+
+
 ///**
 //Called by cron, this check for new photos for each user
 //
@@ -311,11 +317,11 @@ function flickrrippr_menu() {
 
 
 /**
-* administer global settings
-*/
+ * administer global settings
+ */
 function flickrrippr_admin_form() {
   $form = array();
-  $form['instructions'] = array('#type' => 'markup', '#value' => 'Get your own API key from ' . l('http://www.flickr.com/services/api/','http://www.flickr.com/services/api/'));
+  $form['instructions'] = array('#type' => 'markup', '#value' => 'Get your own API key from '. l('http://www.flickr.com/services/api/', 'http://www.flickr.com/services/api/'));
   
   $form['api_key'] = array(
                             '#title' => 'Flickr Api Key',
@@ -353,75 +359,86 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
 }
 
 
-///**
-//* Where a user defines their username
-//*/
-//function flickrrippr_user_settings($user) {
-//  $output = '';
-//  $output .= drupal_get_form('flickrrippr_user_settings_form', $user);
-//  return $output;
-//}
-//
-//function flickrrippr_user_settings_form($user) {
-//  GLOBAL $user;
-//  $settings = flickrrippr_user_settings_get($user->uid);
-//  if (!$settings->flickrusername) {
-//    drupal_set_message(t("Flickr username not set yet"));
-//  }
-//  $form = array();
-//  $form['flickr_username'] = array(
-//                                    '#type' => 'textfield',
-//                                    '#title'=> t('Flickr Username'),
-//                                    '#default_value' => $settings->flickrusername,
-//                                    '#required' => true
-//                                  );
-//  $form['thumbnailpage'] = array(
-//                                 '#type' => 'checkbox',
-//                                 '#title'=> t('Enable Thumbnail page'),
-//                                              '#default_value' => true,
-//                                );
-//  $form['promote'] = array(
-//                           '#type' => 'checkbox',
-//                           '#title' => t('Promote new photos to front page?'),
-//                          );
-//  if (user_access('Cache own Flickr Photos on this server')) {
-//    $form['cache'] = array(
-//                           '#title' => t('Cache photos on this server?'),
-//                                         '#type' => 'checkbox'
-//                          );
-//  }
-//  
-//  
-//  $form['save'] = array(
-//                        '#type' => 'submit',
-//                        '#value' => t('Save'),
-//                       );
-//  return $form;
-//}
-///**
-//* Get a user's flickr settings from our database
-//*/
-//function flickrrippr_user_settings_get($uid) {
-//  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid));
-//}
-//
-//function flickrrippr_user_settings_form_validate($form_id, $form_values) {
-//  
-//}
-//function flickrrippr_user_settings_form_submit($form_id, $form_values) {
-//  GLOBAL $user;
-//  
-//  $settings = flickrrippr_user_settings_get($user->uid);
-//  
-//  if ($settings->flickrusername) {
-//    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s' WHERE uid = %d", $form_values['flickr_username'], $user->uid);
-//    drupal_set_message(t("Flickr username updated"));
-//  }
-//  else {
-//    $result = db_query("INSERT INTO {flickrusers} (flickrusername, uid) VALUES ('%s', %s)", $form_values['flickr_username'], $user->uid);
-//    drupal_set_message(t("Flickr username set"));
-//  }
-//}
+/**
+* Where a user defines their username
+*/
+function flickrrippr_user_settings($uid) {
+  if (!empty($uid) && user_access('Administer global flickr api settings')) {
+    $user = user_load(array('uid' => $uid));
+  }
+  else {
+    GLOBAL $user;
+  }
+  $output = '';
+  $output .= drupal_get_form('flickrrippr_user_settings_form', $user);
+  return $output;
+}
+
+function flickrrippr_user_settings_form($user) {
+  $settings = flickrrippr_user_settings_get($user->uid);
+  $form = array();
+  $form['flickr_username'] = array(
+                                    '#type' => 'textfield',
+                                    '#title' => t('Flickr Username'),
+                                    '#default_value' => $settings->flickrusername,
+                                    '#required' => true
+                                  );
+  $form['thumbnailpage'] = array(
+                                 '#type' => 'checkbox',
+                                 '#title'=> t('Enable Thumbnail page'),
+                                              '#default_value' => true,
+                                );
+  $form['promote'] = array(
+                           '#type' => 'checkbox',
+                           '#title' => t('Promote new photos to front page?'),
+                          );
+  if (user_access('Cache own Flickr Photos on this server')) {
+    $form['cache'] = array(
+                           '#title' => t('Cache photos on this server?'),
+                                         '#type' => 'checkbox'
+                          );
+  }
+  
+  
+  $form['save'] = array(
+                        '#type' => 'submit',
+                        '#value' => t('Save'),
+                       );
+  return $form;
+}
+
+/**
+ * Get a user's flickr settings from our database
+ */
+function flickrrippr_user_settings_get($uid) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid));
+}
+
+
+function flickrrippr_user_settings_form_validate($form, &$form_state) {
+  //TODO, check the submitted username exists on flickr?
+  //query api
+  //and store the 3432@N00 uid then  
+}
+function flickrrippr_user_settings_form_submit($form, &$form_state) {
+  $form_values = &$form_state['values'];
+  if ($form_values['uid']) {
+  	$user = user_load(array('uid' => $form_values['uid']));
+  }
+  else {
+    GLOBAL $user;
+  }
+  $settings = flickrrippr_user_settings_get($user->uid);
+  
+  if ($settings->flickrusername) {
+    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s' WHERE uid = %d", $form_values['flickr_username'], $user->uid);
+    drupal_set_message(t("Flickr username updated"));
+  }
+  else {
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, uid) VALUES ('%s', %s)", $form_values['flickr_username'], $user->uid);
+    drupal_set_message(t("Flickr username set"));
+  }
+}
 ///**
 //* Used when attempting to edit a flickrphoto node.
 //*/
