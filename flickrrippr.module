@@ -324,21 +324,21 @@ function flickrrippr_admin_form() {
   $form['instructions'] = array('#type' => 'markup', '#value' => 'Get your own API key from '. l('http://www.flickr.com/services/api/', 'http://www.flickr.com/services/api/'));
   
   $form['api_key'] = array(
-                            '#title' => 'Flickr Api Key',
-                            '#required' => true,
-                            '#type' => 'textfield',
-                            '#default_value' => variable_get('flickrapikey', '')
-                          );
+        '#title' => 'Flickr Api Key',
+        '#required' => true,
+        '#type' => 'textfield',
+        '#default_value' => variable_get('flickrapikey', '')
+      );
   $form['jpegcache'] = array(
-                            '#title' => 'Allow Local Cache',
-                            '#type' => 'checkbox',
-                            '#default_value' => variable_get('flickrjpegcache', false),
-                            '#description' => t('Allow users to cache flickr photo jpeg files locally'),
-                          );
+      '#title' => 'Allow Local Cache',
+      '#type' => 'checkbox',
+      '#default_value' => variable_get('flickrjpegcache', false),
+      '#description' => t('Allow users to cache flickr photo jpeg files locally'),
+      );
   $form['save'] = array(
-                         '#type' => 'submit',
-                         '#value' => t('Save'),
-                       );
+     '#type' => 'submit',
+     '#value' => t('Save'),
+      );
   return $form;
 }
 
@@ -360,8 +360,8 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
 
 
 /**
-* Where a user defines their username
-*/
+ * Where a user defines their username
+ */
 function flickrrippr_user_settings($uid) {
   if (!empty($uid) && user_access('Administer global flickr api settings')) {
     $user = user_load(array('uid' => $uid));
@@ -384,14 +384,14 @@ function flickrrippr_user_settings_form($user) {
                                     '#required' => true
                                   );
   $form['thumbnailpage'] = array(
-                                 '#type' => 'checkbox',
-                                 '#title'=> t('Enable Thumbnail page'),
-                                              '#default_value' => true,
-                                );
+    '#type' => 'checkbox',
+    '#title' => t('Enable Thumbnail page'),
+    '#default_value' => true,
+    );
   $form['promote'] = array(
-                           '#type' => 'checkbox',
-                           '#title' => t('Promote new photos to front page?'),
-                          );
+   '#type' => 'checkbox',
+   '#title' => t('Promote new photos to front page?'),
+  );
   if (user_access('Cache own Flickr Photos on this server')) {
     $form['cache'] = array(
                            '#title' => t('Cache photos on this server?'),
@@ -401,9 +401,9 @@ function flickrrippr_user_settings_form($user) {
   
   
   $form['save'] = array(
-                        '#type' => 'submit',
-                        '#value' => t('Save'),
-                       );
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    );
   return $form;
 }
 
@@ -423,7 +423,7 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
   $form_values = &$form_state['values'];
   if ($form_values['uid']) {
-  	$user = user_load(array('uid' => $form_values['uid']));
+    $user = user_load(array('uid' => $form_values['uid']));
   }
   else {
     GLOBAL $user;
