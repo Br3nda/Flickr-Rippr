@@ -20,17 +20,16 @@ function flickrrippr_menu() {
   $items['admin/settings/flickrrippr'] = array(
                       'title' => t('Flickr Rippr Settings'),
                       'path' => 'admin/settings/flickrrippr',
-                      'access' => user_access('Administer global flickr api settings'),
+                      'access arguments' => array('Administer global flickr api settings'),
                       'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'drupal_get_form',
-                      'callback arguments' => array('flickrrippr_admin_form')
+                      'page callback' => 'drupal_get_form',
+                      'page arguments' => array('flickrrippr_admin_form')
                     );
     $items['admin/content/flickrrippr-fetch'] = array(
                       'title' => t('Re-fetch oldest flickr photos'),
                       'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'flickrrippr_refresh_oldest',
-                      'callback arguments' => $user->uid,
-                      'access' => user_access('Administer global flickr api settings'),
+                      'page callback' => 'flickrrippr_refresh_oldest',
+                      'access arguments' => array('Administer global flickr api settings'),
                     );
     
   
