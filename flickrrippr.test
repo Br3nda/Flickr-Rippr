@@ -1,0 +1,262 @@
+<?php
+/**
+* Description
+*/
+class FlickrPermTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrMenuTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrGetUserByFlickrUserTest phpFlickrextends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprCheckLatestTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprPathTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprPhotoGetNidTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprMakeNodeTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprFlickrUserTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprCronTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+/**
+* Description
+*/
+class FlickrRipprAdminFormTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprAdminFormValidateTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprAdminFormSubmitTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprUserSettingsTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprUSerTestingsFormTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprNodeFormTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprBlockTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprThumbnailsTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
+
+/**
+* Description
+*/
+class FlickrRipprNewestTest extends DrupalTestCase {
+  function get_info() {
+    return array('name'  => 'CoolFeature Test',
+                 'desc'  => t('Assure that all cool features of your module work.'),
+                              'group' => 'Your Module Tests');
+  }
+  
+  function testYourCoolFeature() {
+    /* Test code here */
+  }
+}
