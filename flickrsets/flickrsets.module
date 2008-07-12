@@ -1,0 +1,28 @@
+<?php
+function flickrsets_perm() {
+  return array('Read Flickr Sets');
+}
+function flickrsets_menu() {
+  $items = array();
+  $items['flickr/sets'] = array('title' => t('Flickr Sets'),
+                                 'page callback' => 'flickrsets_page',
+                                 'access arguments' => array('Read Flickr Sets'));
+                                     
+  return $items;
+}
+                                 
+function flickrsets_page() {
+  $output = '';
+  
+  $output .= drupal_get_form('flickrsets_form');
+  return $output;
+}
+
+function flickrsets_form() {
+  $form =array();
+  $form['flickrusername'] = array(
+                                  '#type' => 'textfield', 
+                                  '#title' => t('Flickr user name'),
+                                  '#required' => true);
+  return $form;
+}
