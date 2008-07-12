@@ -4,6 +4,8 @@
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
+ * PHP Flickr: http://phpflickr.com/docs/
+ * Flickr API docs http://www.flickr.com/services/api/
  */
 
 /**
@@ -14,10 +16,10 @@
 function flickrrippr_phpFlickr() {
   //Find the phpFlickr library
   $include_file = drupal_get_path('module', 'flickrrippr') .'/phpFlickr-2.2.0/phpFlickr.php';
-//  if (!file_exists($include_file)) {
-//    drupal_set_message(t("Missing phpFlickr - expected to find it at !file", array('!file' => $include_file)));
-//    return false;
-//  }
+  if (!file_exists($include_file)) {
+    drupal_set_message(t("Missing phpFlickr - expected to find it at !file", array('!file' => $include_file)));
+    return false;
+  }
 //  require_once($include_file);
 //
 //  //Get the api key, we need this to make queries.
@@ -93,24 +95,26 @@ function flickrrippr_phpFlickr() {
 //  return $s;
 //}
 //
-///**
-//* Helper function, to get drupal user details for a flickr user
-//*/
-//function flickrrippr_get_user_by_flickruser($fuser) {
-//  if (!$fuser) {
-//    drupal_set_message(t("Refusing to search for blank username"));
-//    return;
-//  }
-//  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername = '%s'", $fuser));
-//  if (!$flickruser) {
-//    drupal_set_message(t("Flickruser %flickrusername is not a registered user of this site", array('%flickrusername' => $fuser)));
-//    return;
-//  }
-//  
-//  $user = user_load(array('uid' => $flickruser->uid));
-//  return $user;
-//}
-//
+    
+/**
+* Helper function, to get drupal user details for a flickr user (string of their username of flickr)
+*/
+function flickrrippr_get_user_by_flickruser($fuser) {
+  if (!$fuser) {
+    drupal_set_message(t("Refusing to search for blank username"));
+    return;
+  }
+  
+  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername = '%s'", $fuser));
+  if (!$flickruser) {
+    drupal_set_message(t("Flickruser %flickrusername is not a registered user of this site", array('%flickrusername' => $fuser)));
+    return;
+  }
+  
+  $user = user_load(array('uid' => $flickruser->uid));
+  return $user;
+}
+
 ///**
 //* Work out the path to a photo - also handles the cache on the local filesystem
 //*/
