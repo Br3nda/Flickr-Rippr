@@ -42,7 +42,9 @@ function flickrsets_form() {
 
 function flickrsets_form_submit($form, $values) {
   $flickr = flickrrippr_phpFlickr();
-  $flickr->
+  $username = $values['values']['flickrusername'];
+  $user_id = flickrrippr_get_user_by_flickrusername($values);
+  //$flickr->photosets_getList($user_id);
   //put into temp table
   //redirect and display
 }

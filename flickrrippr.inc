@@ -99,7 +99,7 @@ function flickrrippr_phpFlickr() {
 /**
 * Helper function, to get drupal user details for a flickr user (string of their username of flickr)
 */
-function flickrrippr_get_user_by_flickruser($fuser) {
+function flickrrippr_get_user_by_flickrusername($fuser) {
   if (!$fuser) {
     drupal_set_message(t("Refusing to search for blank username"));
     return;
@@ -189,7 +189,7 @@ function flickrrippr_get_user_by_flickruser($fuser) {
 //  drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)));
 //  
 //  //get user details
-//      $user = flickrrippr_get_user_by_flickruser($flickrusername);
+//      $user = flickrrippr_get_user_by_flickrusername($flickrusername);
 //  if (!$user) {
 //    drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)));
 //    return false;
