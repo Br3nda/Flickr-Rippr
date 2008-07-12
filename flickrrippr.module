@@ -172,12 +172,12 @@ function flickrrippr_refresh_oldest() {
 ///**
 //* Makes a node for a flickr photo - or updates if it already exists
 //*/
-//function flickrrippr_makenode($photo_id) {
-//  drupal_set_message(t("Making node for %photo_id", array('%photo_id' => $photo_id)));
-//  if (!$photo_id) {
-//    drupal_set_message(t("Photo_id required"));
-//    return;
-//  }
+function flickrrippr_makenode($photo_id) {
+  drupal_set_message(t("Making node for %photo_id", array('%photo_id' => $photo_id)));
+  if (!$photo_id) {
+   drupal_set_message(t("Photo_id required"));
+    return;
+  }
 //
 //  $node->nid = flickrrippr_photo_get_nid($photo_id) ;
 //  $flickr = @flickrrippr_phpFlickr();
@@ -252,7 +252,10 @@ function flickrrippr_refresh_oldest() {
 //  }
 //  else {
 //    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
-//  }
+}
+
+
+
 //
 //function flickrrippr_addcomments($photo_id, $nid) {
 //  $flickr = @flickrrippr_phpFlickr();
