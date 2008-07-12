@@ -1,4 +1,13 @@
 <?php
+/**
+ * @file reads flickr set from flickr.com, 
+ * From this you can copy markup, or save a a node
+ * Does not stay in sync with flickr... at least not yet.
+ */
+ 
+/** 
+ * Hook_perm
+ */
 function flickrsets_perm() {
   return array('Read Flickr Sets');
 }
@@ -24,5 +33,16 @@ function flickrsets_form() {
                                   '#type' => 'textfield', 
                                   '#title' => t('Flickr user name'),
                                   '#required' => true);
+  $form['submit'] = array(
+                          '#type' => 'submit',
+                          '#value' => t('Get Sets'),
+                         );
   return $form;
+}
+
+function flickrsets_form_submit($form, $values) {
+  $flickr = flickrrippr_phpFlickr();
+  $flickr->
+  //put into temp table
+  //redirect and display
 }
