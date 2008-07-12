@@ -1,9 +1,11 @@
 <?php
-///**
-// * @file flickrriprr.inc 
-// * Functions that are likely to be of use to other modules, are in this file.
-// */
-//
+//$Id ;
+
+/**
+ * @file flickrriprr.inc 
+ * Functions that are likely to be of use to other modules, are in this file.
+ */
+
 /**
  * returns the phpFlickr object.
  * If we need to change anything, such as making the cache configuration,
