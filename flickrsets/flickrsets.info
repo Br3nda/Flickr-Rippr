@@ -1,5 +1,5 @@
 name = FlickrSets
 description = Bunch of utilities for reading sets of photos from flickr
 package = Flickr
-dependencides = flickrrippr
+dependencies = flickrrippr
 core = 6.x
