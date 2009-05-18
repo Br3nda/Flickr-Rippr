@@ -296,7 +296,7 @@ function flickrrippr_makenode($photo_id) {
 function flickrrippr_flickruser($username) {
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to query flickr.com, library missing"), 'error');
+    drupal_set_message(t("Unable to query flickr.com"), 'error');
     return $output;
   }
   $fuser = $flickr->people_findByUsername($username);
