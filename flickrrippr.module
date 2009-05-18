@@ -309,14 +309,16 @@ function flickrrippr_makenode($photo_id) {
 //  return $fuser['id'];
 //}
 ///**
-//* Implementation of hook_cron
-//*/
-//function flickrrippr_cron() {
-//  $result = db_query("SELECT * from {flickrusers} ORDER BY uid");
-//  while ($fuser = db_fetch_object($result)) {
-//    flickrrippr_check_latest($fuser->uid);
-//  }
-//}
+/** Implementation of hook_cron
+*/
+function flickrrippr_cron() {
+  drupal_set_message("flickr rippr cron");
+  $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
+  while ($fuser = db_fetch_object($result)) {
+    drupal_set_message("flickrrippr cron for $fuser->uid");
+    flickrrippr_check_latest($fuser->uid);
+  }
+}
 
 
 /**
@@ -365,7 +367,7 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
 /**
  * Where a user defines their username
  */
-function flickrrippr_user_settings($uid) {
+function flickrrippr_user_settings($uid=null) {
   if (!empty($uid) && user_access('Administer global flickr api settings')) {
     $user = user_load(array('uid' => $uid));
   }
