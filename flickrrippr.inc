@@ -17,7 +17,7 @@ function flickrrippr_phpFlickr() {
   //Find the phpFlickr library
   $include_file = drupal_get_path('module', 'flickrrippr') .'/phpFlickr/phpFlickr.php';
   if (!file_exists($include_file)) {
-    drupal_set_message(t("Missing phpFlickr - expected to find it at !file", array('!file' => $include_file)), 'error');
+    drupal_set_message(t("Missing phpFlickr - expected to find it at !file. Download this from !link", array('!file' => $include_file, '!link' => l('phpflickr.com', 'http://phpflickr.com/'))), 'error');
     return false;
   }
 //  require_once($include_file);
