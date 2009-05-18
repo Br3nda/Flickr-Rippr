@@ -20,16 +20,16 @@ function flickrrippr_phpFlickr() {
     drupal_set_message(t("Missing phpFlickr - expected to find it at !file. Download this from !link", array('!file' => $include_file, '!link' => l('phpflickr.com', 'http://phpflickr.com/'))), 'error');
     return false;
   }
-//  require_once($include_file);
-//
-//  //Get the api key, we need this to make queries.
-//  $api_key = variable_get('flickrapikey', '');
-//  if (!$api_key) {
-//    drupal_set_message(t("Flickr API key not set"), 'error');
-//    if (user_access('Administer global flickr api settings')) {
-//      drupal_set_message(t("Goto !link to configure FlickrRipper", array('!link' => l('admin/settings/flickrrippr', 'admin/settings/flickrrippr'))));
-//    }
-//  }
+ require_once($include_file);
+
+ //Get the api key, we need this to make queries.
+ $api_key = variable_get('flickrapikey', '');
+ if (!$api_key) {
+   drupal_set_message(t("Flickr API key not set"), 'error');
+   if (user_access('Administer global flickr api settings')) {
+     drupal_set_message(t("Goto !link to configure FlickrRipper", array('!link' => l('admin/settings/flickrrippr', 'admin/settings/flickrrippr'))), 'error');
+   }
+ }
 //
 //  //call the phpFlickr library
 //  $flickr = new phpFlickr($api_key);
@@ -37,7 +37,7 @@ function flickrrippr_phpFlickr() {
 //  //TODO make caching configurable.. but really you'd want to have this turned on.
 //  $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
 //
-//  return $flickr;
+ return $flickr;
 }
 //
 //
