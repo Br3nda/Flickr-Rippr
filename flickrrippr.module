@@ -108,11 +108,11 @@ function flickrrippr_refresh_oldest() {
 //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
 //
 //*/
-//function flickrrippr_check_latest($user_id, $pagenum = 1) {
-//  $output = '';
+function flickrrippr_check_latest($user_id, $pagenum = 1) {
+ $output = '';
 //  //TODO, don't run every time.
 //  
-//  $num_photos = 10;
+  $num_photos = 10; //TODO make customisable
 //  
 //  //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
 //  //maximum of 5 fetches.
@@ -157,7 +157,7 @@ function flickrrippr_refresh_oldest() {
 //  //flickrrippr_check_latest($user_id, $pagenum +1);
 //  return $output;
 //  
-//}
+}
 //
 //
 ///**
@@ -312,10 +312,8 @@ function flickrrippr_makenode($photo_id) {
 /** Implementation of hook_cron
 */
 function flickrrippr_cron() {
-  drupal_set_message("flickr rippr cron");
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
   while ($fuser = db_fetch_object($result)) {
-    drupal_set_message("flickrrippr cron for $fuser->uid");
     flickrrippr_check_latest($fuser->uid);
   }
 }
