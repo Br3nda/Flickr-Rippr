@@ -115,22 +115,22 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   $num_photos = 10; //TODO make customisable
 //  
 //  //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
-//  //maximum of 5 fetches.
-//  if ($pagenum > 5) {
-//    return 'done';
-//  }
-//  
-//  
-//  
-//  //fetches defails from our database
-//  $flickr_settings = flickrrippr_user_settings_get($user_id);
-//  
-//  
-//  //fetches from api.flickr.com
-//  if (!$flickr_settings->flickrid) {
-//    $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
-//  }
-//  
+ //maximum of 5 fetches.
+ if ($pagenum > 5) {
+   return 'done';
+ }
+ 
+
+
+ //fetches defails from our database
+ $flickr_settings = flickrrippr_user_settings_get($user_id);
+
+
+ //fetches from api.flickr.com
+ if (!$flickr_settings->flickrid) {
+   $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
+ }
+
 //  //search flickr for latest photos from that user.
 //  $flickr = @flickrrippr_phpFlickr();
 //  if (!$flickr) {
@@ -293,21 +293,21 @@ function flickrrippr_makenode($photo_id) {
 ///**
 //* helper function, returns the flickr_id for a flickr username
 //*/
-//function flickrrippr_flickruser($username) {
-//  $flickr = @flickrrippr_phpFlickr();
-//  if (!$flickr) {
-//    drupal_set_message(t("Unable to query flickr.com, library missing"));
-//    return $output;
-//  }
-//  $fuser = $flickr->people_findByUsername($username);
-//  
-//  if (!$fuser['id']) {
-//    drupal_set_message(t('!username is not known by flickr.com', array('!username' => $username)));
-//    return;
-//  }
-//  db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE flickrusername='%s'", $fuser['id'], $username);
-//  return $fuser['id'];
-//}
+function flickrrippr_flickruser($username) {
+  $flickr = @flickrrippr_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
+    return $output;
+  }
+  $fuser = $flickr->people_findByUsername($username);
+  
+  if (!$fuser['id']) {
+    drupal_set_message(t('!username is not known by flickr.com', array('!username' => $username)));
+    return;
+  }
+  db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE flickrusername='%s'", $fuser['id'], $username);
+  return $fuser['id'];
+}
 ///**
 /** Implementation of hook_cron
 */
