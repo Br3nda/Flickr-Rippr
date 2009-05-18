@@ -21,7 +21,7 @@ function flickrrippr_schema() {
   $schema['flickrusers'] = array(
     'fields' => array(
       'uid' => array('type' => 'int'),
-      'flickrusername' => array('type' => 'text'),
+      'flickrid' => array('type' => 'text'),
       'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(  
       'flickrusername' => array('type' => 'text', 'not null' => true),
       ),
