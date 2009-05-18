@@ -374,12 +374,10 @@ function flickrrippr_user_settings($uid=null) {
   else {
     GLOBAL $user;
   }
-  $output = '';
-  $output .= drupal_get_form('flickrrippr_user_settings_form', $user);
-  return $output;
+  return drupal_get_form('flickrrippr_user_settings_form', $user);
 }
 
-function flickrrippr_user_settings_form($user) {
+function flickrrippr_user_settings_form($a, $user) {
   $settings = flickrrippr_user_settings_get($user->uid);
   $form = array();
   $form['flickr_username'] = array(
@@ -426,6 +424,7 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
   //and store the 3432@N00 uid then  
 }
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
+  drupal_set_message('SAVE called');
   $form_values = &$form_state['values'];
   if ($form_values['uid']) {
     $user = user_load(array('uid' => $form_values['uid']));
