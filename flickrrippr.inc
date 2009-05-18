@@ -30,13 +30,13 @@ function flickrrippr_phpFlickr() {
      drupal_set_message(t("Goto !link to configure FlickrRipper", array('!link' => l('admin/settings/flickrrippr', 'admin/settings/flickrrippr'))), 'error');
    }
  }
-//
-//  //call the phpFlickr library
-//  $flickr = new phpFlickr($api_key);
-//
-//  //TODO make caching configurable.. but really you'd want to have this turned on.
-//  $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
-//
+
+ //call the phpFlickr library
+ $flickr = new phpFlickr($api_key);
+
+ //TODO make caching configurable.. but really you'd want to have this turned on.
+ $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
+
  return $flickr;
 }
 //
