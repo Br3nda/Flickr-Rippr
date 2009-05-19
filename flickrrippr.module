@@ -145,8 +145,10 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   $photos = $flickr->photos_search($query);
   $output = '';
   $new = true;
-  foreach ($photos['photo'] as $p) {
-    $new = (flickrrippr_makenode($p['id']) && $new);
+  if (is_array($photos['photo'])) {
+    foreach ($photos['photo'] as $p) {
+      $new = (flickrrippr_makenode($p['id']) && $new);
+    }
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
@@ -172,7 +174,7 @@ function flickrrippr_photo_get_nid($photo_id) {
 //* Makes a node for a flickr photo - or updates if it already exists
 //*/
 function flickrrippr_makenode($photo_id) {
-  drupal_set_message(t("Making node for %photo_id", array('%photo_id' => $photo_id)));
+  drupal_set_message(t("Making node for photoid=%photo_id", array('%photo_id' => $photo_id)));
   if (!$photo_id) {
    drupal_set_message(t("Photo_id required"), 'error');
     return;
@@ -206,6 +208,9 @@ function flickrrippr_makenode($photo_id) {
 
   //Full (normal) sized image
   $path =  flickrrippr_path($flickr_info);
+  if (!$path) {
+    return;
+  }
   list($width, $height, $type, $attr) = getimagesize($path);
   $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
 
@@ -250,10 +255,11 @@ function flickrrippr_makenode($photo_id) {
   node_save($node);
 
   if ($node->is_new) {
-    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid) VALUES (%s, %d)", $photo_id, $node->nid);
+    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched) VALUES (%s, %d, %d)", $photo_id, $node->nid, strtotime('now'));
     drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   }
   else {
+    $result = db_query("UPDATE {flickrphotos} SET lastfetched=%d WHERE flickrphoto_id=%d AND nid=%d", strtotime('now'), $photo_id, $node->nid);
     drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
 }
@@ -338,12 +344,12 @@ function flickrrippr_admin_form() {
         '#type' => 'textfield',
         '#default_value' => variable_get('flickrapikey', '')
       );
-  $form['jpegcache'] = array(
-      '#title' => 'Allow Local Cache',
-      '#type' => 'checkbox',
-      '#default_value' => variable_get('flickrjpegcache', true),
-      '#description' => t('Allow users to cache flickr photo jpeg files locally'),
-      );
+//   $form['jpegcache'] = array(
+//       '#title' => 'Allow Local Cache',
+//       '#type' => 'checkbox',
+//       '#default_value' => variable_get('flickrjpegcache', true),
+//       '#description' => t('Allow users to cache flickr photo jpeg files locally'),
+//       );
   $form['save'] = array(
      '#type' => 'submit',
      '#value' => t('Save'),
