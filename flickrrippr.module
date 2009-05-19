@@ -109,6 +109,7 @@ function flickrrippr_refresh_oldest() {
 //
 //*/
 function flickrrippr_check_latest($user_id, $pagenum = 1) {
+  
  $output = '';
 //  //TODO, don't run every time.
 //  
@@ -124,26 +125,24 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
 
  //fetches defails from our database
  $flickr_settings = flickrrippr_user_settings_get($user_id);
-
-
+  
  //fetches from api.flickr.com
  if (!$flickr_settings->flickrid) {
    $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
  }
-
-//  //search flickr for latest photos from that user.
-//  $flickr = @flickrrippr_phpFlickr();
-//  if (!$flickr) {
-//    drupal_set_message(t("Unable to query flickr.com, library missing"));
-//    return $output;
-//  }
-//  $photos = $flickr->photos_search(
-//                                    array(
-//                                           'user_id' => $flicksettings->flickrid,
-//                                           'per_page' => $num_photos,
-//                                           'page' =>  $pagenum
-//                                         )
-//                                  );
+  
+ //search flickr for latest photos from that user.
+ $flickr = @flickrrippr_phpFlickr();
+ if (!$flickr) {
+   drupal_set_message(t("Unable to query flickr.com"));
+   return $output;
+ }
+  $query = array(
+    'user_id' => $flickr_settings->flickrid,
+    'per_page' => $num_photos,
+    'page' =>  $pagenum
+    );
+  $photos = $flickr->photos_search($query);
 //  $output = '';
 //  $new = true;
 //  foreach ($photos['photo'] as $p) {
@@ -312,8 +311,10 @@ function flickrrippr_flickruser($username) {
 /** Implementation of hook_cron
 */
 function flickrrippr_cron() {
+
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
-  while ($fuser = db_fetch_object($result)) {
+  
+  while ($fuser = db_fetch_object($result)) {    
     flickrrippr_check_latest($fuser->uid);
   }
 }
