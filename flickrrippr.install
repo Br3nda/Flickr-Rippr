@@ -29,7 +29,7 @@ function flickrrippr_schema() {
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
-      'flickrphoto_id' => array('type' => 'int'),
+      'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
       'nid' => array('type' => 'int', 'not null' => true),
       'lastfetched' => array('type' => 'int', 'not null' => true), //can has timestamp? :-(
       ),
