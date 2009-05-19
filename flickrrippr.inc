@@ -105,7 +105,7 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
     return;
   }
   
-  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername = '%s'", $fuser));
+  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE LOWER(flickrusername) = '%s'", strtolower($fuser)));
   if (!$flickruser) {
     drupal_set_message(t("Flickruser %flickrusername is not a registered user of this site", array('%flickrusername' => $fuser)));
     return;
