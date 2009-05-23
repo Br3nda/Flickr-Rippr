@@ -34,7 +34,7 @@ function flickrrippr_menu() {
     
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
-                      'title' => t('Flickr Photo settings'),
+                      'title' => t('My Flickr Photo settings'),
                       'type' => MENU_NORMAL_ITEM,
                       'page callback' => 'flickrrippr_user_settings',
                       'access arguments' => array('Configure own blogged flickr stream'),
