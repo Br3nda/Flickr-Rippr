@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.73 2009/05/23 23:04:17 taniwha Exp $
+// $Id: flickrrippr.module,v 1.74 2009/05/23 23:04:59 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -65,7 +65,7 @@ function flickrrippr_menu() {
                       'callback arguments' => array($r->flickrusername, $r->uid),
                       'type' => MENU_NORMAL_ITEM,
                       'callback' => 'flickrphoto_thumbnails',
-                      'access' => true,
+                      'access' => TRUE,
                     );
     }
   */
@@ -83,7 +83,7 @@ function flickrrippr_refresh_oldest() {
   while ($photo = db_fetch_object($result)) {
     flickrrippr_makenode($photo->flickrphoto_id);
     $node = node_load($photo->nid);
-    $content .= theme('node', $node, true);
+    $content .= theme('node', $node, TRUE);
   }
   return $content;
 }
@@ -141,7 +141,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   $photos = $flickr->photos_search($query);
   //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
 
-  $new = true;
+  $new = TRUE;
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
       $new = (flickrrippr_makenode($p['id']) && $new);
@@ -153,7 +153,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
     drupal_set_message('No new photos');
-    return false;
+    return FALSE;
   }
   //recursive - call this function again to get the next 10;
   //flickrrippr_check_latest($user_id, $pagenum +1);
@@ -204,7 +204,7 @@ function flickrrippr_makenode($photo_id) {
   $user = flickrrippr_get_user_by_flickrusername($flickrusername);
   if (!$user) {
     drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)));
-    return false;
+    return FALSE;
   }
 
   //Full (normal) sized image
@@ -217,7 +217,7 @@ function flickrrippr_makenode($photo_id) {
 
 
   //thumbnail version
-  $path =  flickrrippr_path($flickr_info, true, 'm');
+  $path =  flickrrippr_path($flickr_info, TRUE, 'm');
 
   list($width, $height, $type, $attr) = getimagesize($path);
   $thumb = '<img src="' . $path . '" width="' . $width . '" height="' . $height . '" />';
@@ -345,14 +345,14 @@ function flickrrippr_admin_form() {
 
   $form['api_key'] = array(
         '#title' => 'Flickr Api Key',
-        '#required' => true,
+        '#required' => TRUE,
         '#type' => 'textfield',
         '#default_value' => variable_get('flickrapikey', '')
       );
 //   $form['jpegcache'] = array(
 //       '#title' => 'Allow Local Cache',
 //       '#type' => 'checkbox',
-//       '#default_value' => variable_get('flickrjpegcache', true),
+//       '#default_value' => variable_get('flickrjpegcache', TRUE),
 //       '#description' => t('Allow users to cache flickr photo jpeg files locally'),
 //       );
 
@@ -400,12 +400,12 @@ function flickrrippr_user_settings_form($a, $user) {
                                     '#type' => 'textfield',
                                     '#title' => t('Flickr Username'),
                                     '#default_value' => $settings->flickrusername,
-                                    '#required' => true
+                                    '#required' => TRUE
                                   );
   $form['thumbnailpage'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Thumbnail page'),
-    '#default_value' => true,
+    '#default_value' => TRUE,
     );
   $form['promote'] = array(
    '#type' => 'checkbox',
@@ -470,7 +470,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //  //TODO add instructions on edit the photo on flickr.com
 //
 //      $form['flickr'] = array('#type' => 'fieldset',
-//                              '#collapsible' => true,
+//                              '#collapsible' => TRUE,
 //                          '#title' => t('Flickr API queries'),
 //                         );
 //  $form['flickr']['cache'] = array(
@@ -492,7 +492,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //                                 );
 //
 //  $form['size'] = array('#type' => 'fieldset',
-//                        '#collapsible' => true,
+//                        '#collapsible' => TRUE,
 //                        '#title' => t('Image sizes'),
 //                       );
 //  $sizes = array('t' => t('Thumbnail'),
@@ -669,7 +669,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //* Make a html chunk of photos ready for display from a
 //* photo list as returned by phpFlickr methods
 //*/
-//function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
+//function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = TRUE) {
 //  $row = 0;
 //  if (!is_array($photos['photo'])) {
 //    return t('No photos found');
@@ -690,7 +690,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //      return '';
 //    }
 //
-//    $img = flickrrippr_show_photo($p, false, null, $cache);
+//    $img = flickrrippr_show_photo($p, FALSE, null, $cache);
 //    if ($cache) {
 //      $url = url('node/' . $nid);
 //    }
