@@ -1,5 +1,5 @@
 <?php
-//$Id: flickrrippr.module,v 1.70 2009/05/23 22:57:43 taniwha Exp $
+// $Id: flickrrippr.module,v 1.71 2009/05/23 22:58:14 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
