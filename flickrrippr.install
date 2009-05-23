@@ -3,14 +3,6 @@ function flickrrippr_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysql':
     case 'mysqli':
-      $ret[] = db_query("CREATE TABLE {flickrusers} (
-                        uid int(11) NOT NULL,
-                        flickrusername text NOT NULL,
-                        cachejpegs tinyint(1) NOT NULL default 0,
-                        flickrusername TEXT NOT NULL,
-                        PRIMARY KEY (uid)
-                       ) ENGINE=MyISAM DEFAULT");
-
       $ret[] = db_query("CREATE TABLE {flickrphotos} (
                         flickrphoto_id int(11) NOT NULL,
                         nid int(11) NOT NULL,
@@ -18,6 +10,14 @@ function flickrrippr_install() {
                         PRIMARY KEY (flickrphoto_id),
                         UNIQUE KEY flickrphoto_id (flickrphoto_id),
                         UNIQUE KEY nid (nid)
+                       ) ENGINE=MyISAM DEFAULT");
+
+      $ret[] = db_query("CREATE TABLE {flickrusers} (
+                        uid int(11) NOT NULL,
+                        flickusername text NOT NULL,
+                        cachejpegs tinyint(1) NOT NULL default 0,
+                        flickrid TEXT NOT NULL,
+                        PRIMARY KEY (uid)
                        ) ENGINE=MyISAM DEFAULT");
 
       break;
@@ -28,12 +28,12 @@ function flickrrippr_install() {
                         lastfetched timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                         PRIMARY KEY (flickrphoto_id)
                        )");
-      db_query("CREATE TABLE {flickrusers} (
-               uid INTEGER NOT NULL REFERENCES {users} (uid),
-               flickrusername TEXT NOT NULL,
-	       cachejpegs integer NOT NULL default 0,
-               flickrid TEXT,
-               PRIMARY KEY (uid)
+      $ret[] = db_query("CREATE TABLE {flickrusers} (
+		      uid INTEGER NOT NULL REFERENCES {users} (uid),
+		      flickrusername TEXT NOT NULL,
+		      cachejpegs integer NOT NULL default 0,
+		      flickrid TEXT,
+		      PRIMARY KEY (uid)
               );");
       break;
   }
