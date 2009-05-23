@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.76 2009/05/23 23:08:34 taniwha Exp $
+// $Id: flickrrippr.module,v 1.77 2009/05/23 23:10:07 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -77,6 +77,7 @@ function flickrrippr_menu() {
  * TODO check this work in drupal6
  */
 function flickrrippr_refresh_oldest() {
+  //TODO db_query_range
   $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} ORDER BY lastfetched ASC LIMIT 20");
 
   $content = '';
@@ -165,9 +166,9 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
  * get the node id for a flickr photo id
  */
 function flickrrippr_photo_get_nid($photo_id) {
- $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
- $nid = $rec->nid;
- return $nid;
+  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
+  $nid = $rec->nid;
+  return $nid;
 }
 
 ///**
