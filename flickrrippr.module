@@ -1,5 +1,5 @@
 <?php
-//$Id ;
+//$Id: flickrrippr.module,v 1.70 2009/05/23 22:57:43 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -18,7 +18,7 @@ function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
   $items['admin/settings/flickrrippr'] = array(
-                      'title' => t('Flickr Rippr Settings'),
+                      'title' => 'Flickr Rippr Settings',
                       'path' => 'admin/settings/flickrrippr',
                       'access arguments' => array('Administer global flickr api settings'),
                       'type' => MENU_NORMAL_ITEM,
@@ -26,7 +26,7 @@ function flickrrippr_menu() {
                       'page arguments' => array('flickrrippr_admin_form')
                     );
     $items['admin/content/flickrrippr-fetch'] = array(
-                      'title' => t('Re-fetch oldest flickr photos'),
+                      'title' => 'Re-fetch oldest flickr photos',
                       'type' => MENU_NORMAL_ITEM,
                       'page callback' => 'flickrrippr_refresh_oldest',
                       'access arguments' => array('Administer global flickr api settings'),
@@ -34,7 +34,7 @@ function flickrrippr_menu() {
     
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
-                      'title' => t('My Flickr Photo settings'),
+                      'title' => 'My Flickr Photo settings',
                       'type' => MENU_NORMAL_ITEM,
                       'page callback' => 'flickrrippr_user_settings',
                       'access arguments' => array('Configure own blogged flickr stream'),
