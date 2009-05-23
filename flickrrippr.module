@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.81 2009/05/23 23:16:58 taniwha Exp $
+// $Id: flickrrippr.module,v 1.69.2.1 2009/05/23 23:22:47 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -554,9 +554,9 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //  drupal_goto('node/'. $form_values['nid']);
 //}
 //
-///**
-//    * Implementation of hook_block
-//*/
+/**
+ * Implementation of hook_block().
+ */
 //    function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
 //      $result = db_query("SELECT * FROM {flickrusers} INNER JOIN {users} ON {flickrusers}.uid = {users}.uid ORDER BY name");
 //      $users = array();
@@ -707,8 +707,8 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //
 //
 /**
-//    menu callback, page-able screen full of thumbnails
-//*/
+ * menu callback, page-able screen full of thumbnails
+ */
 //    function flickrrippr_thumbnails($fuser, $page = 1) {
 //      $output = '';
 //      if (!$fuser) {
@@ -757,6 +757,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //	if (!$record) return 0;
 //        return $record->flickrphoto_id;
 //}
+ 
 function flickrrippr_node_form(&$form_state, $node) {
 }
 /**
@@ -767,7 +768,7 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
       //delete where there is no node.. THIS WON'T SCALE
       //how to get around drupal's lack of referential integrity?
       db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
-      drupal_set_message("Flickr photo deleted");
+      drupal_set_message(t("Details of flickr photo deleted. Photo on flickr.com not changed."));
     break;
 //     case 'view':
 //       flickrrippr_node_view($node);
