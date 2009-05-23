@@ -142,21 +142,27 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     'per_page' => $num_photos,
     'page' =>  $pagenum
     );
+  //drupal_set_message(__FUNCTION__ .' query: '. print_r($query, 1));
+  
   $photos = $flickr->photos_search($query);
-  $output = '';
+  //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
+  
   $new = true;
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
       $new = (flickrrippr_makenode($p['id']) && $new);
     }
   }
+  else {
+    drupal_set_message(t('No new photos'));
+  }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
+    drupal_set_message('No new photos');
     return false;
   }
   //recursive - call this function again to get the next 10;
   //flickrrippr_check_latest($user_id, $pagenum +1);
-  return $output;
 
 }
 
@@ -174,13 +180,13 @@ function flickrrippr_photo_get_nid($photo_id) {
 //* Makes a node for a flickr photo - or updates if it already exists
 //*/
 function flickrrippr_makenode($photo_id) {
-  drupal_set_message(t("Making node for photoid=%photo_id", array('%photo_id' => $photo_id)));
+  drupal_set_message(t("Making node for flickr photoid=%photo_id", array('%photo_id' => $photo_id)));
   if (!$photo_id) {
-   drupal_set_message(t("Photo_id required"), 'error');
+    drupal_set_message(t("Photo_id required"), 'error');
     return;
   }
-
- $node->nid = flickrrippr_photo_get_nid($photo_id) ;
+  
+  $node->nid = flickrrippr_photo_get_nid($photo_id) ;
   if ($node->nid) {
     //already exists
     drupal_set_message(t('Existing node id = !nid. !link.'), array('!nid' => $node->nid, '!link' => l('View node', 'node/'. $node->nid)));
@@ -195,6 +201,7 @@ function flickrrippr_makenode($photo_id) {
   $flickr_info = $flickr->photos_getInfo($photo_id);
   $flickr_context = $flickr->photos_getContext($photo_id);
 
+  //drupal_set_message(__FUNCTION__ .'photo info: '. print_r($flickr_info, 1));
   //flickr username
   $flickrusername = $flickr_info['owner']['username'];
   drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)));
@@ -212,14 +219,14 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . file_create_url($path)  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
 
 
   //thumbnail version
   $path =  flickrrippr_path($flickr_info, true, 'm');
 
   list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . file_create_url($path) . '" width="' . $width . '" height="' . $height . '" />';
+  $thumb = '<img src="' . $path . '" width="' . $width . '" height="' . $height . '" />';
 
 
   $node->title = htmlentities($flickr_info['title']);
@@ -251,6 +258,7 @@ function flickrrippr_makenode($photo_id) {
   $node->status =1;
   $node->comment = 2;
   $node->promote = 1;
+  $node->format = 2;
 
   node_save($node);
 
@@ -292,17 +300,18 @@ function flickrrippr_makenode($photo_id) {
 //	}
 //
 //    
-//     db_query("INSERT INTO {flickrcomments} (cid, flickrcomment_id, author, authorname, datecreate, permalink, content)
-//VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s')", $cid, $c['id'], $c['author'], $c['authorname'], $c['datecreate'], $c['permalink'], $c['_content']); 
-//	 db_query("UPDATE {comments} set status =1, timestamp=%d where cid = %d", $c['datecreate'], $cid);
-//   	 db_query("UPDATE {ua_logger} SET ua='<a href=\"http://flickr.com/photos/taniwha/\">Flickr</a>' where xid=%d and type='comment'", $cid);
+//      db_query("INSERT INTO {flickrcomments} (cid, flickrcomment_id, author, authorname, datecreate, permalink, content)
+// VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s')", $cid, $c['id'], $c['author'], $c['authorname'], $c['datecreate'], $c['permalink'], $c['_content']);
+// 	 db_query("UPDATE {comments} set status =1, timestamp=%d where cid = %d", $c['datecreate'], $cid);
+//    	 db_query("UPDATE {ua_logger} SET ua='<a href=\"http://flickr.com/photos/taniwha/\">Flickr</a>' where xid=%d and type='comment'", $cid);
+//    }
 //   }
-//  }
-//
-//}
-///**
-//* helper function, returns the flickr_id for a flickr username
-//*/
+// 
+// }
+
+/**
+* helper function, returns the flickr_id for a flickr username
+*/
 function flickrrippr_flickruser($username) {
   $flickr = @flickrrippr_phpFlickr();
   if (!$flickr) {
@@ -318,14 +327,16 @@ function flickrrippr_flickruser($username) {
   db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE flickrusername='%s'", $fuser['id'], $username);
   return $fuser['id'];
 }
-///**
-/** Implementation of hook_cron
+
+/**
+* Implementation of hook_cron
 */
 function flickrrippr_cron() {
-
+  //drupal_set_message(__FUNCTION__);
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
   
-  while ($fuser = db_fetch_object($result)) {    
+  while ($fuser = db_fetch_object($result)) {
+    //drupal_set_message('checking: '. print_r($fuser, 1));
     flickrrippr_check_latest($fuser->uid);
   }
 }
@@ -350,6 +361,7 @@ function flickrrippr_admin_form() {
 //       '#default_value' => variable_get('flickrjpegcache', true),
 //       '#description' => t('Allow users to cache flickr photo jpeg files locally'),
 //       );
+
   $form['save'] = array(
      '#type' => 'submit',
      '#value' => t('Save'),
@@ -701,7 +713,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //}
 //
 //
-///**
+/**
 //    menu callback, page-able screen full of thumbnails
 //*/
 //    function flickrrippr_thumbnails($fuser, $page = 1) {
@@ -752,3 +764,20 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //	if (!$record) return 0;
 //        return $record->flickrphoto_id;
 //}
+function flickrrippr_node_form(&$form_state, $node) {
+}
+/**
+*/
+function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'delete':
+      //delete where there is no node.. THIS WON'T SCALE
+      //how to get around drupal's lack of referential integrity?
+      db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
+      drupal_set_message("Flickr photo deleted");
+    break;
+//     case 'view':
+//       flickrrippr_node_view($node);
+  }
+}
+

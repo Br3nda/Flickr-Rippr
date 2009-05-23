@@ -115,51 +115,56 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
   return $user;
 }
 
-///**
-//* Work out the path to a photo - also handles the cache on the local filesystem
-//*/
+
+
+/**
+* Work out the path to a photo - also handles the cache on the local filesystem
+*/
 function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
 
 
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
-     $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
- if (!$cache) return $src;
+  $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  if (!$cache) {
+    return $src;
+  }
+  return $src;
 
  $folder =  file_directory_path() . '/flickr';
  if (!file_create_path($folder)) {
    drupal_set_message(t('Files directory not set, unable to cache flickr photos'), 'error');
-   return ;
+   return;
  }
- 
- $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
-
+  
+  $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  
  //If we've already go it, then we dont' need to get it
-     if (file_exists($filename)) {
+  if (file_exists($filename)) {
    //if (filesize($filename) > 0) {
      //TODO, check mtime against photo info -- if possible
-       return $filename;
+    return $filename;
    //}
-     }
-
-     require_once "HTTP/Request.php";
-     $req =& new HTTP_Request($src);
+  }
+  
+  require_once "HTTP/Request.php";
+  $req =& new HTTP_Request($src);
    //Something went wrong?
-       if (PEAR::isError($req->sendRequest())) {
-     drupal_set_message(t("Failed to retrieve jpeg file from flick.com, url = %url", array('%url' => $src)));
+  if (PEAR::isError($req->sendRequest())) {
+    drupal_set_message(t("Failed to retrieve jpeg file from flick.com, url = %url", array('%url' => $src)));
    //use flickr hosted jpeg
-       return $src;
-       }
-
+    return $src;
+  }
+  
    //file handle to save the jpeg into
-       $contents = $req->getResponseBody();
-   if (file_save_data($contents, $filename, FILE_EXISTS_REPLACE)) {
-     return $filename;
-   }
-   else {
-     drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
-     return $src;
-   }
-//  
+  $contents = $req->getResponseBody();
+  if (file_save_data($contents, $filename, FILE_EXISTS_REPLACE)) {
+    return $filename;
+  }
+  else {
+    drupal_set_message(t("Failed to save image to %filename", array('%filename' => $filename)));
+    return $src;
+  }
+ 
 }
 //
 ///**
