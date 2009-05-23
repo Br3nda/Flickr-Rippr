@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.74 2009/05/23 23:04:59 taniwha Exp $
+// $Id: flickrrippr.module,v 1.75 2009/05/23 23:07:33 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -152,7 +152,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
-    drupal_set_message('No new photos');
+    drupal_set_message(t('No new photos'));
     return FALSE;
   }
   //recursive - call this function again to get the next 10;
@@ -165,7 +165,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
  * get the node id for a flickr photo id
  */
 function flickrrippr_photo_get_nid($photo_id) {
- $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = %s", $photo_id));
+ $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
  $nid = $rec->nid;
  return $nid;
 }
