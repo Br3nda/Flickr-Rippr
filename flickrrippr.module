@@ -147,13 +147,16 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
                                            'page' =>  $pagenum
                                          )
                                   );
-  $output = '';
-  
-  
-  
+
   $new = true;
-  foreach ($photos['photo'] as $p) {
-    $new = (flickrrippr_makenode($p['id'], $p) && $new);
+  if(!$photos) {
+    watchdog('flickrrippr', 'Could not query flickr.com.');
+    return false;
+  }
+  if (is_array($photos['photo'])) {
+    foreach ($photos['photo'] as $p) {
+      $new = (flickrrippr_makenode($p['id'], $p) && $new);
+    }
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
@@ -161,7 +164,6 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   }
   //recursive - call this function again to get the next 10;
   //flickrrippr_check_latest($user_id, $pagenum +1);
-  return $output;
   
 }
 /**
