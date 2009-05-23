@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.75 2009/05/23 23:07:33 taniwha Exp $
+// $Id: flickrrippr.module,v 1.76 2009/05/23 23:08:34 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -257,7 +257,7 @@ function flickrrippr_makenode($photo_id) {
   node_save($node);
 
   if ($node->is_new) {
-    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched) VALUES (%s, %d, %d)", $photo_id, $node->nid, strtotime('now'));
+    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched) VALUES ('%s', %d, %d)", $photo_id, $node->nid, strtotime('now'));
     drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   }
   else {
@@ -374,8 +374,8 @@ function flickrrippr_admin_form_validate() {
  */
 function flickrrippr_admin_form_submit($form, &$form_state) {
   $form_values = &$form_state['values'];
-  variable_set('flickrapikey', $form_values['api_key']);
-  variable_set('flickrjpegcache', $form_values['jpegcache']);
+  variable_set('flickrapikey', $form_state['values']['api_key']);
+  variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
   drupal_set_message(t('Settings saved'));
 }
 
