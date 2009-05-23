@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.78 2009/05/23 23:12:50 taniwha Exp $
+// $Id: flickrrippr.module,v 1.79 2009/05/23 23:15:06 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -305,7 +305,7 @@ function flickrrippr_makenode($photo_id) {
 // }
 
 /**
- * helper function, returns the flickr_id for a flickr username
+ * Helper function, returns the flickr_id for a flickr username.
  */
 function flickrrippr_flickruser($username) {
   $flickr = @flickrrippr_phpFlickr();
@@ -324,7 +324,7 @@ function flickrrippr_flickruser($username) {
 }
 
 /**
- * Implementation of hook_cron
+ * Implementation of hook_cron().
  */
 function flickrrippr_cron() {
   //drupal_set_message(__FUNCTION__);
@@ -384,7 +384,7 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
 /**
  * Where a user defines their username
  */
-function flickrrippr_user_settings($uid=null) {
+function flickrrippr_user_settings($uid=NULL) {
   if (!empty($uid) && user_access('Administer global flickr api settings')) {
     $user = user_load(array('uid' => $uid));
   }
@@ -615,7 +615,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 ///**
 //    Displays flickr photos, and links to nodes if caches
 //*/
-//    function flickrphoto_thumbnails($uid=null) {
+//    function flickrphoto_thumbnails($uid=NULL) {
 //      if($user_id) {
 //        $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid WHERE uid = %d ORDER BY u.name", $uid);
 //
@@ -627,7 +627,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //      $flickr = @flickrrippr_phpFlickr();
 //      while ($user = db_fetch_object($result)) {
 //        $user->flickrid = flickrrippr_flickruser($user->flickrusername);
-//        $photos = $flickr->people_getPublicPhotos($user->flickrid, null, $LIMIT, 1);
+//        $photos = $flickr->people_getPublicPhotos($user->flickrid, NULL, $LIMIT, 1);
 //        $output .= flickrrippr_thumbnail_table($photos, $photo_list);
 //      }
 //      return $output;
@@ -656,7 +656,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //      if (!$user->flickrid) {
 //        return $output;
 //      }
-//      $photos = $flickr->people_getPublicPhotos($user->flickrid, null, 18, 1);
+//      $photos = $flickr->people_getPublicPhotos($user->flickrid, NULL, 18, 1);
 //      $output .= flickrrippr_thumbnail_table($photos, $photo_list);
 //
 //  //$output .= l('more photos', 'flickr_newest');
@@ -690,7 +690,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //      return '';
 //    }
 //
-//    $img = flickrrippr_show_photo($p, FALSE, null, $cache);
+//    $img = flickrrippr_show_photo($p, FALSE, NULL, $cache);
 //    if ($cache) {
 //      $url = url('node/' . $nid);
 //    }
@@ -726,7 +726,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 //      $num_per_page = 60;
 //
 //      $user = flickrrippr_flickruser($fuser);
-//      $photos= $flickr->people_getPublicPhotos($user['id'], null, $num_per_page, intval($page));
+//      $photos= $flickr->people_getPublicPhotos($user['id'], NULL, $num_per_page, intval($page));
 //
 //      $output .= flickrrippr_thumbnail_table($photos, $photo_list);
 //
