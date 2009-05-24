@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.82 2009/05/24 00:24:29 taniwha Exp $
+// $Id: flickrrippr.module,v 1.83 2009/05/24 00:39:34 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -118,26 +118,29 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   if ($pagenum > 5) {
     return 'done';
   }
+  
+  
  //fetches defails from our database
   $flickr_settings = flickrrippr_user_settings_get($user_id);
-
+  
  //fetches from api.flickr.com
   if (!$flickr_settings->flickrid) {
     $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
   }
 
+  
  //search flickr for latest photos from that user.
-  $flickr = @flickrrippr_phpFlickr();
+  $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com"));
     return $output;
   }
+  
   $query = array(
     'user_id' => $flickr_settings->flickrid,
     'per_page' => $num_photos,
     'page' =>  $pagenum
     );
-  //drupal_set_message(__FUNCTION__ .' query: '. print_r($query, 1));
 
   $photos = $flickr->photos_search($query);
   //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
@@ -327,11 +330,9 @@ function flickrrippr_flickruser($username) {
  * Implementation of hook_cron().
  */
 function flickrrippr_cron() {
-  //drupal_set_message(__FUNCTION__);
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
 
   while ($fuser = db_fetch_object($result)) {
-    //drupal_set_message('checking: '. print_r($fuser, 1));
     flickrrippr_check_latest($fuser->uid);
   }
 }
