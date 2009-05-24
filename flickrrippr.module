@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.83 2009/05/24 00:39:34 taniwha Exp $
+// $Id: flickrrippr.module,v 1.84 2009/05/24 00:40:27 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -189,7 +189,7 @@ function flickrrippr_makenode($photo_id) {
     //already exists
     drupal_set_message(t('Existing node id = !nid. !link.'), array('!nid' => $node->nid, '!link' => l('View node', 'node/'. $node->nid)));
   }
-  $flickr = @flickrrippr_phpFlickr();
+  $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com, library missing"));
     return $output;
@@ -274,7 +274,7 @@ function flickrrippr_makenode($photo_id) {
 
 //
 //function flickrrippr_addcomments($photo_id, $nid) {
-//  $flickr = @flickrrippr_phpFlickr();
+//  $flickr = @flickrapi_phpFlickr();
 //    if (!$flickr) {
 //    drupal_set_message(t("Unable to query flickr.com, library missing"));
 //    return $output;
@@ -311,7 +311,7 @@ function flickrrippr_makenode($photo_id) {
  * Helper function, returns the flickr_id for a flickr username.
  */
 function flickrrippr_flickruser($username) {
-  $flickr = @flickrrippr_phpFlickr();
+  $flickr = @flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com"), 'error');
     return $output;
@@ -622,7 +622,7 @@ function flickrrippr_form(&$node) {
 //        $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
 //      }
 //      $LIMIT = 200;
-//      $flickr = @flickrrippr_phpFlickr();
+//      $flickr = @flickrapi_phpFlickr();
 //      while ($user = db_fetch_object($result)) {
 //        $user->flickrid = flickrrippr_flickruser($user->flickrusername);
 //        $photos = $flickr->people_getPublicPhotos($user->flickrid, NULL, $LIMIT, 1);
@@ -642,7 +642,7 @@ function flickrrippr_form(&$node) {
 //    function flickrphoto_newest($user) {
 //      $output = '';
 //
-//      $flickr = @flickrrippr_phpFlickr();
+//      $flickr = @flickrapi_phpFlickr();
 //      if (!$flickr) {
 //        drupal_set_message(t("Unable to query flickr.com, library missing"));
 //        return $output;
@@ -714,7 +714,7 @@ function flickrrippr_form(&$node) {
 //        return $output;
 //      }
 //
-//      $flickr = @flickrrippr_phpFlickr();
+//      $flickr = @flickrapi_phpFlickr();
 //
 //      if (!$flickr) {
 //        drupal_set_message(t("Unable to query flickr.com, library missing"));
