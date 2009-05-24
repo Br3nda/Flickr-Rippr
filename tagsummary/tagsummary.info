@@ -1,4 +1,5 @@
 name = Flickr Tag Summary
-package=Flickr Rippr
-dependencies=flickrrippr
-description=Produces thumbnail sheets from a flickr tag + username
+package = Flickr
+dependencies[] = flickrrippr
+description = Produces thumbnail sheets from a flickr tag + username
+core = 6.x
