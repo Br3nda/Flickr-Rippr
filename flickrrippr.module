@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.6 2010/06/21 22:31:34 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.7 2010/06/21 22:33:37 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -81,7 +81,9 @@ function flickrrippr_menu() {
 }
 
 function flickrrippr_admin_fetch($uid) {
-  return '';
+  
+  flickrrippr_check_latest(intval($uid));
+  drupal_goto('admin/content/flickrrippr');
 }
 
 /**
