@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.86 2009/05/26 20:08:39 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87 2010/06/21 04:50:07 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -401,7 +401,7 @@ function flickrrippr_user_settings_form($a, $user) {
   $form['flickr_username'] = array(
                                     '#type' => 'textfield',
                                     '#title' => t('Flickr Username'),
-                                    '#default_value' => $settings->flickrusername,
+                                    '#default_value' => isset($settings->flickrusername) ? $settings->flickrusername : '',
                                     '#required' => TRUE
                                   );
   $form['thumbnailpage'] = array(
