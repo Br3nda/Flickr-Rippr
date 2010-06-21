@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.2 2010/06/21 04:53:47 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.3 2010/06/21 04:59:11 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -25,10 +25,11 @@ function flickrrippr_menu() {
 //                       'page callback' => 'drupal_get_form',
 //                       'page arguments' => array('flickrrippr_admin_form')
 //                     );
-    $items['admin/content/flickrrippr-fetch'] = array(
-                      'title' => 'Re-fetch oldest flickr photos',
+    $items['admin/content/flickrrippr'] = array(
+                      'title' => t('Flickr Rippr'),
+		      'description' => t('View users, and force re-read from flickr.com'),
                       'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'flickrrippr_refresh_oldest',
+                      'page callback' => 'flickrrippr_admin',
                       'access arguments' => array('Administer global flickr api settings'),
                     );
 
@@ -76,9 +77,27 @@ function flickrrippr_menu() {
  * This is called from admin menu, and will refresh the 20 oldest photos
  * TODO check this work in drupal6
  */
-function flickrrippr_refresh_oldest() {
+function flickrrippr_admin() {
+  $output = '';
+
+  $result = pager_query("SELECT * FROM {flickrusers} f INNER JOIN {users} u ON u.uid = f.uid");
+  $headers = array(
+    array('data' => t('Name'), 'field' => 'name'),
+    array('data' => t('Flickr Username'), 'field' => 'flickrusername'),
+  );
+
+
+  while ($u = db_fetch_object($result)) {
+    $rows[] = array(
+      $u->name,
+      $u->flickrusername,
+      l('Fetch latest', 'admin/content/flickrrippr/fetch/'. $u->uid),
+    );
+  }
+  $output .= theme('table', $headers, $rows);
+  return $output;
   //TODO db_query_range
-  $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} ORDER BY lastfetched ASC LIMIT 20");
+/*  $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} ORDER BY lastfetched ASC LIMIT 20");
 
   $content = '';
   while ($photo = db_fetch_object($result)) {
@@ -86,7 +105,7 @@ function flickrrippr_refresh_oldest() {
     $node = node_load($photo->nid);
     $content .= theme('node', $node, TRUE);
   }
-  return $content;
+  return $content;*/
 }
 
 
