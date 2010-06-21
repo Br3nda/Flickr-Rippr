@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.4 2010/06/21 04:59:54 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.5 2010/06/21 22:31:16 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -30,6 +30,13 @@ function flickrrippr_menu() {
 		      'description' => t('View users, and force re-read from flickr.com'),
                       'type' => MENU_NORMAL_ITEM,
                       'page callback' => 'flickrrippr_admin',
+                      'access arguments' => array('Administer global flickr api settings'),
+                    );
+
+    $items['admin/content/flickrrippr/fetch'] = array(
+                      'title' => t('Fetch'),
+                      'type' => MENU_CALLBACK,
+                      'page callback' => 'flickrrippr_admin_fetch',
                       'access arguments' => array('Administer global flickr api settings'),
                     );
 
@@ -71,6 +78,10 @@ function flickrrippr_menu() {
     }
   */
   return $items;
+}
+
+function flickrrippr_admin_fetch($uid) {
+  return '';
 }
 
 /**
