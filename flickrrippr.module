@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.7 2010/06/21 22:33:37 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.8 2010/06/21 22:35:23 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -17,36 +17,28 @@ function flickrrippr_perm() {
 function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
-//   $items['admin/settings/flickrrippr'] = array(
-//                       'title' => 'Flickr Rippr Settings',
-//                       'path' => 'admin/settings/flickrrippr',
-//                       'access arguments' => array('Administer global flickr api settings'),
-//                       'type' => MENU_NORMAL_ITEM,
-//                       'page callback' => 'drupal_get_form',
-//                       'page arguments' => array('flickrrippr_admin_form')
-//                     );
-    $items['admin/content/flickrrippr'] = array(
-                      'title' => t('Flickr Rippr'),
-		      'description' => t('View users, and force re-read from flickr.com'),
-                      'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'flickrrippr_admin',
-                      'access arguments' => array('Administer global flickr api settings'),
-                    );
+  $items['admin/content/flickrrippr'] = array(
+		    'title' => t('Flickr Rippr'),
+		    'description' => t('View users, and force re-read from flickr.com'),
+		    'type' => MENU_NORMAL_ITEM,
+		    'page callback' => 'flickrrippr_admin',
+		    'access arguments' => array('Administer global flickr api settings'),
+		  );
 
-    $items['admin/content/flickrrippr/fetch'] = array(
-                      'title' => t('Fetch'),
-                      'type' => MENU_CALLBACK,
-                      'page callback' => 'flickrrippr_admin_fetch',
-                      'access arguments' => array('Administer global flickr api settings'),
-                    );
+  $items['admin/content/flickrrippr/fetch'] = array(
+		    'title' => t('Fetch'),
+		    'type' => MENU_CALLBACK,
+		    'page callback' => 'flickrrippr_admin_fetch',
+		    'access arguments' => array('Administer global flickr api settings'),
+		  );
 
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
-                      'title' => 'My Flickr Photo settings',
-                      'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'flickrrippr_user_settings',
-                      'access arguments' => array('Configure own blogged flickr stream'),
-                    );
+		    'title' => 'My Flickr Photo settings',
+		    'type' => MENU_NORMAL_ITEM,
+		    'page callback' => 'flickrrippr_user_settings',
+		    'access arguments' => array('Configure own blogged flickr stream'),
+		  );
   /*
   	//The refresh tab
     if (arg(0) == 'node' && is_numeric(arg(1))) {
@@ -81,7 +73,6 @@ function flickrrippr_menu() {
 }
 
 function flickrrippr_admin_fetch($uid) {
-  
   flickrrippr_check_latest(intval($uid));
   drupal_goto('admin/content/flickrrippr');
 }
