@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.69.2.5 2010/06/21 04:28:24 taniwha Exp $
+// $Id: flickrrippr.module,v 1.69.2.6 2010/06/21 04:43:49 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -340,6 +340,25 @@ function flickrrippr_cron() {
 function flickrrippr_admin() {
   $output = '';
   $output .= drupal_get_form('flickrrippr_admin_form');
+
+  $headers = array(
+    array('data' => t('Name'), 'field' => 'name', 'sort' => 'asc',), 
+    array('data' => 'Flickr Name', 'field' => 'flickrusername'), 
+    array('data' => 'Flickr ID', 'field' => 'flickrid'),
+    t('Actions'),
+  );
+
+  $result = pager_query("SELECT u.uid, flickrid, flickrusername, name FROM {flickrusers} f INNER JOIN {users} u on u.uid = f.uid". tablesort_sql($headers), 10);
+  while($user = db_fetch_object($result)) {
+    $rows[] = array(
+      $user->name, 
+      $user->flickrusername, 
+      $user->flickrid,
+      l('Fetch Now', 'admin/settings/flickrrippr/fetch/'. $user->uid) , l('Edit', 'admin/settings/flickrrippr/fetch/'. $user->uid)
+    );
+  }
+
+  $output .= theme('table', $headers, $rows, array(), t('Users of the Flickr Rippr module'));
   return $output;
 }
 /**
