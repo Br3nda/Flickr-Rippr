@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.5 2010/06/21 22:31:16 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.6 2010/06/21 22:31:34 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -102,7 +102,7 @@ function flickrrippr_admin() {
     $rows[] = array(
       $u->name,
       $u->flickrusername,
-      l('Fetch latest', 'admin/content/flickrrippr/fetch/'. $u->uid),
+      l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->uid),
     );
   }
   $output .= theme('table', $headers, $rows);
