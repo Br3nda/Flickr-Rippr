@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87 2010/06/21 04:50:07 taniwha Exp $
+// $Id: flickrrippr.module,v 1.88 2010/06/21 22:32:22 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -25,10 +25,18 @@ function flickrrippr_menu() {
 //                       'page callback' => 'drupal_get_form',
 //                       'page arguments' => array('flickrrippr_admin_form')
 //                     );
-    $items['admin/content/flickrrippr-fetch'] = array(
-                      'title' => 'Re-fetch oldest flickr photos',
+    $items['admin/content/flickrrippr'] = array(
+                      'title' => t('Flickr Rippr'),
+		      'description' => t('View users, and force re-read from flickr.com'),
                       'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'flickrrippr_refresh_oldest',
+                      'page callback' => 'flickrrippr_admin',
+                      'access arguments' => array('Administer global flickr api settings'),
+                    );
+
+    $items['admin/content/flickrrippr/fetch'] = array(
+                      'title' => t('Fetch'),
+                      'type' => MENU_CALLBACK,
+                      'page callback' => 'flickrrippr_admin_fetch',
                       'access arguments' => array('Administer global flickr api settings'),
                     );
 
@@ -72,21 +80,34 @@ function flickrrippr_menu() {
   return $items;
 }
 
+function flickrrippr_admin_fetch($uid) {
+  return '';
+}
+
 /**
  * This is called from admin menu, and will refresh the 20 oldest photos
  * TODO check this work in drupal6
  */
-function flickrrippr_refresh_oldest() {
-  //TODO db_query_range
-  $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} ORDER BY lastfetched ASC LIMIT 20");
+function flickrrippr_admin() {
+  $output = '';
 
-  $content = '';
-  while ($photo = db_fetch_object($result)) {
-    flickrrippr_makenode($photo->flickrphoto_id);
-    $node = node_load($photo->nid);
-    $content .= theme('node', $node, TRUE);
+  $result = pager_query("SELECT * FROM {flickrusers} f INNER JOIN {users} u ON u.uid = f.uid");
+  $headers = array(
+    array('data' => t('Name'), 'field' => 'name'),
+    array('data' => t('Flickr Username'), 'field' => 'flickrusername'),
+  );
+
+
+  while ($u = db_fetch_object($result)) {
+    $rows[] = array(
+      $u->name,
+      $u->flickrusername,
+      l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->uid),
+    );
   }
-  return $content;
+  $output .= theme('table', $headers, $rows);
+  return $output;
+
 }
 
 
@@ -409,10 +430,10 @@ function flickrrippr_user_settings_form($a, $user) {
     '#title' => t('Enable Thumbnail page'),
     '#default_value' => TRUE,
     );
-  $form['promote'] = array(
-   '#type' => 'checkbox',
-   '#title' => t('Promote new photos to front page?'),
-  );
+//   $form['promote'] = array(
+//    '#type' => 'checkbox',
+//    '#title' => t('Promote new photos to front page?'),
+//   );
   if (user_access('Cache own Flickr Photos on this server')) {
     $form['cache'] = array(
                            '#title' => t('Cache photos on this server?'),
@@ -442,8 +463,8 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
   //and store the 3432@N00 uid then
 }
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
-  if ($form_state['values']['uid']) {
-    $user = user_load(array('uid' => $form_state['values']['uid']));
+  if (!empty($form_state['values']['uid'])) {
+    $user = user_load(array('uid' => intval($form_state['values']['uid'])));
   }
   else {
     GLOBAL $user;
