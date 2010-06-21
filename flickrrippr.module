@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.3 2010/06/21 04:59:11 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.4 2010/06/21 04:59:54 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -96,16 +96,7 @@ function flickrrippr_admin() {
   }
   $output .= theme('table', $headers, $rows);
   return $output;
-  //TODO db_query_range
-/*  $result = db_query("SELECT flickrphoto_id, nid FROM {flickrphotos} ORDER BY lastfetched ASC LIMIT 20");
 
-  $content = '';
-  while ($photo = db_fetch_object($result)) {
-    flickrrippr_makenode($photo->flickrphoto_id);
-    $node = node_load($photo->nid);
-    $content .= theme('node', $node, TRUE);
-  }
-  return $content;*/
 }
 
 
