@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.1 2010/06/21 04:53:12 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.2 2010/06/21 04:53:47 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -409,10 +409,10 @@ function flickrrippr_user_settings_form($a, $user) {
     '#title' => t('Enable Thumbnail page'),
     '#default_value' => TRUE,
     );
-  $form['promote'] = array(
-   '#type' => 'checkbox',
-   '#title' => t('Promote new photos to front page?'),
-  );
+//   $form['promote'] = array(
+//    '#type' => 'checkbox',
+//    '#title' => t('Promote new photos to front page?'),
+//   );
   if (user_access('Cache own Flickr Photos on this server')) {
     $form['cache'] = array(
                            '#title' => t('Cache photos on this server?'),
