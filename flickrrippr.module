@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.69.2.4 2010/06/21 04:23:55 taniwha Exp $
+// $Id: flickrrippr.module,v 1.69.2.5 2010/06/21 04:28:24 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -22,9 +22,9 @@ function flickrrippr_menu() {
                       'path' => 'admin/settings/flickrrippr',
                       'access arguments' => array('Administer global flickr api settings'),
                       'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'drupal_get_form',
-                      'page arguments' => array('flickrrippr_admin_form')
+                      'page callback' => 'flickrrippr_admin',
                     );
+
     $items['admin/content/flickrrippr-fetch'] = array(
                       'title' => 'Re-fetch oldest flickr photos',
                       'type' => MENU_NORMAL_ITEM,
@@ -337,6 +337,11 @@ function flickrrippr_cron() {
 }
 
 
+function flickrrippr_admin() {
+  $output = '';
+  $output .= drupal_get_form('flickrrippr_admin_form');
+  return $output;
+}
 /**
  * administer global settings
  */
@@ -376,7 +381,7 @@ function flickrrippr_admin_form_validate() {
 function flickrrippr_admin_form_submit($form, &$form_state) {
   $form_values = &$form_state['values'];
   variable_set('flickrapikey', $form_state['values']['api_key']);
-  variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
+//   variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
   drupal_set_message(t('Settings saved'));
 }
 
