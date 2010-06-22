@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.26 2010/06/22 22:25:48 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.27 2010/06/22 22:28:47 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -18,34 +18,34 @@ function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
   $items['admin/content/flickrrippr'] = array(
-		    'title' => t('Flickr Rippr'),
-		    'description' => t('View users, and force re-read from flickr.com'),
-		    'type' => MENU_NORMAL_ITEM,
-		    'page callback' => 'flickrrippr_admin',
-		    'access arguments' => array('Administer global flickr api settings'),
-		  );
+    'title' => t('Flickr Rippr'),
+    'description' => t('View users, and force re-read from flickr.com'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'flickrrippr_admin',
+    'access arguments' => array('Administer global flickr api settings'),
+  );
 
   $items['admin/content/flickrrippr/fetch'] = array(
-        'title' => t('Fetch'),
-        'type' => MENU_CALLBACK,
-        'page callback' => 'flickrrippr_admin_fetch',
-        'access arguments' => array('Administer global flickr api settings'),
-      );
+    'title' => t('Fetch'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrrippr_admin_fetch',
+    'access arguments' => array('Administer global flickr api settings'),
+  );
 
   $items['admin/content/flickrrippr/edit'] = array(
-        'title' => t('Edit'),
-        'type' => MENU_CALLBACK,
-        'page callback' => 'flickrrippr_admin_edit',
-        'access arguments' => array('Administer global flickr api settings'),
-      );
+    'title' => t('Edit'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrrippr_admin_edit',
+    'access arguments' => array('Administer global flickr api settings'),
+  );
 
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
-		    'title' => t('My Flickr Photo settings'),
-		    'type' => MENU_NORMAL_ITEM,
-		    'page callback' => 'flickrrippr_user_settings',
-		    'access arguments' => array('Configure own blogged flickr stream'),
-		  );
+    'title' => t('My Flickr Photo settings'),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'flickrrippr_user_settings',
+    'access arguments' => array('Configure own blogged flickr stream'),
+  );
   /*
   	//The refresh tab
     if (arg(0) == 'node' && is_numeric(arg(1))) {
@@ -199,7 +199,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
  */
 function flickrrippr_photo_get_nid($photo_id) {
   $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
-  return (!empty($rec->nid) ? $rec->nid : null);
+  return (!empty($rec->nid) ? $rec->nid : NULL);
 }
 
 ///**
@@ -574,12 +574,12 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   }
 
   if ($page) {
-    $image = '<img src="'. htmlentities($photo->photo_path). '" />';
-    $image = '<a href="' . htmlentities($photo->page_url). '">'. $image .'</a>';
+    $image = '<img src="'. htmlentities($photo->photo_path) .'" />';
+    $image = '<a href="' . htmlentities($photo->page_url) .'">'. $image .'</a>';
   }
   else {
-    $image = '<img src="'. htmlentities($photo->thumbnail_path). '" />';
-    $image = '<a href="' . url('node/'. $node->nid). '">'. $image .'</a>';
+    $image = '<img src="'. htmlentities($photo->thumbnail_path) .'" />';
+    $image = '<a href="'. url('node/'. $node->nid) .'">'. $image .'</a>';
   }
 
   $node->content['flickr_photo'] = array(
@@ -588,7 +588,7 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   );
 
   $node->content['flickr_description'] = array(
-    '#value' => '<div class="flickrriprr_description">' . htmlentities(html_entity_decode($photo->description))  .'</div>', //decode then encode
+    '#value' => '<div class="flickrriprr_description">'. htmlentities(html_entity_decode($photo->description))  .'</div>', //decode then encode
     '#weight' => 5
   );
   
