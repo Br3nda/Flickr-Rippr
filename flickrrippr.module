@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.21 2010/06/22 21:42:55 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.22 2010/06/22 21:44:50 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -166,7 +166,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     }
   }
   else {
-    drupal_set_message(t('No new photos'));
+    drupal_set_message(t('No photos found'));
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
@@ -198,13 +198,13 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
 
-  drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
+//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
 // 
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid)) {
 //     //already exists
     $node = node_load(array('nid' => $nid));
-    drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
+//     drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
   }
   else {
   
@@ -239,7 +239,7 @@ function flickrrippr_makenode($photo_id) {
   
   $node->title = htmlentities($title);
   $node->created = strtotime($flickr_info['dates']['taken']);
-  $node->name = $user->name;
+//   $node->name = $user->name;
   $node->uid = $user->uid;
   $node->type = 'flickrrippr_photo';
   $node->published = 1;
