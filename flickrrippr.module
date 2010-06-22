@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.16 2010/06/22 03:57:15 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.17 2010/06/22 03:59:58 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -552,16 +552,16 @@ function flickrrippr_node_form(&$form_state, $node) {
 /**
  * 
  */
-function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
-  switch ($op) {
-    case 'delete':
-      //delete where there is no node.. THIS WON'T SCALE
-      //how to get around drupal's lack of referential integrity?
-      db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
-      drupal_set_message("Flickr photo deleted");
-    break;
-    case 'view':
-      flickrippr_view($node, $teaser, $page);
-  }
-}
+// function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
+//   switch ($op) {
+//     case 'delete':
+//       //delete where there is no node.. THIS WON'T SCALE
+//       //how to get around drupal's lack of referential integrity?
+//       db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
+//       drupal_set_message("Flickr photo deleted");
+//     break;
+//     case 'view':
+//       flickrippr_view($node, $teaser, $page);
+//   }
+// }
 
