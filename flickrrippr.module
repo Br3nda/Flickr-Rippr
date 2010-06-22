@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.15 2010/06/22 03:50:58 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.16 2010/06/22 03:57:15 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -243,7 +243,6 @@ function flickrrippr_makenode($photo_id) {
   $node->format = 2;
 
   node_save($node);
-  drupal_set_message($node);
 
   if ($node->is_new) {
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path)
