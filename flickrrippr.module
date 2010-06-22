@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.24 2010/06/22 22:20:31 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.25 2010/06/22 22:23:45 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -584,11 +584,12 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   $node->content['flickr_photo'] = array(
     '#weight' => 0,
-   '#value' => $image,
+   '#value' => '<div class="flickrrippr_photo">'. $image .'</div>',
   );
 
   $node->content['flickr_description'] = array(
-    '#value' => htmlentities($photo->description)
+    '#value' => '<div class="flickrriprr_description">' . htmlentities($photo->description)  .'</div>',
+    '#weight' => 5
   );
   
   $node->content['body'] = array();
