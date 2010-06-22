@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.17 2010/06/22 03:59:58 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.18 2010/06/22 05:59:45 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -34,7 +34,7 @@ function flickrrippr_menu() {
 
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
-		    'title' => 'My Flickr Photo settings',
+		    'title' => t('My Flickr Photo settings'),
 		    'type' => MENU_NORMAL_ITEM,
 		    'page callback' => 'flickrrippr_user_settings',
 		    'access arguments' => array('Configure own blogged flickr stream'),
@@ -125,7 +125,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
 
   $output = '';
   //TODO, don't run every time.
-  $num_photos = 10; //TODO make customisable
+  $num_photos = 200; //TODO make customisable
 
   //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
  //maximum of 5 fetches.
@@ -245,6 +245,7 @@ function flickrrippr_makenode($photo_id) {
   node_save($node);
 
   if ($node->is_new) {
+    drupal_set_message("New node, nid = $node->nid");
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path)
       VALUES ('%s', %d, %d, '%s', '%s')",
       $photo_id, $node->nid, strtotime('now'), $photo_path, $thumbnail_path);
@@ -524,25 +525,27 @@ function flickrrippr_node_info() {
 
 }
 
-function flickrippr_view($node, $teaser = FALSE, $page = FALSE) {
-
-  $photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d LIMIT 1", $node->nid));
+function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   
+  $photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d LIMIT 1", $node->nid));
+
+  if (!$photo) {
+    drupal_set_message(t("Failed to find flickr photo info for !link", array('!link' => l($node->title, 'node/'. $node->nid))), 'error');
+    return $node;
+  }
+
   if ($page) {
     $image = '<img src="'. htmlentities($photo->photo_path). '" />';
-    $node->content['photo'] = array(
-      '#weight' => 0,
-      '#value' => $image,
-    );
   }
   else {
-    $image = '<img src="'. htmlentities($photo->photo_path). '" />';
-    $node->content['thumbnail'] = array(
-    '#weight' => 0,
-    '#value' => $image,
-  );
+    $image = '<img src="'. htmlentities($photo->thumbnail_path). '" />';
   }
+  $node->content['photo'] = array(
+    '#weight' => 0,
+   '#value' => $image,
+  );
   $node->content['body'] = array();
+  return $node;
 }
 
 
@@ -552,16 +555,21 @@ function flickrrippr_node_form(&$form_state, $node) {
 /**
  * 
  */
-// function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
-//   switch ($op) {
-//     case 'delete':
-//       //delete where there is no node.. THIS WON'T SCALE
-//       //how to get around drupal's lack of referential integrity?
-//       db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
-//       drupal_set_message("Flickr photo deleted");
-//     break;
-//     case 'view':
-//       flickrippr_view($node, $teaser, $page);
-//   }
-// }
+function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
+  if (!preg_match('!^flickrrippr_!', $node->type)) {
+    return;
+  }
+  
+  switch ($op) {
+    case 'delete':
+      //delete where there is no node.. THIS WON'T SCALE
+      //how to get around drupal's lack of referential integrity?
+      db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
+      drupal_set_message("Flickr photo deleted");
+    break;
+    case 'view':
+      flickrrippr_view($node, $teaser, $page);
+    break;
+  }
+}
 
