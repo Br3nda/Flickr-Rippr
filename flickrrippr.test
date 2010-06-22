@@ -1,7 +1,9 @@
 <?php
+// $Id: flickrrippr.test,v 1.1.4.1 2010/06/22 22:31:47 taniwha Exp $
 /**
-* Description
-*/
+ * Description
+ * @file Unit Tests for Flickr Rippr Module
+ */
 class FlickrPermTest extends DrupalTestCase {
   function get_info() {
     return array('name'  => 'CoolFeature Test',

@@ -1,5 +1,5 @@
 <?php
-//$Id ;
+// $Id: flickrrippr.inc,v 1.11.4.1 2010/06/22 22:31:47 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -18,7 +18,7 @@ function flickrrippr_phpFlickr() {
   $include_file = drupal_get_path('module', 'flickrrippr') .'/phpFlickr/phpFlickr.php';
   if (!file_exists($include_file)) {
     drupal_set_message(t("Missing phpFlickr - expected to find it at !file. Download this from !link", array('!file' => $include_file, '!link' => l('phpflickr.com', 'http://phpflickr.com/'))), 'error');
-    return false;
+    return FALSE;
   }
  require_once($include_file);
 
@@ -45,7 +45,7 @@ function flickrrippr_phpFlickr() {
 // * Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
 // * NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
 // */
-//function flickrrippr_show_photo($photo, $link = true, $owner = "", $cache = true) {
+//function flickrrippr_show_photo($photo, $link = TRUE, $owner = "", $cache = TRUE) {
 //  $src = flickrrippr_path($photo, $cache, 's');
 //  if ($cache) {
 //    file_create_url($src);
@@ -63,7 +63,7 @@ function flickrrippr_phpFlickr() {
 // * Make a html chunk of photos ready for display from a 
 // * photo list as returned by phpFlickr methods
 // */
-//function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = true) {
+//function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = TRUE) {
 //	
 //  $row = 0;
 //  if (!is_array($photos['photo'])) {
@@ -80,7 +80,7 @@ function flickrrippr_phpFlickr() {
 //      }
 //    }
 //    
-//    $img = flickrrippr_show_photo($p, false, null, $cache);
+//    $img = flickrrippr_show_photo($p, FALSE, null, $cache);
 //    if ($cache) {
 //      $s .= '<a href="'. url('node/'. $nid)  .'">';
 //    }
@@ -120,11 +120,12 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
+function flickrrippr_path($flickr_photo, $cache = TRUE, $size = FALSE) {
 
 
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
-  $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
+  
   if (!$cache) {
     return $src;
   }
@@ -136,7 +137,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
    return;
  }
   
-  $filename =  $folder . '/' . $flickr_photo['id'] . '_' . $flickr_photo['secret'] . ($size ? '_'.$size : '') .'.jpg';
+  $filename =  $folder .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
   
  //If we've already go it, then we dont' need to get it
   if (file_exists($filename)) {
@@ -197,7 +198,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
 //      $user = flickrrippr_get_user_by_flickrusername($flickrusername);
 //  if (!$user) {
 //    drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)));
-//    return false;
+//    return FALSE;
 //  }
 //  
 //  //Full (normal) sized image
@@ -207,7 +208,7 @@ function flickrrippr_path($flickr_photo, $cache = true, $size = false) {
 //  
 //  
 //  //thumbnail version
-//      $path =  flickrrippr_path($flickr_info, true, 'm');
+//      $path =  flickrrippr_path($flickr_info, TRUE, 'm');
 //  
 //  list($width, $height, $type, $attr) = getimagesize($path);
 //  $thumb = '<img src="' . file_create_url($path) . '" width="' . $width . '" height="' . $height . '" />';
