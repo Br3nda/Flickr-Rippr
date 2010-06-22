@@ -35,6 +35,7 @@ function flickrrippr_schema() {
       'photo_path' => array('type' => 'text'),
       'thumbnail_path' => array('type' => 'text'),
       'description' => array('type' => 'text'),
+      'page_url' => array('type' => 'text'),
       ),
       'primary key' => array('flickrphoto_id'),
     );
@@ -80,5 +81,6 @@ function flickrrippr_update_7() {
 }
 function flickrrippr_update_8() {
   db_add_column($ret, 'flickrphotos', 'description', 'text');
+  db_add_column($ret, 'flickrphotos', 'page_url', 'text');
   return $ret;
 }
