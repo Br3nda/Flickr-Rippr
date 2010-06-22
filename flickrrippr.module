@@ -1,5 +1,9 @@
 <?php
-// $Id: flickrrippr.module,v 1.88 2010/06/21 22:32:22 taniwha Exp $
+<<<<<<< flickrrippr.module
+// $Id: flickrrippr.module,v 1.89 2010/06/22 02:53:47 taniwha Exp $
+=======
+// $Id: flickrrippr.module,v 1.89 2010/06/22 02:53:47 taniwha Exp $
+>>>>>>> 1.87.2.9
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -17,6 +21,7 @@ function flickrrippr_perm() {
 function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
+<<<<<<< flickrrippr.module
 //   $items['admin/settings/flickrrippr'] = array(
 //                       'title' => 'Flickr Rippr Settings',
 //                       'path' => 'admin/settings/flickrrippr',
@@ -39,14 +44,30 @@ function flickrrippr_menu() {
                       'page callback' => 'flickrrippr_admin_fetch',
                       'access arguments' => array('Administer global flickr api settings'),
                     );
+=======
+  $items['admin/content/flickrrippr'] = array(
+		    'title' => t('Flickr Rippr'),
+		    'description' => t('View users, and force re-read from flickr.com'),
+		    'type' => MENU_NORMAL_ITEM,
+		    'page callback' => 'flickrrippr_admin',
+		    'access arguments' => array('Administer global flickr api settings'),
+		  );
+
+  $items['admin/content/flickrrippr/fetch'] = array(
+		    'title' => t('Fetch'),
+		    'type' => MENU_CALLBACK,
+		    'page callback' => 'flickrrippr_admin_fetch',
+		    'access arguments' => array('Administer global flickr api settings'),
+		  );
+>>>>>>> 1.87.2.9
 
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
-                      'title' => 'My Flickr Photo settings',
-                      'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'flickrrippr_user_settings',
-                      'access arguments' => array('Configure own blogged flickr stream'),
-                    );
+		    'title' => 'My Flickr Photo settings',
+		    'type' => MENU_NORMAL_ITEM,
+		    'page callback' => 'flickrrippr_user_settings',
+		    'access arguments' => array('Configure own blogged flickr stream'),
+		  );
   /*
   	//The refresh tab
     if (arg(0) == 'node' && is_numeric(arg(1))) {
@@ -80,10 +101,18 @@ function flickrrippr_menu() {
   return $items;
 }
 
+<<<<<<< flickrrippr.module
 function flickrrippr_admin_fetch($uid) {
   return '';
 }
 
+=======
+function flickrrippr_admin_fetch($uid) {
+  flickrrippr_check_latest(intval($uid));
+  drupal_goto('admin/content/flickrrippr');
+}
+
+>>>>>>> 1.87.2.9
 /**
  * This is called from admin menu, and will refresh the 20 oldest photos
  * TODO check this work in drupal6
@@ -191,8 +220,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
  */
 function flickrrippr_photo_get_nid($photo_id) {
   $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
-  $nid = $rec->nid;
-  return $nid;
+  return (!empty($rec->nid) ? $rec->nid : null);
 }
 
 ///**
@@ -238,7 +266,7 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . $path  . '" alt="' . t($flickr_info['title']) . '" width="' . $width . '" height="' . $height . '" />';
 
 
   //thumbnail version
