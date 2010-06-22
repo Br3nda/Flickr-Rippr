@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.23 2010/06/22 22:02:34 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.24 2010/06/22 22:20:31 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -26,11 +26,18 @@ function flickrrippr_menu() {
 		  );
 
   $items['admin/content/flickrrippr/fetch'] = array(
-		    'title' => t('Fetch'),
-		    'type' => MENU_CALLBACK,
-		    'page callback' => 'flickrrippr_admin_fetch',
-		    'access arguments' => array('Administer global flickr api settings'),
-		  );
+        'title' => t('Fetch'),
+        'type' => MENU_CALLBACK,
+        'page callback' => 'flickrrippr_admin_fetch',
+        'access arguments' => array('Administer global flickr api settings'),
+      );
+
+  $items['admin/content/flickrrippr/edit'] = array(
+        'title' => t('Edit'),
+        'type' => MENU_CALLBACK,
+        'page callback' => 'flickrrippr_admin_edit',
+        'access arguments' => array('Administer global flickr api settings'),
+      );
 
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
@@ -72,6 +79,11 @@ function flickrrippr_menu() {
   return $items;
 }
 
+function flickrrippr_admin_edit($uid) {
+  $user = user_load(array('uid' => $uid));
+  return drupal_get_form('flickrrippr_user_settings_form', $user);
+}
+
 function flickrrippr_admin_fetch($uid) {
   flickrrippr_check_latest(intval($uid));
   drupal_goto('admin/content/flickrrippr');
@@ -84,10 +96,11 @@ function flickrrippr_admin_fetch($uid) {
 function flickrrippr_admin() {
   $output = '';
 
-  $result = pager_query("SELECT * FROM {flickrusers} f INNER JOIN {users} u ON u.uid = f.uid");
+  $result = pager_query("SELECT u.uid, u.name, f.flickrusername, f.flickrid FROM {users} u LEFT OUTER JOIN {flickrusers} f  ON u.uid = f.uid AND u.uid > 0");
   $headers = array(
     array('data' => t('Name'), 'field' => 'name'),
     array('data' => t('Flickr Username'), 'field' => 'flickrusername'),
+    array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
   );
 
 
@@ -95,7 +108,9 @@ function flickrrippr_admin() {
     $rows[] = array(
       $u->name,
       $u->flickrusername,
-      l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->uid),
+      $u->flickrid,
+      ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->uid) : ''),
+      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid),
     );
   }
   $output .= theme('table', $headers, $rows);
@@ -404,8 +419,12 @@ function flickrrippr_user_settings($uid = NULL) {
 }
 
 function flickrrippr_user_settings_form($a, $user) {
+
   $settings = flickrrippr_user_settings_get($user->uid);
+  
   $form = array();
+  drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $user->name)));
+  $form['uid'] = array('#type' => 'hidden', '#value' => $user->uid);
   $form['flickr_username'] = array(
                                     '#type' => 'textfield',
                                     '#title' => t('Flickr Username'),
@@ -457,13 +476,20 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
     GLOBAL $user;
   }
   $settings = flickrrippr_user_settings_get($user->uid);
+  $flickrid = flickrrippr_flickruser($form_state['values']['flickr_username']);
 
   if (isset($settings->flickrusername)) {
-    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s' WHERE uid = %d", $form_state['values']['flickr_username'], $user->uid);
+    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrid='%s' WHERE uid = %d",
+      $form_state['values']['flickr_username'],
+      $flickrid,
+      $user->uid);
     drupal_set_message(t("Flickr username updated"));
   }
   else {
-    $result = db_query("INSERT INTO {flickrusers} (flickrusername, uid) VALUES ('%s', '%s')", $form_state['values']['flickr_username'], $user->uid);
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, uid) VALUES ('%s', '%s', '%s')",
+      $form_state['values']['flickr_username'],
+      $flickrid,
+      $user->uid);
     drupal_set_message(t("Flickr username set"));
   }
 }
@@ -556,7 +582,6 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
     $image = '<a href="' . url('node/'. $node->nid). '">'. $image .'</a>';
   }
 
-  
   $node->content['flickr_photo'] = array(
     '#weight' => 0,
    '#value' => $image,
