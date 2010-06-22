@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.14 2010/06/22 03:50:32 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.15 2010/06/22 03:50:58 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -229,7 +229,6 @@ function flickrrippr_makenode($photo_id) {
 
   //Full (normal) sized image
   $photo_path =  flickrrippr_path($flickr_info);
-  drupal_set_message("Photo = $photo_path");
   $thumbnail_path =  flickrrippr_path($flickr_info, TRUE, 'm');
   
   $node->title = htmlentities($flickr_info['title']);
