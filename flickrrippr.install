@@ -1,4 +1,6 @@
 <?php
+// $Id: flickrrippr.install,v 1.14.4.4 2010/06/22 22:29:32 taniwha Exp $
+
 /**
  * Implementation of hook_install().
  */
@@ -23,15 +25,15 @@ function flickrrippr_schema() {
       'uid' => array('type' => 'int'),
       'flickrid' => array('type' => 'text'),
       'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(  
-      'flickrusername' => array('type' => 'text', 'not null' => true),
+      'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       ),
     'primary key' => array('uid')
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
       'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
-      'nid' => array('type' => 'int', 'not null' => true),
-      'lastfetched' => array('type' => 'int', 'not null' => true), //can has timestamp? :-(
+      'nid' => array('type' => 'int', 'not null' => TRUE),
+      'lastfetched' => array('type' => 'int', 'not null' => TRUE), //can has timestamp? :-(
       'photo_path' => array('type' => 'text'),
       'thumbnail_path' => array('type' => 'text'),
       'description' => array('type' => 'text'),
