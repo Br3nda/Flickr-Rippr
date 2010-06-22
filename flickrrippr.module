@@ -1,9 +1,5 @@
 <?php
-<<<<<<< flickrrippr.module
-// $Id: flickrrippr.module,v 1.89 2010/06/22 02:53:47 taniwha Exp $
-=======
-// $Id: flickrrippr.module,v 1.89 2010/06/22 02:53:47 taniwha Exp $
->>>>>>> 1.87.2.9
+// $Id: flickrrippr.module,v 1.90 2010/06/22 02:54:14 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -21,30 +17,6 @@ function flickrrippr_perm() {
 function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
-<<<<<<< flickrrippr.module
-//   $items['admin/settings/flickrrippr'] = array(
-//                       'title' => 'Flickr Rippr Settings',
-//                       'path' => 'admin/settings/flickrrippr',
-//                       'access arguments' => array('Administer global flickr api settings'),
-//                       'type' => MENU_NORMAL_ITEM,
-//                       'page callback' => 'drupal_get_form',
-//                       'page arguments' => array('flickrrippr_admin_form')
-//                     );
-    $items['admin/content/flickrrippr'] = array(
-                      'title' => t('Flickr Rippr'),
-		      'description' => t('View users, and force re-read from flickr.com'),
-                      'type' => MENU_NORMAL_ITEM,
-                      'page callback' => 'flickrrippr_admin',
-                      'access arguments' => array('Administer global flickr api settings'),
-                    );
-
-    $items['admin/content/flickrrippr/fetch'] = array(
-                      'title' => t('Fetch'),
-                      'type' => MENU_CALLBACK,
-                      'page callback' => 'flickrrippr_admin_fetch',
-                      'access arguments' => array('Administer global flickr api settings'),
-                    );
-=======
   $items['admin/content/flickrrippr'] = array(
 		    'title' => t('Flickr Rippr'),
 		    'description' => t('View users, and force re-read from flickr.com'),
@@ -59,7 +31,6 @@ function flickrrippr_menu() {
 		    'page callback' => 'flickrrippr_admin_fetch',
 		    'access arguments' => array('Administer global flickr api settings'),
 		  );
->>>>>>> 1.87.2.9
 
   //configure a user's account with their flickr username
   $items['user/flickrippr'] = array(
@@ -101,18 +72,11 @@ function flickrrippr_menu() {
   return $items;
 }
 
-<<<<<<< flickrrippr.module
-function flickrrippr_admin_fetch($uid) {
-  return '';
-}
-
-=======
 function flickrrippr_admin_fetch($uid) {
   flickrrippr_check_latest(intval($uid));
   drupal_goto('admin/content/flickrrippr');
 }
 
->>>>>>> 1.87.2.9
 /**
  * This is called from admin menu, and will refresh the 20 oldest photos
  * TODO check this work in drupal6
