@@ -32,6 +32,8 @@ function flickrrippr_schema() {
       'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
       'nid' => array('type' => 'int', 'not null' => true),
       'lastfetched' => array('type' => 'int', 'not null' => true), //can has timestamp? :-(
+      'photo_path' => array('type' => 'text'),
+      'thumbnail_path' => array('type' => 'text'),
       ),
       'primary key' => array('flickrphoto_id'),
     );
@@ -64,5 +66,13 @@ function flickrrippr_update_6() {
   $ret[] = update_sql("UPDATE {flickrphotos} SET flickrphoto_id = oldflickrphoto_id::text");
   $ret[] = update_sql("ALTER TABLE {flickrphotos} DROP COLUMN oldflickrphoto_id");
   $ret[] = update_sql("COMMIT");
+  return $ret;
+}
+
+function flickrrippr_update_7() {
+  $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid text");
+  db_add_column($ret, 'flickrphotos', 'photo_path', 'text');
+  db_add_column($ret, 'flickrphotos', 'thumbnail_path', 'text');
+  
   return $ret;
 }
