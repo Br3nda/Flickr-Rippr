@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.10 2010/06/22 03:36:12 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.11 2010/06/22 03:41:30 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -228,43 +228,11 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $path =  flickrrippr_path($flickr_info);
-  if (!$path) {
-    return;
-  }
-  list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . $path  . '" alt="' . t($flickr_info['title']) . '" width="' . $width . '" height="' . $height . '" />';
-
-
-  //thumbnail version
-  $path =  flickrrippr_path($flickr_info, TRUE, 'm');
-
-  list($width, $height, $type, $attr) = getimagesize($path);
-  $thumb = '<img src="' . $path . '" width="' . $width . '" height="' . $height . '" />';
-
-
+  $photo_path =  flickrrippr_path($flickr_info);
+  $thumbnail_path =  flickrrippr_path($flickr_info, TRUE, 'm');
+  
   $node->title = htmlentities($flickr_info['title']);
-
   $node->created = strtotime($flickr_info['dates']['taken']);
-
-  $node->teaser = '<p>'  . $thumb . '</p>';
-
-  $node->teaser .= '<p>' . htmlentities(html_entity_decode($flickr_info['description'])) . '</p>';
-  $node->format = 3;
-
-  $content = '';
-  if ($flickr_info['description']) {
-  $content .= '<p>' . htmlentities(html_entity_decode($flickr_info['description'])) . '</p>';
-  }
-  $content .= $img;
-
-  //$content .= '<p>' . t('photo by %name', array('%name' => $realname)) ."</p>\n";
-  //$content .= '<!--break-->';
-
-  $content .= '<p>' . t('This is a ' . l(t('Flickr Photo') , 'http://flickr.com/photos/' . $flickr_info['owner']['nsid'] . '/' . $photo_id .'/') . ' imported via the flickr api') . '</p>';
-
-  $node->body = $content;
-
   $node->name = $user->name;
   $node->uid = $user->uid;
   $node->type = 'flickrrippr_photo';
@@ -275,13 +243,24 @@ function flickrrippr_makenode($photo_id) {
   $node->format = 2;
 
   node_save($node);
+  drupal_set_message($node);
 
   if ($node->is_new) {
-    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path) VALUES ('%s', %d, %d, '%s')", $photo_id, $node->nid, strtotime('now'), $path);
+    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path)
+      VALUES ('%s', %d, %d, '%s', '%s')",
+      $photo_id, $node->nid, strtotime('now'), $photo_path, $thumbnail_path);
     drupal_set_message(t("New photo found, %photo_id", array('%photo_id' =>  $photo_id)));
   }
   else {
-    $result = db_query("UPDATE {flickrphotos} SET lastfetched=%d, photo_path='%s', thumbnail_path='%s' WHERE flickrphoto_id=%d AND nid=%d", strtotime('now'), $photo_id, $node->nid);
+    $result = db_query("UPDATE {flickrphotos} SET
+      lastfetched=%d,
+      photo_path='%s',
+      thumbnail_path='%s' WHERE flickrphoto_id=%d AND nid=%d",
+      strtotime('now'),
+      $photo_id,
+      $node->nid,
+      $photo_path,
+      $thumbnail_path);
     drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
 }
@@ -533,222 +512,7 @@ function flickrrippr_form(&$node) {
 
   return $form;
 }
-///*
-//    function flickrphoto_node_form_alter($form_id, &$form) {
-//  //$form = array();
-//
-//  $form['content'] = array(
-//  '#type' => 'markup',
-//  '#value' => $node->body
-//                          );
-//
-//  $form['refresh'] = array(
-//  '#type' => 'submit',
-//  '#value' => t('Refresh data from flickr.com'),
-//                          );
-//
-//  $form['nid'] = array(
-//  '#type' => 'hidden',
-//  '#value' => $node->nid,
-//                      );
-//
-//  return $form;
-//}
-// */
-//
-///**
-//  * After pressing the refresh button, a node is updated from flickr.com
-// */
-//function flickrrippr_node_form_submit($form_id, $form_values) {
-//
-//  if ($form_values['refresh']) {
-//    $photo =  db_fetch_object(db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE nid = %d", $form_values['nid']));
-//    assert($photo);
-//    flickrrippr_makenode($photo->flickrphoto_id);
-//  }
-//  drupal_goto('node/'. $form_values['nid']);
-//}
-//
-///**
-//    * Implementation of hook_block
-//*/
-//    function flickrrippr_block($op = 'list', $delta = 0, $edit = array()) {
-//      $result = db_query("SELECT * FROM {flickrusers} INNER JOIN {users} ON {flickrusers}.uid = {users}.uid ORDER BY name");
-//      $users = array();
-//      while ($user = db_fetch_object($result)) {
-//        $users[] = $user;
-//      }
-//
-//      if ($op == 'list') {
-//        foreach ($users as $user) {
-//          $blocks[] = array('info' => t("!username's Newest Flickr Photos", array('!username' => $user->name)),
-//                            'weight' => 0,
-//                            'enabled' => 0,
-//                            'region' => 'left');
-//
-//        }
-//        return $blocks;
-//      }
-//      elseif ($op == 'configure' && $delta == 0) {
-//    /*
-//        $form['items'] = array(
-//        '#type' => 'select',
-//        '#title' => t('Number of items'),
-//        '#default_value' => variable_get('mymodule_block_items', 0),
-//        '#options' => array('1', '2', '3'),
-//                          );
-//    return $form;
-//     */
-//      }
-//      elseif ($op == 'save' && $delta == 0) {
-//    //variable_set('mymodule_block_items', $edit['items']);
-//      }
-//      elseif ($op == 'view') {
-//        $user = $users[$delta];
-//        $block = array(
-//                       'subject' => $user->name,
-//                       'content' => flickrphoto_newest($user)
-//                      );
-//        return $block;
-//    /*
-//        switch($delta) {
-//        case 0:
-//        $block = array('subject' => t('Title of block #1'),
-//        'content' => mymodule_display_block_1());
-//    break;
-//        case 1:
-//        $block = array('subject' => t('Title of block #2'),
-//        'content' => mymodule_display_block_2());
-//    break;
-//      }
-//    return $block;
-//     */
-//      }
-//    }
-//
-///**
-//    Displays flickr photos, and links to nodes if caches
-//*/
-//    function flickrphoto_thumbnails($uid=NULL) {
-//      if($user_id) {
-//        $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid WHERE uid = %d ORDER BY u.name", $uid);
-//
-//      }
-//      else {
-//        $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
-//      }
-//      $LIMIT = 200;
-//      $flickr = @flickrapi_phpFlickr();
-//      while ($user = db_fetch_object($result)) {
-//        $user->flickrid = flickrrippr_flickruser($user->flickrusername);
-//        $photos = $flickr->people_getPublicPhotos($user->flickrid, NULL, $LIMIT, 1);
-//        $output .= flickrrippr_thumbnail_table($photos, $photo_list);
-//      }
-//      return $output;
-//    }
-//
-///**
-//    * Returns html formated chunk
-//    * of a user's newest photo
-//    *
-//    * user is the drupal user (object)
-//    * as returned by user_load
-//    * or GLOBAL $user
-//*/
-//    function flickrphoto_newest($user) {
-//      $output = '';
-//
-//      $flickr = @flickrapi_phpFlickr();
-//      if (!$flickr) {
-//        drupal_set_message(t("Unable to query flickr.com, library missing"));
-//        return $output;
-//      }
-//
-//      if (!$user->flickrid) {
-//        $user->flickrid = flickrrippr_flickruser($user->flickrusername);
-//      }
-//      if (!$user->flickrid) {
-//        return $output;
-//      }
-//      $photos = $flickr->people_getPublicPhotos($user->flickrid, NULL, 18, 1);
-//      $output .= flickrrippr_thumbnail_table($photos, $photo_list);
-//
-//  //$output .= l('more photos', 'flickr_newest');
-//  //TODO, make a page where more photos can be seen
-//      return $output;
-//    }
-//
-//}
-///**
-//* Make a html chunk of photos ready for display from a
-//* photo list as returned by phpFlickr methods
-//*/
-//function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = TRUE) {
-//  $row = 0;
-//  if (!is_array($photos['photo'])) {
-//    return t('No photos found');
-//  }
-//
-//  foreach ($photos['photo'] as $p) {
-//    unset($nid);
-//    $photo_id = $p['id'];
-//    if ($cache) {
-//      $nid = flickrrippr_photo_get_nid($photo_id);
-//      if (!$nid) {
-//        flickrrippr_makenode($photo_id);
-//        $nid = flickrrippr_photo_get_nid($photo_id);
-//      }
-//    }
-//    if (!$nid) {
-//      drupal_set_message(t('Unable to get new node nid for photos %photo_id', array('%photo_id' => $photo_id)), 'error');
-//      return '';
-//    }
-//
-//    $img = flickrrippr_show_photo($p, FALSE, NULL, $cache);
-//    if ($cache) {
-//      $url = url('node/' . $nid);
-//    }
-//    else {
-//      $url = 'http://flickr.com/photos/'.$p['owner'] .'/'. $p['id'] ;
-//    }
-//    $s .= '<a href="' . $url .'">';
-//    $s .= $img;
-//    $s .= '</a>';
-//    $photo_list[] = $p['id'];
-//    $row++;
-//  }
-//  return $s;
-//}
-//
-//
-/**
-//    menu callback, page-able screen full of thumbnails
-//*/
-//    function flickrrippr_thumbnails($fuser, $page = 1) {
-//      $output = '';
-//      if (!$fuser) {
-//        return $output;
-//      }
-//
-//      $flickr = @flickrapi_phpFlickr();
-//
-//      if (!$flickr) {
-//        drupal_set_message(t("Unable to query flickr.com, library missing"));
-//        return $output;
-//      }
-//
-//      $num_per_page = 60;
-//
-//      $user = flickrrippr_flickruser($fuser);
-//      $photos= $flickr->people_getPublicPhotos($user['id'], NULL, $num_per_page, intval($page));
-//
-//      $output .= flickrrippr_thumbnail_table($photos, $photo_list);
-//
-//      $output .= l(t('More'), 'flickrthumbnails/' . $fuser. '/' . ($page + 1));
-//
-//      return $output;
-//    }
-//
+
 function flickrrippr_node_info() {
   return array(
     'flickrrippr_photo' => array(
@@ -764,21 +528,12 @@ function flickrippr_view($node, $teaser = FALSE, $page = FALSE) {
   drupal_set_message(__FUNCTION__);
 }
 
-//
-//
-//function flickrrippr_get_photo_id($nid) {
-//  $record = db_fetch_object(db_query("SELECT flickrphoto_id from {flickrphotos} where nid=%d", $nid));
-//  return $record->flickrphoto_id;
-//}
-//
-//function flickrrippr_get_photo_id($nid) {
-//        $record = db_fetch_object(db_query("SELECT flickrphoto_id from {flickrphotos} where nid=%d", $nid));
-//	if (!$record) return 0;
-//        return $record->flickrphoto_id;
-//}
+
 function flickrrippr_node_form(&$form_state, $node) {
 }
+
 /**
+ * 
  */
 function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
@@ -788,8 +543,8 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
       db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
       drupal_set_message("Flickr photo deleted");
     break;
-//     case 'view':
-//       flickrrippr_node_view($node);
+    case 'view':
+      flickrippr_view($node, $teaser, $page);
   }
 }
 
