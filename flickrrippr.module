@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.11 2010/06/22 03:41:30 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.12 2010/06/22 03:42:13 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -519,6 +519,7 @@ function flickrrippr_node_info() {
       'name' => t('Flickr Rippr Photo'),
       'module' => 'flickrrippr',
       'description' => t("Photos imported from a user's flickr stream"),
+      'has_body' => FALSE,
       )
     );
 
