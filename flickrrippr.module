@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.8 2010/06/21 22:35:23 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.9 2010/06/22 02:53:20 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -184,8 +184,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
  */
 function flickrrippr_photo_get_nid($photo_id) {
   $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
-  $nid = $rec->nid;
-  return $nid;
+  return (!empty($rec->nid) ? $rec->nid : null);
 }
 
 ///**
@@ -231,7 +230,7 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
   list($width, $height, $type, $attr) = getimagesize($path);
-  $img = '<img src="' . $path  . '" alt="' . t($info['title']) . '" width="' . $width . '" height="' . $height . '" />';
+  $img = '<img src="' . $path  . '" alt="' . t($flickr_info['title']) . '" width="' . $width . '" height="' . $height . '" />';
 
 
   //thumbnail version
