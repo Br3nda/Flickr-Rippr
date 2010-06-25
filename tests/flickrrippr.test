@@ -1,0 +1,51 @@
+<?php
+// $Id: flickrrippr.test,v 1.1 2010/06/25 04:24:01 taniwha Exp $
+
+/**
+ * @file
+ * Unit Tests for flickrrippr module
+ */
+
+class FlickrRipprTestCase extends DrupalWebTestCase {
+
+  /**
+   * User with rights to post SimpleTest Example content.
+   */
+  protected $privileged_user;
+
+  /**
+   * getInfo() returns properties that are displayed in the test selection form.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Flickr Rippr',
+      'description' => 'Ensure that the flickrrippr content type provided functions properly.',
+      'group' => 'Flickr Rippr',
+    );
+  }
+
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen. 
+   */
+  public function setUp() {
+    // Enable any modules required for the test.
+    parent::setUp('flickrrippr');
+
+    // Create and log in our privileged user.
+    $this->privileged_user = $this->drupalCreateUser( array('Configure own blogged flickr stream'));
+    $this->drupalLogin($this->privileged_user);
+  }
+
+  /**
+   * Test saving your settings
+   */
+  public function testSavingsettings() {
+    $this->drupalGet('user/flickrippr');
+    $this->assertResponse(200);
+    $edit['flickr_username'] = 'br3nda';
+    $this->drupalPost('user/flickrippr', $edit, 'Save');
+    $this->assertResponse(200);
+  }
+
+
+}
