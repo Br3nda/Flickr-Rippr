@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.12.2.1 2010/07/09 21:27:51 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.12.2.2 2010/07/09 21:38:04 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -7,38 +7,6 @@
  * PHP Flickr: http://phpflickr.com/docs/
  * Flickr API docs http://www.flickr.com/services/api/
  */
-
-/**
- * returns the phpFlickr object.
- * If we need to change anything, such as making the cache configuration,
- * then it'll all be done here.
- */
-function flickrrippr_phpFlickr() {
-  //Find the phpFlickr library
-  $include_file = drupal_get_path('module', 'flickrrippr') .'/phpFlickr/phpFlickr.php';
-  if (!file_exists($include_file)) {
-    drupal_set_message(t("Missing phpFlickr - expected to find it at !file. Download this from !link", array('!file' => $include_file, '!link' => l('phpflickr.com', 'http://phpflickr.com/'))), 'error');
-    return FALSE;
-  }
- require_once($include_file);
-
- //Get the api key, we need this to make queries.
- $api_key = variable_get('flickrapikey', '');
- if (!$api_key) {
-   drupal_set_message(t("Flickr API key not set"), 'error');
-   if (user_access('Administer global flickr api settings')) {
-     drupal_set_message(t("Goto !link to configure FlickrRipper", array('!link' => l('admin/settings/flickrrippr', 'admin/settings/flickrrippr'))), 'error');
-   }
- }
-
- //call the phpFlickr library
- $flickr = new phpFlickr($api_key);
-
- //TODO make caching configurable.. but really you'd want to have this turned on.
- $flickr->enableCache("fs", variable_get('flickrcachepath', '/tmp'));
-
- return $flickr;
-}
 //
 //
 ///**
