@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.27 2010/06/22 22:28:47 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.28 2010/07/09 08:31:19 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -8,7 +8,7 @@ include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
  * Implementation of hook_perm().
  */
 function flickrrippr_perm() {
-  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', 'Cache own Flickr Photos on this server');
+  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', /* 'Cache own Flickr Photos on this server'*/);
 }
 
 /**
@@ -400,7 +400,7 @@ function flickrrippr_admin_form_validate() {
 function flickrrippr_admin_form_submit($form, &$form_state) {
   $form_values = &$form_state['values'];
   variable_set('flickrapikey', $form_state['values']['api_key']);
-  variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
+//   variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
   drupal_set_message(t('Settings saved'));
 }
 
@@ -431,21 +431,27 @@ function flickrrippr_user_settings_form($a, $user) {
                                     '#default_value' => isset($settings->flickrusername) ? $settings->flickrusername : '',
                                     '#required' => TRUE
                                   );
-  $form['thumbnailpage'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Thumbnail page'),
-    '#default_value' => TRUE,
-    );
+  $form['flickr_tag'] = array(
+                                    '#type' => 'textfield',
+                                    '#title' => t('Filter by Tag'),
+                                    '#description' => t('If entered, only photos that have this tag will be imported. Be aware that your friends and family on flickr may also be allowed to tag your photos.'),
+                                    '#default_value' => isset($settings->flickrtag) ? $settings->flickrtag : '',
+                                  );                                  
+//   $form['thumbnailpage'] = array(
+//     '#type' => 'checkbox',
+//     '#title' => t('Enable Thumbnail page'),
+//     '#default_value' => TRUE,
+//     );
 //   $form['promote'] = array(
 //    '#type' => 'checkbox',
 //    '#title' => t('Promote new photos to front page?'),
 //   );
-  if (user_access('Cache own Flickr Photos on this server')) {
-    $form['cache'] = array(
-                           '#title' => t('Cache photos on this server?'),
-                                         '#type' => 'checkbox'
-                          );
-  }
+//   if (user_access('Cache own Flickr Photos on this server')) {
+//     $form['cache'] = array(
+//                            '#title' => t('Cache photos on this server?'),
+//                                          '#type' => 'checkbox'
+//                           );
+//   }
 
 
   $form['save'] = array(
@@ -501,15 +507,15 @@ function flickrrippr_form(&$node) {
   $form = array();
   //TODO add instructions on edit the photo on flickr.com
 
-  $form['flickr'] = array('#type' => 'fieldset',
-                              '#collapsible' => TRUE,
-                          '#title' => t('Flickr API queries'),
-                         );
-  $form['flickr']['cache'] = array(
-                                   '#type' => 'checkbox',
-                                   '#title' => t('Cache jpeg locally'),
-                                  );
-
+//   $form['flickr'] = array('#type' => 'fieldset',
+//                               '#collapsible' => TRUE,
+//                           '#title' => t('Flickr API queries'),
+//                          );
+//   $form['flickr']['cache'] = array(
+//                                    '#type' => 'checkbox',
+//                                    '#title' => t('Cache jpeg locally'),
+//                                   );
+/*
   $form['flickr']['refresh'] = array(
                                      '#type' => 'checkbox',
                                      '#title' => t('Refresh details from flickr.com'),
@@ -521,33 +527,33 @@ function flickrrippr_form(&$node) {
   $form['flickr']['link'] = array(
                                   '#type' => 'checkbox',
                                   '#title' => t('Show link to flickr photo page'),
-                                 );
+                                 );*/
 
-  $form['size'] = array('#type' => 'fieldset',
-                        '#collapsible' => TRUE,
-                        '#title' => t('Image sizes'),
-                       );
-  $sizes = array('t' => t('Thumbnail'),
-                 's' => t('Square'),
-                          'm' => t('Medium'),
-                                   '' => t('Default')
-                );
-  $form['size']['teaser_size'] = array(
-                                       '#type' => 'select',
-                                       '#options' => $sizes,
-                                       '#title' => t('Teaser Size'),
-                                           '#description' => t('Size of jpeg shown in node teaser'),
-                                      );
-  $form['size']['page_size'] = array(
-                                     '#type' => 'select',
-                                     '#options' => $sizes,
-                                     '#title' => t('Page Size'),
-                                         '#description' => t('Size of jpeg shown in node page and rss feed'),
-                                    );
-  $form['nid'] = array(
-                       '#type' => 'hidden',
-                       '#value' => $node->nid,
-                      );
+//   $form['size'] = array('#type' => 'fieldset',
+//                         '#collapsible' => TRUE,
+//                         '#title' => t('Image sizes'),
+//                        );
+//   $sizes = array('t' => t('Thumbnail'),
+//                  's' => t('Square'),
+//                           'm' => t('Medium'),
+//                                    '' => t('Default')
+//                 );
+//   $form['size']['teaser_size'] = array(
+//                                        '#type' => 'select',
+//                                        '#options' => $sizes,
+//                                        '#title' => t('Teaser Size'),
+//                                            '#description' => t('Size of jpeg shown in node teaser'),
+//                                       );
+//   $form['size']['page_size'] = array(
+//                                      '#type' => 'select',
+//                                      '#options' => $sizes,
+//                                      '#title' => t('Page Size'),
+//                                          '#description' => t('Size of jpeg shown in node page and rss feed'),
+//                                     );
+//   $form['nid'] = array(
+//                        '#type' => 'hidden',
+//                        '#value' => $node->nid,
+//                       );
 
   return $form;
 }
