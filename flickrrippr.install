@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.15 2010/06/22 22:43:22 taniwha Exp $
+// $Id: flickrrippr.install,v 1.16 2010/07/09 08:43:15 taniwha Exp $
 
 /**
  * Implementation of hook_install().
@@ -24,7 +24,8 @@ function flickrrippr_schema() {
     'fields' => array(
       'uid' => array('type' => 'int'),
       'flickrid' => array('type' => 'text'),
-      'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(  
+      'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(
+      'tag' => array('type' => 'text'),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       ),
     'primary key' => array('uid')
@@ -84,5 +85,10 @@ function flickrrippr_update_7() {
 function flickrrippr_update_8() {
   db_add_column($ret, 'flickrphotos', 'description', 'text');
   db_add_column($ret, 'flickrphotos', 'page_url', 'text');
+  return $ret;
+}
+
+function flickrrippr_update_9() {
+  db_add_column($ret, 'flickrusers', 'tag', 'text');
   return $ret;
 }

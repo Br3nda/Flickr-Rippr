@@ -1,12 +1,14 @@
 <?php
-// $Id: flickrrippr.module,v 1.91 2010/06/22 22:43:22 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92 2010/07/09 08:43:15 taniwha Exp $
+
+
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
 
 /**
  * Implementation of hook_perm().
  */
 function flickrrippr_perm() {
-  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', 'Cache own Flickr Photos on this server');
+  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', /* 'Cache own Flickr Photos on this server'*/);
 }
 
 /**
@@ -168,6 +170,11 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     'per_page' => $num_photos,
     'page' =>  $pagenum
     );
+  if ($flickr_settings->tag) {
+//     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
+    $query['tags'] = check_plain($flickr_settings->tag);
+  }
+  
 
   $photos = $flickr->photos_search($query);
   //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
@@ -179,11 +186,11 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     }
   }
   else {
-    drupal_set_message(t('No photos found'));
+//     drupal_set_message(t('No photos found'));
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
-    drupal_set_message(t('No new photos'));
+//     drupal_set_message(t('No new photos'));
     return FALSE;
   }
   //recursive - call this function again to get the next 10;
@@ -266,7 +273,7 @@ function flickrrippr_makenode($photo_id) {
   node_save($node);
 
   if ($node->is_new) {
-    drupal_set_message("New node, nid = $node->nid");
+//     drupal_set_message("New node, nid = $node->nid");
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path, description, page_url)
       VALUES ('%s', %d, %d, '%s', '%s', '%s', '%s')",
       $photo_id, $node->nid, strtotime('now'), $photo_path, $thumbnail_path, $description, $page_url);
@@ -398,7 +405,7 @@ function flickrrippr_admin_form_validate() {
 function flickrrippr_admin_form_submit($form, &$form_state) {
   $form_values = &$form_state['values'];
   variable_set('flickrapikey', $form_state['values']['api_key']);
-  variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
+//   variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
   drupal_set_message(t('Settings saved'));
 }
 
@@ -429,21 +436,27 @@ function flickrrippr_user_settings_form($a, $user) {
                                     '#default_value' => isset($settings->flickrusername) ? $settings->flickrusername : '',
                                     '#required' => TRUE
                                   );
-  $form['thumbnailpage'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Thumbnail page'),
-    '#default_value' => TRUE,
-    );
+  $form['flickr_tag'] = array(
+                                    '#type' => 'textfield',
+                                    '#title' => t('Filter by Tag'),
+                                    '#description' => t('If entered, only photos that have this tag will be imported. Be aware that your friends and family on flickr may also be allowed to tag your photos.'),
+                                    '#default_value' => isset($settings->tag) ? $settings->tag : '',
+                                  );                                  
+//   $form['thumbnailpage'] = array(
+//     '#type' => 'checkbox',
+//     '#title' => t('Enable Thumbnail page'),
+//     '#default_value' => TRUE,
+//     );
 //   $form['promote'] = array(
 //    '#type' => 'checkbox',
 //    '#title' => t('Promote new photos to front page?'),
 //   );
-  if (user_access('Cache own Flickr Photos on this server')) {
-    $form['cache'] = array(
-                           '#title' => t('Cache photos on this server?'),
-                                         '#type' => 'checkbox'
-                          );
-  }
+//   if (user_access('Cache own Flickr Photos on this server')) {
+//     $form['cache'] = array(
+//                            '#title' => t('Cache photos on this server?'),
+//                                          '#type' => 'checkbox'
+//                           );
+//   }
 
 
   $form['save'] = array(
@@ -477,16 +490,18 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   $flickrid = flickrrippr_flickruser($form_state['values']['flickr_username']);
 
   if (isset($settings->flickrusername)) {
-    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrid='%s' WHERE uid = %d",
+    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrid='%s', tag='%s' WHERE uid = %d",
       $form_state['values']['flickr_username'],
       $flickrid,
+      $form_state['values']['flickr_tag'],
       $user->uid);
     drupal_set_message(t("Flickr username updated"));
   }
   else {
-    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, uid) VALUES ('%s', '%s', '%s')",
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s')",
       $form_state['values']['flickr_username'],
       $flickrid,
+      $form_state['values']['flickr_tag'],
       $user->uid);
     drupal_set_message(t("Flickr username set"));
   }
@@ -499,15 +514,15 @@ function flickrrippr_form(&$node) {
   $form = array();
   //TODO add instructions on edit the photo on flickr.com
 
-  $form['flickr'] = array('#type' => 'fieldset',
-                              '#collapsible' => TRUE,
-                          '#title' => t('Flickr API queries'),
-                         );
-  $form['flickr']['cache'] = array(
-                                   '#type' => 'checkbox',
-                                   '#title' => t('Cache jpeg locally'),
-                                  );
-
+//   $form['flickr'] = array('#type' => 'fieldset',
+//                               '#collapsible' => TRUE,
+//                           '#title' => t('Flickr API queries'),
+//                          );
+//   $form['flickr']['cache'] = array(
+//                                    '#type' => 'checkbox',
+//                                    '#title' => t('Cache jpeg locally'),
+//                                   );
+/*
   $form['flickr']['refresh'] = array(
                                      '#type' => 'checkbox',
                                      '#title' => t('Refresh details from flickr.com'),
@@ -519,33 +534,33 @@ function flickrrippr_form(&$node) {
   $form['flickr']['link'] = array(
                                   '#type' => 'checkbox',
                                   '#title' => t('Show link to flickr photo page'),
-                                 );
+                                 );*/
 
-  $form['size'] = array('#type' => 'fieldset',
-                        '#collapsible' => TRUE,
-                        '#title' => t('Image sizes'),
-                       );
-  $sizes = array('t' => t('Thumbnail'),
-                 's' => t('Square'),
-                          'm' => t('Medium'),
-                                   '' => t('Default')
-                );
-  $form['size']['teaser_size'] = array(
-                                       '#type' => 'select',
-                                       '#options' => $sizes,
-                                       '#title' => t('Teaser Size'),
-                                           '#description' => t('Size of jpeg shown in node teaser'),
-                                      );
-  $form['size']['page_size'] = array(
-                                     '#type' => 'select',
-                                     '#options' => $sizes,
-                                     '#title' => t('Page Size'),
-                                         '#description' => t('Size of jpeg shown in node page and rss feed'),
-                                    );
-  $form['nid'] = array(
-                       '#type' => 'hidden',
-                       '#value' => $node->nid,
-                      );
+//   $form['size'] = array('#type' => 'fieldset',
+//                         '#collapsible' => TRUE,
+//                         '#title' => t('Image sizes'),
+//                        );
+//   $sizes = array('t' => t('Thumbnail'),
+//                  's' => t('Square'),
+//                           'm' => t('Medium'),
+//                                    '' => t('Default')
+//                 );
+//   $form['size']['teaser_size'] = array(
+//                                        '#type' => 'select',
+//                                        '#options' => $sizes,
+//                                        '#title' => t('Teaser Size'),
+//                                            '#description' => t('Size of jpeg shown in node teaser'),
+//                                       );
+//   $form['size']['page_size'] = array(
+//                                      '#type' => 'select',
+//                                      '#options' => $sizes,
+//                                      '#title' => t('Page Size'),
+//                                          '#description' => t('Size of jpeg shown in node page and rss feed'),
+//                                     );
+//   $form['nid'] = array(
+//                        '#type' => 'hidden',
+//                        '#value' => $node->nid,
+//                       );
 
   return $form;
 }
