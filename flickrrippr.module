@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.87.2.29 2010/07/09 08:34:20 taniwha Exp $
+// $Id: flickrrippr.module,v 1.87.2.30 2010/07/09 08:40:27 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -170,6 +170,11 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     'per_page' => $num_photos,
     'page' =>  $pagenum
     );
+  if ($flickr_settings->tag) {
+//     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
+    $query['tags'] = check_plain($flickr_settings->tag);
+  }
+  
 
   $photos = $flickr->photos_search($query);
   //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
@@ -181,11 +186,11 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     }
   }
   else {
-    drupal_set_message(t('No photos found'));
+//     drupal_set_message(t('No photos found'));
   }
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
-    drupal_set_message(t('No new photos'));
+//     drupal_set_message(t('No new photos'));
     return FALSE;
   }
   //recursive - call this function again to get the next 10;
@@ -268,7 +273,7 @@ function flickrrippr_makenode($photo_id) {
   node_save($node);
 
   if ($node->is_new) {
-    drupal_set_message("New node, nid = $node->nid");
+//     drupal_set_message("New node, nid = $node->nid");
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path, description, page_url)
       VALUES ('%s', %d, %d, '%s', '%s', '%s', '%s')",
       $photo_id, $node->nid, strtotime('now'), $photo_path, $thumbnail_path, $description, $page_url);
