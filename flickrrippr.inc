@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.12.2.2 2010/07/09 21:38:04 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.12.2.3 2010/07/10 02:56:11 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -13,57 +13,6 @@
 // * Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
 // * NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
 // */
-//function flickrrippr_show_photo($photo, $link = TRUE, $owner = "", $cache = TRUE) {
-//  $src = flickrrippr_path($photo, $cache, 's');
-//  if ($cache) {
-//    file_create_url($src);
-//  }
-//  $alt = $photo['title'];
-//  if (!$photo['owner']) {
-//    $photo['owner'] = $owner;
-//  }
-//
-//  return '<img src="'. htmlentities($src) .'" title="'. htmlentities($alt) .'" alt="'. htmlentities($alt) .'" height="75" width="75">';
-//  
-//}
-//
-///**
-// * Make a html chunk of photos ready for display from a 
-// * photo list as returned by phpFlickr methods
-// */
-//function flickrrippr_thumbnail_table($photos, &$photo_list, $cache = TRUE) {
-//	
-//  $row = 0;
-//  if (!is_array($photos['photo'])) {
-//    return t('No photos found');
-//  }
-//  $s = '';
-//  
-//  foreach ($photos['photo'] as $p) {
-//    if ($cache) {
-//      $nid = flickrrippr_photo_get_nid($p['id']);
-//      if (!$nid) {
-//        flickrrippr_makenode($p['id'], $p);
-//        $nid = flickrrippr_photo_get_nid($p['id']);
-//      }
-//    }
-//    
-//    $img = flickrrippr_show_photo($p, FALSE, null, $cache);
-//    if ($cache) {
-//      $s .= '<a href="'. url('node/'. $nid)  .'">';
-//    }
-//    else {
-//      $s .= '<a href="http://flickr.com/photos/'. htmlentities($p['owner']) .'/'. $p['id'] .'">';
-//    }
-//    $s .= $img;
-//    $s .= '</a>';
-//    $photo_list[] = $p['id'];
-//    $row++;
-//  }
-//  return $s;
-//}
-//
-    
 /**
 * Helper function, to get drupal user details for a flickr user (string of their username of flickr)
 */
