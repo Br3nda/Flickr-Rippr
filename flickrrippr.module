@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.2 2010/07/10 05:11:51 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.3 2010/07/10 05:12:20 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -114,6 +114,7 @@ function flickrrippr_admin() {
     );
   }
   $output .= theme('table', $headers, $rows);
+  $output .= theme('pager');
   return $output;
 
 }
