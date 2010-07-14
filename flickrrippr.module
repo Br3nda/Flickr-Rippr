@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.104 2010/07/14 01:48:19 taniwha Exp $
+// $Id: flickrrippr.module,v 1.105 2010/07/14 01:58:01 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -103,8 +103,8 @@ function flickrrippr_admin_edit($uid) {
   //return drupal_get_form('flickrrippr_user_settings_form', $user);
 }
 
-function flickrrippr_admin_fetch($uid) {
-  flickrrippr_check_latest(intval($uid));
+function flickrrippr_admin_fetch($flickrid) {
+  flickrrippr_check_latest_account($flickrid);
   drupal_goto('admin/content/flickrrippr');
 }
 
@@ -120,7 +120,7 @@ function flickrrippr_admin() {
     array('data' => t('Flickr Username'), 'field' => 'flickrusername'),
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
   );
-  $result = pager_query("SELECT u.uid, u.name, f.flickrusername, f.flickrid FROM {users} u LEFT OUTER JOIN {flickrusers} f  ON u.uid = f.uid AND u.uid > 0". tablesort_sql($headers));
+  $result = pager_query("SELECT u.uid, u.name, f.flickrusername, f.flickrid FROM {users} u LEFT OUTER JOIN {flickrusers} f  ON u.uid = f.uid WHERE u.uid > 0 ". tablesort_sql($headers), 20);
 
 
   while ($u = db_fetch_object($result)) {
@@ -128,7 +128,7 @@ function flickrrippr_admin() {
       $u->name,
       $u->flickrusername,
       $u->flickrid,
-      ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->uid) : ''),
+      ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->flickrid) : ''),
       l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid),
     );
   }
@@ -158,6 +158,17 @@ function flickrrippr_admin() {
  */
 function flickrrippr_check_latest($user_id, $pagenum = 1) {
 
+
+  $accounts = flickrrippr_user_get_accounts($uid);
+
+  foreach($accounts as $flickrid) {
+    flickrrippr_check_latest_account($flickrid);
+  }
+  
+}
+
+function flickrrippr_check_latest_account($flickrid) {
+  drupal_set_message("Checking latest for $flickrid");
   $output = '';
   //TODO, don't run every time.
   $num_photos = 20; //TODO make customisable
@@ -169,12 +180,10 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   }
   
   
- //fetches defails from our database
-  $flickr_settings = flickrrippr_user_settings_get($user_id);
   
  //fetches from api.flickr.com
-  if (!$flickr_settings->flickrid) {
-    $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
+  if (!$account->flickrid) {
+    $account->flickrid = flickrrippr_flickruser($account->flickrusername);
   }
 
   
@@ -186,13 +195,13 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   }
   
   $query = array(
-    'user_id' => $flickr_settings->flickrid,
+    'user_id' => $account->flickrid,
     'per_page' => $num_photos,
     'page' =>  $pagenum
     );
-  if ($flickr_settings->tag) {
+  if ($account->tag) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
-    $query['tags'] = check_plain($flickr_settings->tag);
+    $query['tags'] = check_plain($account->tag);
   }
   
 
@@ -491,12 +500,15 @@ function flickrrippr_account_settings_form($f, $uid) {
   $form = array();
   drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $user->name)));
   $form['uid'] = array('#type' => 'hidden', '#value' => $uid);
+
+  //TODO allow editing tags
   $form['flickr_username'] = array(
                                     '#type' => 'textfield',
                                     '#title' => t('Flickr Username'),
                                     '#default_value' => isset($account->flickrusername) ? $account->flickrusername : '',
                                     '#required' => TRUE
                                   );
+                                  
   $form['flickr_tag'] = array(
                                     '#type' => 'textfield',
                                     '#title' => t('Filter by Tag'),
