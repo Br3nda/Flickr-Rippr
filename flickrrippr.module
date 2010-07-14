@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.100 2010/07/14 01:12:38 taniwha Exp $
+// $Id: flickrrippr.module,v 1.101 2010/07/14 01:21:31 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -448,12 +448,18 @@ function flickrrippr_user_settings_edit($flickrid) {
  * Where a user defines their username
  */
 function flickrrippr_user_settings($uid = NULL) {
+
+  $output = '';
+
+  
   if (!empty($uid) && user_access('Administer global flickr api settings')) {
     $user = user_load(array('uid' => $uid));
   }
   else {
     GLOBAL $user;
   }
+
+  $output .= l('Add new account', 'flickrrippr/add/'. $uid);
 
   $headers = array('Flickr Username', 'FlickrId', 'Tag Filter');
   $flickr_accounts = flickrrippr_user_get_accounts($user->uid);
@@ -466,7 +472,8 @@ function flickrrippr_user_settings($uid = NULL) {
       l('Delete', 'user/flickrrippr/delete/'. $account->flickrid),
     );
   }
-  return theme('table', $headers, $rows);
+  $output .= theme('table', $headers, $rows);
+  return $output;
 }
 
 function flickrrippr_account_settings_form($f, $flickrid) {
