@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.98 2010/07/14 00:18:09 taniwha Exp $
+// $Id: flickrrippr.module,v 1.99 2010/07/14 00:23:26 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -49,7 +49,6 @@ function flickrrippr_menu() {
 
     //configure a user's account with their flickr username
   $items['user/flickrippr/edit'] = array(
-    'title' => t('My Flickr Photo settings'),
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_settings_edit',
     'access arguments' => array('Configure own blogged flickr stream'),
