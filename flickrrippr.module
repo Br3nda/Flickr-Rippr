@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.99 2010/07/14 00:23:26 taniwha Exp $
+// $Id: flickrrippr.module,v 1.100 2010/07/14 01:12:38 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -40,7 +40,7 @@ function flickrrippr_menu() {
   );
 
   //configure a user's account with their flickr username
-  $items['user/flickrippr'] = array(
+  $items['user/flickrrippr'] = array(
     'title' => t('My Flickr Photo settings'),
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrrippr_user_settings',
@@ -48,9 +48,9 @@ function flickrrippr_menu() {
   );
 
     //configure a user's account with their flickr username
-  $items['user/flickrippr/edit'] = array(
+  $items['user/flickrrippr/delete'] = array(
     'type' => MENU_CALLBACK,
-    'page callback' => 'flickrrippr_user_settings_edit',
+    'page callback' => 'flickrrippr_user_settings_delete',
     'access arguments' => array('Configure own blogged flickr stream'),
   );
   /*
@@ -58,7 +58,7 @@ function flickrrippr_menu() {
     if (arg(0) == 'node' && is_numeric(arg(1))) {
       //TODO - there has gotta be a better way to work out this is a flickrrippr node
       $node = node_load(array('nid' => arg(1)));
-      if ($node->type == 'flickrippr') {
+      if ($node->type == 'flickrrippr') {
         $items['node/'. arg(1) .'/flickr-refresh'] = array(
           'title' => t('Refresh'),
           'callback' => 'flickrrippr_node_refresh',
@@ -424,6 +424,22 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
   drupal_set_message(t('Settings saved'));
 }
 
+function flickrrippr_user_settings_delete($flickrid) {
+
+  $account = flickrrippr_account_get($flickrid);
+  if(!user_access('Administer global flickr api settings')) {
+    GLOBAL $user;
+    if($account->uid != $user->uid) {
+      drupal_set_message(t('Unable to edit other users', 'error'));
+      return;
+    }
+  }
+
+  db_query("DELETE FROM {flickrusers} WHERE flickrid='%s'", $flickrid);
+  drupal_goto('user/flickrrippr');
+  
+}
+
 function flickrrippr_user_settings_edit($flickrid) {
   return drupal_get_form('flickrrippr_account_settings_form', $flickrid);
 }
@@ -447,7 +463,7 @@ function flickrrippr_user_settings($uid = NULL) {
       check_plain($account->flickrid),
       check_plain($account->tag),
 //       print_r($account, 1)
-      l('Edit', 'user/flickrippr/edit/'. $account->flickrid),
+      l('Delete', 'user/flickrrippr/delete/'. $account->flickrid),
     );
   }
   return theme('table', $headers, $rows);
@@ -509,31 +525,43 @@ function flickrrippr_account_settings_form_validate($form, &$form_state) {
   //and store the 3432@N00 uid then
 }
 function flickrrippr_account_settings_form_submit($form, &$form_state) {
-  if (!empty($form_state['values']['uid'])) {
-    $user = user_load(array('uid' => intval($form_state['values']['uid'])));
-  }
-  else {
+  $flickrid = $form_state['values']['flickrid'];
+  $account = flickrrippr_account_get($flickrid);
+  
+  if(!user_access('Administer global flickr api settings')) {
     GLOBAL $user;
+    if($account->uid != $user->uid) {
+      drupal_set_message(t('Unable to edit other users', 'error'));
+      return;
+    }
   }
-  $settings = flickrrippr_user_settings_get($user->uid);
-  $flickrid = flickrrippr_flickruser($form_state['values']['flickr_username']);
+  
+//   $settings = flickrrippr_user_settings_get($user->uid);
 
-  if (isset($settings->flickrusername)) {
-    $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrid='%s', tag='%s' WHERE uid = %d",
+//flickrrippr_flickruser(
+//   if (isset($account->flickrusername)) {
+//     $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrid='%s', tag='%s' WHERE flickrid = '%d'",
+//       $form_state['values']['flickr_username'],
+//       $flickrid,
+//       $form_state['values']['flickr_tag'],
+//       $flickrid);
+//       drupal_set_message(sprintf("UPDATE {flickrusers} SET flickrusername='%s', tag='%s' WHERE flickrid = '%d'",
+//       $form_state['values']['flickr_username'],
+//       $form_state['values']['flickr_tag'],
+//       $flickrid));
+//     drupal_set_message(t("Flickr username updated"));
+//   }
+//   else {
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, tag, uid) VALUES ('%s', '%s', %d)",
       $form_state['values']['flickr_username'],
-      $flickrid,
       $form_state['values']['flickr_tag'],
-      $user->uid);
-    drupal_set_message(t("Flickr username updated"));
-  }
-  else {
-    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s', %d)",
+      $flickrid);
+    drupal_set_message(sprintf("INSERT INTO {flickrusers} (flickrusername, tag, uid) VALUES ('%s', '%s', %d)",
       $form_state['values']['flickr_username'],
-      $flickrid,
       $form_state['values']['flickr_tag'],
-      $user->uid);
+      $flickrid));
     drupal_set_message(t("Flickr username set"));
-  }
+//   }
 }
 
 /**
