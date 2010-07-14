@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.103 2010/07/14 01:24:48 taniwha Exp $
+// $Id: flickrrippr.module,v 1.104 2010/07/14 01:48:19 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -481,13 +481,16 @@ function flickrrippr_user_settings($uid = NULL) {
   return $output;
 }
 
-function flickrrippr_account_settings_form($f, $flickrid) {
+function flickrrippr_account_settings_form($f, $uid) {
+  if (!$uid) {
+    drupal_set_message("No uid passed into ". __FUNCTION__, 'error');
+    return;
+  }
 
 //   $settings = flickrrippr_user_settings_get($user->uid);
-  $account = flickrrippr_account_get($flickrid);
   $form = array();
   drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $user->name)));
-  $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickrid);
+  $form['uid'] = array('#type' => 'hidden', '#value' => $uid);
   $form['flickr_username'] = array(
                                     '#type' => 'textfield',
                                     '#title' => t('Flickr Username'),
@@ -532,6 +535,12 @@ function flickrrippr_user_get_accounts($uid) {
 
 
 function flickrrippr_account_settings_form_validate($form, &$form_state) {
+//   $flickr_username = $form_state['values']['flickr_username'];
+//   drupal_set_message("Checking $flickr_username");
+//   $check_account = flickrrippr_flickruser($flickr_username);
+//   if (!$check_account) {
+//     form_set_error('flickr_username', t('User does not exist on flickr.com'));
+//   }
   //TODO, check the submitted username exists on flickr?
   //query api
   //and store the 3432@N00 uid then
@@ -550,7 +559,7 @@ function flickrrippr_account_settings_form_submit($form, &$form_state) {
   
 //   $settings = flickrrippr_user_settings_get($user->uid);
 
-//flickrrippr_flickruser(
+
 //   if (isset($account->flickrusername)) {
 //     $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrid='%s', tag='%s' WHERE flickrid = '%d'",
 //       $form_state['values']['flickr_username'],
@@ -564,15 +573,16 @@ function flickrrippr_account_settings_form_submit($form, &$form_state) {
 //     drupal_set_message(t("Flickr username updated"));
 //   }
 //   else {
-    $result = db_query("INSERT INTO {flickrusers} (flickrusername, tag, uid) VALUES ('%s', '%s', %d)",
+    $flickrid = flickrrippr_flickruser($form_state['values']['flickr_username']);
+
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s', %d)",
       $form_state['values']['flickr_username'],
+      $flickrid,
       $form_state['values']['flickr_tag'],
-      $flickrid);
-    drupal_set_message(sprintf("INSERT INTO {flickrusers} (flickrusername, tag, uid) VALUES ('%s', '%s', %d)",
-      $form_state['values']['flickr_username'],
-      $form_state['values']['flickr_tag'],
-      $flickrid));
+      $form_state['values']['uid']
+      );
     drupal_set_message(t("Flickr username set"));
+    drupal_goto('user/flickrrippr');
 //   }
 }
 
