@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.16 2010/07/09 08:43:15 taniwha Exp $
+// $Id: flickrrippr.install,v 1.17 2010/07/14 00:47:05 taniwha Exp $
 
 /**
  * Implementation of hook_install().
@@ -22,13 +22,13 @@ function flickrrippr_uninstall() {
 function flickrrippr_schema() {
   $schema['flickrusers'] = array(
     'fields' => array(
-      'uid' => array('type' => 'int'),
       'flickrid' => array('type' => 'text'),
+      'uid' => array('type' => 'int'),
       'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(
       'tag' => array('type' => 'text'),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       ),
-    'primary key' => array('uid')
+    'primary key' => array('flickrid', 'uid'),
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
@@ -75,7 +75,7 @@ function flickrrippr_update_6() {
 }
 
 function flickrrippr_update_7() {
-  $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid text");
+  db_add_column($ret, 'flickrphotos', 'flickrid', 'text');
   db_add_column($ret, 'flickrphotos', 'photo_path', 'text');
   db_add_column($ret, 'flickrphotos', 'thumbnail_path', 'text');
   
@@ -90,5 +90,11 @@ function flickrrippr_update_8() {
 
 function flickrrippr_update_9() {
   db_add_column($ret, 'flickrusers', 'tag', 'text');
+  return $ret;
+}
+
+function flickrrippr_update_10() {
+  db_drop_primary_key($ret, 'flickrusers');
+  db_add_primary_key($ret, 'flickrusers', array('uid', 'flickrid'));
   return $ret;
 }
