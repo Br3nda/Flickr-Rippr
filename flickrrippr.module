@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.97 2010/07/14 00:17:29 taniwha Exp $
+// $Id: flickrrippr.module,v 1.98 2010/07/14 00:18:09 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -50,7 +50,7 @@ function flickrrippr_menu() {
     //configure a user's account with their flickr username
   $items['user/flickrippr/edit'] = array(
     'title' => t('My Flickr Photo settings'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_settings_edit',
     'access arguments' => array('Configure own blogged flickr stream'),
   );
@@ -472,7 +472,7 @@ function flickrrippr_account_settings_form($f, $flickrid) {
                                     '#title' => t('Filter by Tag'),
                                     '#description' => t('If entered, only photos that have this tag will be imported. Be aware that your friends and family on flickr may also be allowed to tag your photos.'),
                                     '#default_value' => isset($account->tag) ? $account->tag : '',
-                                  );                                  
+                                  );
 
 
   $form['save'] = array(
