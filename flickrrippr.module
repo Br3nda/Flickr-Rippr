@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.101 2010/07/14 01:21:31 taniwha Exp $
+// $Id: flickrrippr.module,v 1.102 2010/07/14 01:22:06 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -32,8 +32,8 @@ function flickrrippr_menu() {
     'access arguments' => array('Administer global flickr api settings'),
   );
 
-  $items['admin/content/flickrrippr/edit'] = array(
-    'title' => t('Edit'),
+  $items['admin/content/flickrrippr/add'] = array(
+    'title' => t('Add'),
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_admin_edit',
     'access arguments' => array('Administer global flickr api settings'),
