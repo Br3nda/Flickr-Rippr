@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.110 2010/07/15 09:01:49 taniwha Exp $
+// $Id: flickrrippr.module,v 1.111 2010/07/15 09:10:14 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -572,7 +572,7 @@ function flickrrippr_account_settings_form_submit($form, &$form_state) {
       $form_state['values']['flickr_tag'],
       $flickrid,
       $uid);
-    drupal_set_message(t("Flickr username updated"));
+    drupal_set_message(t("Flickr account updated"));
     if ($uid == $user->uid) {
       drupal_goto('user/'. $uid .'/flickrrippr');
     }
@@ -587,7 +587,7 @@ function flickrrippr_account_settings_form_submit($form, &$form_state) {
       $form_state['values']['flickr_tag'],
       $form_state['values']['uid']
       );
-    drupal_set_message(t("Flickr username set"));
+    drupal_set_message(t("Flickr account saved set"));
 //     drupal_goto('user/flickrrippr');
   }
 }
