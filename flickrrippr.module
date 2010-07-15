@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.105 2010/07/14 01:58:01 taniwha Exp $
+// $Id: flickrrippr.module,v 1.106 2010/07/15 07:40:01 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -137,19 +137,6 @@ function flickrrippr_admin() {
   return $output;
 
 }
-
-
-//function flickrrippr_node_refresh($nid) {
-//  $photo_id = flickrrippr_get_photo_id($nid);
-//  if (!$photo_id) {
-//	return t('Photo not found');
-//  }
-//  flickrrippr_makenode($photo_id);
-//  drupal_goto('node/' . $nid);
-//}
-
-
-
 
 /**
  * Called by cron, this check for new photos for each user
