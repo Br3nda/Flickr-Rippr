@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.111 2010/07/15 09:10:14 taniwha Exp $
+// $Id: flickrrippr.module,v 1.112 2010/07/15 09:51:04 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -49,12 +49,6 @@ function flickrrippr_menu() {
   );
 
     //configure a user's account with their flickr username
-  $items['user/%/flickrrippr/delete/%'] = array(
-    'type' => MENU_CALLBACK,
-    'page callback' => 'flickrrippr_user_accounts_delete',
-    'page arguments' => array(1, 4),
-    'access arguments' => array('Configure own blogged flickr stream'),
-  );
   $items['user/%/flickrrippr/add'] = array(
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_accounts_add',
@@ -408,6 +402,7 @@ function flickrrippr_admin_form() {
         '#type' => 'textfield',
         '#default_value' => variable_get('flickrapikey', '')
       );
+    
 //   $form['jpegcache'] = array(
 //       '#title' => 'Allow Local Cache',
 //       '#type' => 'checkbox',
@@ -419,6 +414,7 @@ function flickrrippr_admin_form() {
      '#type' => 'submit',
      '#value' => t('Save'),
       );
+      
   return $form;
 }
 
@@ -536,6 +532,7 @@ function flickrrippr_account_settings_form($f, $uid, $flickrid=null) {
     '#type' => 'submit',
     '#value' => t('Save'),
     );
+    
   return $form;
 }
 
