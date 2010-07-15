@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.108 2010/07/15 08:02:12 taniwha Exp $
+// $Id: flickrrippr.module,v 1.109 2010/07/15 08:07:07 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -164,7 +164,6 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
 }
 
 function flickrrippr_user_get_account($uid, $flickrid) {
-  drupal_set_message(sprintf("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
   return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
 }
 
@@ -517,11 +516,13 @@ function flickrrippr_account_settings_form($f, $uid, $flickrid=null) {
 
   //TODO allow editing tags
   $form['flickr_username'] = array(
-                                    '#type' => 'textfield',
+                                    '#type' => ($flickrid ? 'markup' : 'textfield'),
                                     '#title' => t('Flickr Username'),
-                                    '#default_value' => isset($account->flickrusername) ? $account->flickrusername : '',
                                     '#required' => TRUE
                                   );
+  if ($flickrid) {
+    $form['flickr_username']['#value'] = t('<strong>Flickr Username</strong>: %flickr_username', array('%flickr_username' => $account->flickrusername));
+  }
                                   
   $form['flickr_tag'] = array(
                                     '#type' => 'textfield',
