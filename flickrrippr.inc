@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.12.2.4 2010/07/27 00:42:13 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.12.2.5 2010/07/27 00:43:00 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -177,3 +177,11 @@ function flickrrippr_makenode($photo_id) {
 }
 
 
+
+/**
+ * get the node id for a flickr photo id
+ */
+function flickrrippr_photo_get_nid($photo_id) {
+  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
+  return (!empty($rec->nid) ? $rec->nid : NULL);
+}
