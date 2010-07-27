@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.8 2010/07/27 00:43:00 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.9 2010/07/27 00:44:37 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -132,8 +132,8 @@ function flickrrippr_admin() {
 }
 
 function flickrrippr_load(&$node) {
-  drupal_set_message(__FUNCTION__);
-  
+//   drupal_set_message(__FUNCTION__);
+  $node->flickr_photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $nid));
 }
 
 function flickrrippr_node_refresh($nid) {
