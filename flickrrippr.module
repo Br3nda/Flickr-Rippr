@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.5 2010/07/10 05:13:30 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.6 2010/07/27 00:38:17 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -46,6 +46,15 @@ function flickrrippr_menu() {
     'page callback' => 'flickrrippr_user_settings',
     'access arguments' => array('Configure own blogged flickr stream'),
   );
+
+  $items['node/%/flickrrefresh'] = array(
+    'title' => 'Re-fetch from Flickr',
+    'page callback' => 'flickrrippr_node_refresh',
+    'page arguments' => array(1),
+    'access callback' => 'flickrrippr_node_refresh_perm',
+    'access arguments' => array(1),
+    'type' => MENU_LOCAL_TASK,
+  );
   /*
   	//The refresh tab
     if (arg(0) == 'node' && is_numeric(arg(1))) {
@@ -78,7 +87,10 @@ function flickrrippr_menu() {
   */
   return $items;
 }
-
+function flickrrippr_node_refresh_perm($nid) {
+  return true;
+  //TODO!
+}
 function flickrrippr_admin_edit($uid) {
   $user = user_load(array('uid' => $uid));
   return drupal_get_form('flickrrippr_user_settings_form', $user);
@@ -120,14 +132,15 @@ function flickrrippr_admin() {
 }
 
 
-//function flickrrippr_node_refresh($nid) {
-//  $photo_id = flickrrippr_get_photo_id($nid);
-//  if (!$photo_id) {
-//	return t('Photo not found');
-//  }
-//  flickrrippr_makenode($photo_id);
-//  drupal_goto('node/' . $nid);
-//}
+function flickrrippr_node_refresh($nid) {
+return 'hello';
+ $photo_id = flickrrippr_get_photo_id($nid);
+ if (!$photo_id) {
+	return t('Photo not found');
+ }
+ flickrrippr_makenode($photo_id);
+ drupal_goto('node/' . $nid);
+}
 
 
 
