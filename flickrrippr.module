@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.9 2010/07/27 00:44:37 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.10 2010/07/27 01:08:20 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -132,19 +132,19 @@ function flickrrippr_admin() {
 }
 
 function flickrrippr_load(&$node) {
-//   drupal_set_message(__FUNCTION__);
-  $node->flickr_photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $nid));
+  $node->flickr_photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
 }
 
 function flickrrippr_node_refresh($nid) {
   $node = node_load(array('nid' => $nid));
-  return $node->title;
- $photo_id = flickrrippr_get_photo_id($nid);
- return $photo_id;
+  $photo_id = $node->flickr_photo->flickrphoto_id;
+
  if (!$photo_id) {
-	return t('Photo not found');
+	 drupal_set_message(t('Photo not found. This should never happen'), 'error');
  }
- flickrrippr_makenode($photo_id);
+ else {
+  flickrrippr_makenode($photo_id);
+}
  drupal_goto('node/' . $nid);
 }
 
