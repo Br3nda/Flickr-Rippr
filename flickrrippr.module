@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.16 2010/07/28 01:24:00 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.17 2010/07/28 01:28:09 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -358,7 +358,20 @@ function flickrrippr_user_settings($uid = NULL) {
   else {
     GLOBAL $user;
   }
-  return drupal_get_form('flickrrippr_user_settings_form', $user);
+
+  $account = flickrrippr_get_flickr_accounts($user->uid);
+  $headers = array(t('Flickr username'), t('Tag'));
+  foreach($account as $a) {
+    $rows[] = array(
+      $a->flickrusername,
+      $a->tag,
+//       print_r($a, 1)
+    );
+    
+  }
+  return theme('table', $headers, $rows);
+  
+//   return drupal_get_form('flickrrippr_user_settings_form', $user);
 }
 
 function flickrrippr_user_settings_form($a, $flickruser) {
@@ -399,7 +412,6 @@ function flickrrippr_get_flickr_accounts($uid) {
   while ($fuser = db_fetch_object($result)) {
     $flickr_users[] = $fuser;
   }
-  drupal_set_message(__FUNCTION__ .'('. $uid .') '.  print_r($flickr_users, 1));
   return $flickr_users;
   
 }
