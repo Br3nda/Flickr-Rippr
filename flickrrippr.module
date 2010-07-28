@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.13 2010/07/28 00:30:57 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.14 2010/07/28 00:34:53 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -37,6 +37,7 @@ function flickrrippr_menu() {
     'title' => t('Edit'),
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_admin_edit',
+    'page argument' => array(4, 5),
     'access arguments' => array('Administer global flickr api settings'),
   );
 
@@ -98,10 +99,13 @@ function flickrrippr_admin_edit($uid) {
 }
 
 function flickrrippr_admin_fetch($flickrid) {
-  
-  $fuser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid='%s'", $flickrid));
+  $fuser = flickrrrippr_get_flickr_user($flickrid);
   flickrrrippr_fetch_latest($fuser);
   drupal_goto('admin/content/flickrrippr');
+}
+
+function flickrrrippr_get_flickr_user($flickrid) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid='%s'", $flickrid));
 }
 
 /**
@@ -125,7 +129,7 @@ function flickrrippr_admin() {
       $u->flickrusername,
       $u->flickrid,
       ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->flickrid) : ''),
-      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid),
+      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. $u->flickrid),
     );
   }
   $output .= theme('table', $headers, $rows);
