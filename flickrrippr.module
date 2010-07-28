@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.11 2010/07/28 00:05:22 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.12 2010/07/28 00:15:11 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -29,6 +29,7 @@ function flickrrippr_menu() {
     'title' => t('Fetch'),
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_admin_fetch',
+    'page arguments' => array(4),
     'access arguments' => array('Administer global flickr api settings'),
   );
 
@@ -97,7 +98,9 @@ function flickrrippr_admin_edit($uid) {
 }
 
 function flickrrippr_admin_fetch($uid) {
+  
   flickrrippr_check_latest(intval($uid));
+  return __FUNCTION__;
   drupal_goto('admin/content/flickrrippr');
 }
 
@@ -121,7 +124,7 @@ function flickrrippr_admin() {
       $u->name,
       $u->flickrusername,
       $u->flickrid,
-      ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->uid) : ''),
+      ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->flickrid) : ''),
       l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid),
     );
   }
@@ -189,7 +192,7 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
     'user_id' => $flickr_settings->flickrid,
     'per_page' => $num_photos,
     'page' =>  $pagenum
-    );
+  );
   if ($flickr_settings->tag) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
     $query['tags'] = check_plain($flickr_settings->tag);
