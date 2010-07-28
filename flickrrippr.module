@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.12 2010/07/28 00:15:11 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.13 2010/07/28 00:30:57 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -97,10 +97,10 @@ function flickrrippr_admin_edit($uid) {
   return drupal_get_form('flickrrippr_user_settings_form', $user);
 }
 
-function flickrrippr_admin_fetch($uid) {
+function flickrrippr_admin_fetch($flickrid) {
   
-  flickrrippr_check_latest(intval($uid));
-  return __FUNCTION__;
+  $fuser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid='%s'", $flickrid));
+  flickrrrippr_fetch_latest($fuser);
   drupal_goto('admin/content/flickrrippr');
 }
 
@@ -159,27 +159,35 @@ function flickrrippr_node_refresh($nid) {
  * This function will recurse, reading futher back into the flickr stream
  * until it finds a photo it already has saved as a node
  */
-function flickrrippr_check_latest($user_id, $pagenum = 1) {
+function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 
   $output = '';
-  //TODO, don't run every time.
-  $num_photos = 20; //TODO make customisable
+
 
   //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
  //maximum of 5 fetches.
   if ($pagenum > 5) {
     return 'done';
   }
-  
+
   
  //fetches defails from our database
-  $flickr_settings = flickrrippr_user_settings_get($user_id);
-  
- //fetches from api.flickr.com
-  if (!$flickr_settings->flickrid) {
-    $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
-  }
+  $flickrusers =  flickrrippr_user_settings_get($user_id);
+    drupal_set_message(print_r($flickrusers, 1));
 
+  foreach($flickrusers as $fu) {
+    flickrrippr_fetch_latest($fu);
+  }
+  return '';
+
+}
+function flickrrrippr_fetch_latest($flickruser) {
+ //fetches from api.flickr.com
+//   if (!$flickr_settings->flickrid) {
+//     $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
+//   }
+  //TODO, don't run every time.
+  $num_photos = 5; //TODO make customisable
   
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
@@ -189,11 +197,12 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
   }
   
   $query = array(
-    'user_id' => $flickr_settings->flickrid,
+    'user_id' => $flickruser->flickrid,
     'per_page' => $num_photos,
     'page' =>  $pagenum
   );
-  if ($flickr_settings->tag) {
+
+  if ($flickruser->tag) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
     $query['tags'] = check_plain($flickr_settings->tag);
   }
@@ -208,16 +217,13 @@ function flickrrippr_check_latest($user_id, $pagenum = 1) {
       $new = (flickrrippr_makenode($p['id']) && $new);
     }
   }
-  else {
-//     drupal_set_message(t('No photos found'));
-  }
+
   //if we found a photo that wasn't new, then don't recurse
   if (!$new) {
-//     drupal_set_message(t('No new photos'));
     return FALSE;
   }
   //recursive - call this function again to get the next 10;
-  //flickrrippr_check_latest($user_id, $pagenum +1);
+  //flickrrippr_check_latest_for_user($user_id, $pagenum +1);
 
 }
 
@@ -286,7 +292,7 @@ function flickrrippr_cron() {
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
 
   while ($fuser = db_fetch_object($result)) {
-    flickrrippr_check_latest($fuser->uid);
+    flickrrippr_check_latest_for_user($fuser->uid);
   }
 }
 
@@ -350,6 +356,10 @@ function flickrrippr_user_settings($uid = NULL) {
 
 function flickrrippr_user_settings_form($a, $user) {
 
+  //TODO fix call to flickrrippr_user_settings_get
+  drupal_set_message('TODO fix call to flickrrippr_user_settings_get');
+  return;
+
   $settings = flickrrippr_user_settings_get($user->uid);
   
   $form = array();
@@ -395,7 +405,13 @@ function flickrrippr_user_settings_form($a, $user) {
  * Get a user's flickr settings from our database
  */
 function flickrrippr_user_settings_get($uid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid));
+  $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid);
+  while ($fuser = db_fetch_object($result)) {
+    $flickr_users[] = $fuser;
+  }
+  drupal_set_message(__FUNCTION__ .'('. $uid .') '.  print_r($flickr_users, 1));
+  return $flickr_users;
+  
 }
 
 
@@ -411,6 +427,9 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   else {
     GLOBAL $user;
   }
+  //TODO fix call to flickrrippr_user_settings_get
+  drupal_set_message('TODO fix call to flickrrippr_user_settings_get');
+  return ;
   $settings = flickrrippr_user_settings_get($user->uid);
   $flickrid = flickrrippr_flickruser($form_state['values']['flickr_username']);
 
