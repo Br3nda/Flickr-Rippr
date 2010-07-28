@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.12.2.5 2010/07/27 00:43:00 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.12.2.6 2010/07/28 00:05:47 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -116,6 +116,13 @@ function flickrrippr_makenode($photo_id) {
 
   //Info to put into the node
   $flickr_info = $flickr->photos_getInfo($photo_id);
+  if (!$flickr_info) {
+    drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
+    db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
+    node_save($node);
+    return;
+  }
+  
   $flickr_context = $flickr->photos_getContext($photo_id);
 
   //flickr username
@@ -125,7 +132,7 @@ function flickrrippr_makenode($photo_id) {
   //get user details
   $user = flickrrippr_get_user_by_flickrusername($flickrusername);
   if (!$user) {
-    drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)));
+    drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)), 'error');
     return FALSE;
   }
 
