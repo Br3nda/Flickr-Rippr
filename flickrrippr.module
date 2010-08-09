@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.17 2010/07/28 01:28:09 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.18 2010/08/09 00:07:45 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -119,8 +119,8 @@ function flickrrippr_admin() {
   $headers = array(
     array('data' => t('Name'), 'field' => 'name', 'sort'=>'asc'),
     array('data' => t('Flickr Username'), 'field' => 'flickrusername'),
-    array('data' => t('Tag'), 'field' => 'tag'),
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
+    array('data' => t('Tag'), 'field' => 'tag'),
   );
   $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u LEFT OUTER JOIN {flickrusers} f  ON u.uid = f.uid AND u.uid > 0". tablesort_sql($headers));
 
