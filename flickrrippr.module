@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.20 2010/08/10 03:55:11 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.21 2010/08/10 04:03:25 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -48,6 +48,13 @@ function flickrrippr_menu() {
     'page callback' => 'flickrrippr_user_settings',
     'access arguments' => array('Configure own blogged flickr stream'),
   );
+  $items['user/%/flickrippr/add'] = array(
+    'title' => t('add'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrrippr_user_add_account',
+    'page arguments' => array(1),
+    'access arguments' => array('Configure own blogged flickr stream'),
+  );
 
   $items['node/%/flickrrefresh'] = array(
     'title' => 'Re-fetch from Flickr',
@@ -93,6 +100,13 @@ function flickrrippr_node_refresh_perm($nid) {
   return true;
   //TODO!
 }
+
+function flickrrippr_user_add_account($uid) {
+  $flickruser->uid = $uid;
+  $output = drupal_get_form('flickrrippr_user_settings_form', $flickruser);
+  return $output;
+}
+
 function flickrrippr_admin_edit($uid, $flickrid) {
 
   $fuser = flickrrrippr_get_flickr_user($flickrid);
@@ -101,7 +115,13 @@ function flickrrippr_admin_edit($uid, $flickrid) {
 
 function flickrrippr_admin_fetch($flickrid) {
   $fuser = flickrrrippr_get_flickr_user($flickrid);
-  flickrrrippr_fetch_latest($fuser);
+  $max_loops = 100;
+  $new = true;
+  while ($new and $loop_count < $max_loops) {
+    $new = flickrrrippr_fetch_latest($fuser);
+    $loop_count++;
+  }
+
   drupal_goto('admin/content/flickrrippr');
 }
 
@@ -188,13 +208,13 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
   return '';
 
 }
-function flickrrrippr_fetch_latest($flickruser) {
+function flickrrrippr_fetch_latest($flickruser, $pagenum=0) {
  //fetches from api.flickr.com
 //   if (!$flickr_settings->flickrid) {
 //     $flickrsettings->flickrid = flickrrippr_flickruser($flickr_settings->flickrusername);
 //   }
   //TODO, don't run every time.
-  $num_photos = 5; //TODO make customisable
+  $num_photos = 20; //TODO make customisable
   
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
@@ -218,10 +238,9 @@ function flickrrrippr_fetch_latest($flickruser) {
   $photos = $flickr->photos_search($query);
   //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
 
-  $new = TRUE;
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
-      $new = (flickrrippr_makenode($p['id']) && $new);
+      $new = flickrrippr_makenode($p['id']) || $new;
     }
   }
 
@@ -229,6 +248,7 @@ function flickrrrippr_fetch_latest($flickruser) {
   if (!$new) {
     return FALSE;
   }
+  return true;
   //recursive - call this function again to get the next 10;
   //flickrrippr_check_latest_for_user($user_id, $pagenum +1);
 
@@ -352,12 +372,14 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
  * Where a user defines their username
  */
 function flickrrippr_user_settings($uid = NULL) {
+  $output = '';
   if (!empty($uid) && user_access('Administer global flickr api settings')) {
     $user = user_load(array('uid' => $uid));
   }
   else {
     GLOBAL $user;
   }
+  $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrippr/add');
 
   $account = flickrrippr_get_flickr_accounts($user->uid);
   $headers = array(t('Flickr username'), t('Tag'));
@@ -369,9 +391,9 @@ function flickrrippr_user_settings($uid = NULL) {
     );
     
   }
-  return theme('table', $headers, $rows);
-  
-//   return drupal_get_form('flickrrippr_user_settings_form', $user);
+  $output .= theme('table', $headers, $rows);
+  return $output;
+
 }
 
 function flickrrippr_user_settings_form($a, $flickruser) {
@@ -381,7 +403,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
   $form['uid'] = array('#type' => 'hidden', '#value' => $flickruser->uid);
 
-  if (!$flickruser) {
+  if (!$flickruser->flickrid) {
     $form['flickr_username'] = array(
       '#type' => 'textfield',
       '#title' => t('Flickr Username'),
@@ -429,6 +451,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   else {
     GLOBAL $user;
   }
+
   //TODO fix call to flickrrippr_get_flickr_accounts
   $flickr_account = flickrrrippr_get_flickr_user($form_state['values']['flickrid']);
 
@@ -447,6 +470,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
       $user->uid);
     drupal_set_message(t("Flickr username set"));
   }
+  drupal_goto('user/'. $user->uid .'/flickrrippr');
 }
 
 /**
