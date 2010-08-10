@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.21 2010/08/10 04:03:25 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.22 2010/08/10 04:04:11 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -388,6 +388,7 @@ function flickrrippr_user_settings($uid = NULL) {
       $a->flickrusername,
       $a->tag,
 //       print_r($a, 1)
+      l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
     );
     
   }
