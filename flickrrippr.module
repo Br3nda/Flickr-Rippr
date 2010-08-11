@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.92.2.22 2010/08/10 04:04:11 taniwha Exp $
+// $Id: flickrrippr.module,v 1.92.2.23 2010/08/11 00:12:28 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -42,17 +42,24 @@ function flickrrippr_menu() {
   );
 
   //configure a user's account with their flickr username
-  $items['user/%/flickrippr'] = array(
+  $items['user/%/flickrrippr'] = array(
     'title' => t('Flickr Rippr'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'flickrrippr_user_settings',
     'access arguments' => array('Configure own blogged flickr stream'),
   );
-  $items['user/%/flickrippr/add'] = array(
+  $items['user/%/flickrrippr/add'] = array(
     'title' => t('add'),
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_add_account',
     'page arguments' => array(1),
+    'access arguments' => array('Configure own blogged flickr stream'),
+  );
+  $items['user/%/flickrrippr/edit/%'] = array(
+    'title' => t('edit'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrrippr_user_edit_account',
+    'page arguments' => array(1, 4),
     'access arguments' => array('Configure own blogged flickr stream'),
   );
 
@@ -64,43 +71,17 @@ function flickrrippr_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
   );
-  /*
-  	//The refresh tab
-    if (arg(0) == 'node' && is_numeric(arg(1))) {
-      //TODO - there has gotta be a better way to work out this is a flickrrippr node
-      $node = node_load(array('nid' => arg(1)));
-      if ($node->type == 'flickrippr') {
-        $items['node/'. arg(1) .'/flickr-refresh'] = array(
-          'title' => t('Refresh'),
-          'callback' => 'flickrrippr_node_refresh',
-          'access' => user_access('Administer global flickr api settings'),
-          'callback arguments' => arg(1),
-          'access' => user_access('Configure own blogged flickr stream'),
-          'type' => MENU_IS_LOCAL_TASK);
-      }
-    }
-
-
-    //create a page for thumbnails, of every user that has settings saved
-    //TODO this really really doesn't scale
-    $result = db_query("SELECT u.name, u.uid, flickrusername from {flickrusers} f INNER JOIN {users} u ON f.uid = u.uid ORDER BY u.name");
-    while ($r = db_fetch_object($result)) {
-      $items['flickrrippr/thumbs/'. $r->uid] = array(
-                      'title' => t('!name\'s Photos', array('!name' => $r->name)),
-                      'callback arguments' => array($r->flickrusername, $r->uid),
-                      'type' => MENU_NORMAL_ITEM,
-                      'callback' => 'flickrphoto_thumbnails',
-                      'access' => TRUE,
-                    );
-    }
-  */
   return $items;
 }
 function flickrrippr_node_refresh_perm($nid) {
   return true;
   //TODO!
 }
-
+function flickrrippr_user_edit_account($uid, $flickrid) {
+  $fuser = flickrrrippr_get_flickr_user($flickrid);
+  $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
+  return $output;
+}
 function flickrrippr_user_add_account($uid) {
   $flickruser->uid = $uid;
   $output = drupal_get_form('flickrrippr_user_settings_form', $flickruser);
@@ -379,15 +360,15 @@ function flickrrippr_user_settings($uid = NULL) {
   else {
     GLOBAL $user;
   }
-  $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrippr/add');
+  $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
 
   $account = flickrrippr_get_flickr_accounts($user->uid);
   $headers = array(t('Flickr username'), t('Tag'));
   foreach($account as $a) {
     $rows[] = array(
-      $a->flickrusername,
-      $a->tag,
-//       print_r($a, 1)
+    $a->flickrusername,
+    $a->tag,
+//       print_r($a, 1),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
     );
     
