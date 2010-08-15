@@ -1,6 +1,4 @@
 <?php
-// $Id: flickrrippr.inc,v 1.14 2010/07/14 00:07:27 taniwha Exp $
-
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -83,4 +81,113 @@ function flickrrippr_path($flickr_photo, $cache = TRUE, $size = FALSE) {
     return $src;
   }
  
+}
+
+
+/**
+ * Makes a node for a flickr photo - or updates if it already exists
+ */
+function flickrrippr_makenode($photo_id) {
+
+
+  if (!$photo_id) {
+    drupal_set_message(t("Photo_id required"), 'error');
+    return;
+  }
+
+//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
+// 
+  $nid = flickrrippr_photo_get_nid($photo_id) ;
+  if (!empty($nid)) {
+//     //already exists
+    $node = node_load(array('nid' => $nid));
+//     drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
+  }
+  else {
+  
+  }
+
+  $flickr = flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library missing"));
+    return $output;
+  }
+
+  //Info to put into the node
+  $flickr_info = $flickr->photos_getInfo($photo_id);
+  if (!$flickr_info) {
+    drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
+    db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
+    node_save($node);
+    return;
+  }
+  
+  $flickr_context = $flickr->photos_getContext($photo_id);
+
+  //flickr username
+  $flickrusername = $flickr_info['owner']['username'];
+//   drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)));
+
+  //get user details
+  $user = flickrrippr_get_user_by_flickrusername($flickrusername);
+  if (!$user) {
+    drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)), 'error');
+    return FALSE;
+  }
+
+  //Full (normal) sized image
+  $photo_path =  flickrrippr_path($flickr_info);
+  $thumbnail_path =  flickrrippr_path($flickr_info, TRUE, 'm');
+  $description = $flickr_info['description'];
+  $title = $flickr_info['title'];
+  $page_url = $flickr_info['urls']['url'][0]['_content'];
+
+  
+  $node->title = htmlentities($title);
+  $node->created = strtotime($flickr_info['dates']['taken']);
+//   $node->name = $user->name;
+  $node->uid = $user->uid;
+  $node->type = 'flickrrippr_photo';
+//   $node->published = 1;
+//   $node->status =1;
+//   $node->comment = 2;
+//   $node->promote = 1;
+//   $node->format = 2;
+
+  node_save($node);
+
+  if ($node->is_new) {
+//     drupal_set_message("New node, nid = $node->nid");
+    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path, description, page_url)
+      VALUES ('%s', %d, %d, '%s', '%s', '%s', '%s')",
+      $photo_id, $node->nid, strtotime('now'), $photo_path, $thumbnail_path, $description, $page_url);
+      drupal_set_message(t("Saved new photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+  }
+  else {
+    $result = db_query("UPDATE {flickrphotos} SET
+      lastfetched=%d,
+      photo_path='%s',
+      thumbnail_path='%s',
+      description = '%s',
+      page_url = '%s'
+      WHERE flickrphoto_id=%d AND nid=%d",
+      strtotime('now'),
+      $photo_path,
+      $thumbnail_path,
+      $description,
+      $page_url,
+      $photo_id,
+      $node->nid);
+    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+  }
+}
+
+
+
+/**
+ * get the node id for a flickr photo id
+ */
+function flickrrippr_photo_get_nid($photo_id) {
+  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
+  return (!empty($rec->nid) ? $rec->nid : NULL);
 }
