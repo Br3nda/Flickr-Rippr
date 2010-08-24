@@ -1,4 +1,6 @@
 <?php
+// $Id: flickrrippr.inc,v 1.16 2010/08/24 04:28:15 taniwha Exp $
+
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -82,7 +84,6 @@ function flickrrippr_path($flickr_photo, $cache = TRUE, $size = FALSE) {
   }
  
 }
-
 
 /**
  * Makes a node for a flickr photo - or updates if it already exists

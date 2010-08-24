@@ -1,4 +1,7 @@
 <?php
+// $Id: flickrrippr.module,v 1.114 2010/08/24 04:28:15 taniwha Exp $
+
+
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
 
 /**
@@ -31,7 +34,7 @@ function flickrrippr_menu() {
   );
 
   $items['admin/content/flickrrippr/edit'] = array(
-    'title' => t('Add'),
+    'title' => t('Edit'),
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_admin_edit',
     'page argument' => array(4, 5),
@@ -86,6 +89,7 @@ function flickrrippr_user_add_account($uid) {
 }
 
 function flickrrippr_admin_edit($uid, $flickrid) {
+
   $fuser = flickrrippr_get_flickr_user($flickrid);
   return drupal_get_form('flickrrippr_user_settings_form', $fuser);
 }
@@ -98,6 +102,7 @@ function flickrrippr_admin_fetch($flickrid) {
     $new = flickrrippr_fetch_latest($fuser);
     $loop_count++;
   }
+
   drupal_goto('admin/content/flickrrippr');
 }
 
@@ -154,6 +159,9 @@ function flickrrippr_node_refresh($nid) {
  drupal_goto('node/' . $nid);
 }
 
+
+
+
 /**
  * Called by cron, this check for new photos for each user
  * This function will recurse, reading futher back into the flickr stream
@@ -161,21 +169,6 @@ function flickrrippr_node_refresh($nid) {
  */
 function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 
-
-  $accounts = flickrrippr_user_get_accounts($uid);
-
-  foreach($accounts as $flickrid) {
-    flickrrippr_check_latest_account($flickrid);
-  }
-  
-}
-
-function flickrrippr_user_get_account($uid, $flickrid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
-}
-
-function flickrrippr_check_latest_account($flickrid) {
-  drupal_set_message("Checking latest for $flickrid");
   $output = '';
 
 
@@ -185,6 +178,7 @@ function flickrrippr_check_latest_account($flickrid) {
     return 'done';
   }
 
+  
  //fetches defails from our database
   $flickrusers =  flickrrippr_get_flickr_accounts($user_id);
     drupal_set_message(print_r($flickrusers, 1));
@@ -214,10 +208,11 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
     'user_id' => $flickruser->flickrid,
     'per_page' => $num_photos,
     'page' =>  $pagenum
-    );
+  );
+
   if ($flickruser->tag) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
-    $query['tags'] = check_plain($account->tag);
+    $query['tags'] = check_plain($flickr_settings->tag);
   }
   
 
@@ -239,6 +234,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   //flickrrippr_check_latest_for_user($user_id, $pagenum +1);
 
 }
+
 
 
 
@@ -322,7 +318,6 @@ function flickrrippr_admin_form() {
         '#type' => 'textfield',
         '#default_value' => variable_get('flickrapikey', '')
       );
-    
 //   $form['jpegcache'] = array(
 //       '#title' => 'Allow Local Cache',
 //       '#type' => 'checkbox',
@@ -334,7 +329,6 @@ function flickrrippr_admin_form() {
      '#type' => 'submit',
      '#value' => t('Save'),
       );
-      
   return $form;
 }
 
@@ -354,27 +348,6 @@ function flickrrippr_admin_form_submit($form, &$form_state) {
   drupal_set_message(t('Settings saved'));
 }
 
-function flickrrippr_user_accounts_delete($uid, $flickrid) {
-  $account = flickrrippr_user_get_account($uid, $flickrid);
-
-  if(!user_access('Administer global flickr api settings')) {
-    GLOBAL $user;
-    if($account->uid != $user->uid) {
-      drupal_set_message(t('Unable to edit other users', 'error'));
-      return;
-    }
-  }
-
-  db_query("DELETE FROM {flickrusers} WHERE flickrid='%s'", $flickrid);
-  drupal_goto('user/'. intval($uid) . '/flickrrippr');
-}
-
-function flickrrippr_user_accounts_edit($uid, $flickrid) {
-  return drupal_get_form('flickrrippr_account_settings_form', $uid, $flickrid);
-}
-function flickrrippr_user_accounts_add($uid) {
-  return drupal_get_form('flickrrippr_account_settings_form', $uid);
-}
 
 /**
  * Where a user defines their username
@@ -402,6 +375,7 @@ function flickrrippr_user_settings($uid = NULL) {
   }
   $output .= theme('table', $headers, $rows);
   return $output;
+
 }
 
 function flickrrippr_user_settings_form($a, $flickruser) {
@@ -431,7 +405,6 @@ function flickrrippr_user_settings_form($a, $flickruser) {
     '#type' => 'submit',
     '#value' => t('Save'),
     );
-    
   return $form;
 }
 
@@ -447,29 +420,18 @@ function flickrrippr_get_flickr_accounts($uid) {
   
 }
 
-function flickrrippr_account_settings_form_validate($form, &$form_state) {
-//   $flickr_username = $form_state['values']['flickr_username'];
-//   drupal_set_message("Checking $flickr_username");
-//   $check_account = flickrrippr_flickruser($flickr_username);
-//   if (!$check_account) {
-//     form_set_error('flickr_username', t('User does not exist on flickr.com'));
-//   }
+
+function flickrrippr_user_settings_form_validate($form, &$form_state) {
   //TODO, check the submitted username exists on flickr?
   //query api
   //and store the 3432@N00 uid then
 }
-function flickrrippr_account_settings_form_submit($form, &$form_state) {
-  $flickrid = $form_state['values']['flickrid'];
-  $uid = $form_state['values']['uid'];
-  GLOBAL $user;
-
-  $account = flickrrippr_user_get_account($uid, $flickrid);
-  
-  if(!user_access('Administer global flickr api settings')) {
-    if($account->uid != $user->uid) {
-      drupal_set_message(t('Unable to edit other users', 'error'));
-      return;
-    }
+function flickrrippr_user_settings_form_submit($form, &$form_state) {
+  if (!empty($form_state['values']['uid'])) {
+    $user = user_load(array('uid' => intval($form_state['values']['uid'])));
+  }
+  else {
+    GLOBAL $user;
   }
 
   //TODO fix call to flickrrippr_get_flickr_accounts
@@ -487,30 +449,10 @@ function flickrrippr_account_settings_form_submit($form, &$form_state) {
       $form_state['values']['flickr_username'],
       $flickrid,
       $form_state['values']['flickr_tag'],
-      $form_state['values']['uid']
-      );
-    drupal_set_message(t("Flickr account saved set"));
-//     drupal_goto('user/flickrrippr');
+      $user->uid);
+    drupal_set_message(t("Flickr username set"));
   }
-}
-
-
-/**
- * Get a user's flickr settings from our database
- */
-function flickrrippr_user_settings_get($uid) {
-  drupal_set_message(__FUNCTION__ . ' is deprecated', 'error');
-}
-
-function flickrrippr_user_get_accounts($uid) {
-  $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid);
-  $all_user_accounts = array();
-  while($fuser = db_fetch_object($result)) {
-    $all_user_accounts[] = $fuser;
-  }
-
-  return $all_user_accounts;
-
+  drupal_goto('user/'. $user->uid .'/flickrrippr');
 }
 
 /**
