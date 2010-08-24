@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.114 2010/08/24 04:28:15 taniwha Exp $
+// $Id: flickrrippr.module,v 1.115 2010/08/24 04:50:18 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -73,6 +73,22 @@ function flickrrippr_menu() {
   );
   return $items;
 }
+
+function flickrrippr_form_alter(&$form, $form_state, $form_id) {
+  switch($form_id) {
+    case 'flickrapi_admin_settings':
+      
+      $fr = array('#type' => 'fieldset', '#title' => t('Flickr Rippr'), '#collapsible' => TRUE, '#collapsed' => FALSE);
+//       $fr['cache_locally'] = array('#title' => t('Cache jpegs locally?'));
+      $fr['import_tags'] = array('#title' => t('Import tags?'), '#type' => 'checkbox');
+      foreach(taxonomy_get_vocabularies() as $v) { $options[$v->vid] = $v->name; }
+      $fr['taxonomy'] = array('#title' => t('Taxonomy for tags'), '#type' => 'select', '#options' => $options);
+
+      array_unshift($form, $fr);
+    break;
+  }
+}
+
 function flickrrippr_node_refresh_perm($nid) {
   return true;
   //TODO!
