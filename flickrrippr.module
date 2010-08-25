@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.module,v 1.115 2010/08/24 04:50:18 taniwha Exp $
+// $Id: flickrrippr.module,v 1.116 2010/08/25 04:28:04 taniwha Exp $
 
 
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
@@ -428,7 +428,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
  * Get a user's flickr settings from our database
  */
 function flickrrippr_get_flickr_accounts($uid) {
-  $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d", $uid);
+  $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d ORDER BY lower(flickrusername)", $uid);
   while ($fuser = db_fetch_object($result)) {
     $flickr_users[] = $fuser;
   }
