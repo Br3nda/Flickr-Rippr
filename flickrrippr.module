@@ -1,7 +1,4 @@
 <?php
-// $Id: flickrrippr.module,v 1.116 2010/08/25 04:28:04 taniwha Exp $
-
-
 include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
 
 /**
