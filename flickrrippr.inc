@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.16 2010/08/24 04:28:15 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.17 2010/09/01 03:23:13 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -127,12 +127,13 @@ function flickrrippr_makenode($photo_id) {
 
   //flickr username
   $flickrusername = $flickr_info['owner']['username'];
+  
 //   drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)));
 
   //get user details
   $user = flickrrippr_get_user_by_flickrusername($flickrusername);
   if (!$user) {
-    drupal_set_message(t("User doesn't exist, unable to save photo %photo_id", array('%photo_id' => $photo_id)), 'error');
+    drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
     return FALSE;
   }
 
