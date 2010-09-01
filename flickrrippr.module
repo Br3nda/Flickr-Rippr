@@ -71,23 +71,21 @@ function flickrrippr_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
   );
+
+
+  $items['admin/settings/flickrrippr'] = array(
+    'title' => t('Flickr Rippr Settings'),
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('Administer global flickr api settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'file' => 'flickrrippr.admin.inc',
+  );
+
+//   $items['admin/settings/flickrapi']['description'] .= ' '. t('Also Flickr Rippr settings');
   return $items;
 }
 
-function flickrrippr_form_alter(&$form, $form_state, $form_id) {
-  switch($form_id) {
-    case 'flickrapi_admin_settings':
-      
-      $fr = array('#type' => 'fieldset', '#title' => t('Flickr Rippr'), '#collapsible' => TRUE, '#collapsed' => FALSE);
-//       $fr['cache_locally'] = array('#title' => t('Cache jpegs locally?'));
-      $fr['import_tags'] = array('#title' => t('Import tags?'), '#type' => 'checkbox');
-      foreach(taxonomy_get_vocabularies() as $v) { $options[$v->vid] = $v->name; }
-      $fr['taxonomy'] = array('#title' => t('Taxonomy for tags'), '#type' => 'select', '#options' => $options);
-
-      array_unshift($form, $fr);
-    break;
-  }
-}
 
 function flickrrippr_node_refresh_perm($nid) {
   return true;

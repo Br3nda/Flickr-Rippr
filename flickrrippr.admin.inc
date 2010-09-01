@@ -90,3 +90,15 @@ function flickrrippr_admin() {
   return $output;
 
 }
+
+function flickrrippr_admin_settings_form() {
+  $form['import_tags'] = array('#title' => t('Import tags?'), '#type' => 'checkbox');
+  foreach(taxonomy_get_vocabularies() as $v) { $options[$v->vid] = $v->name; }
+  $form['taxonomy'] = array('#title' => t('Taxonomy for tags'), '#type' => 'select', '#options' => $options);
+  return $form;
+}
+
+function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
+  
+    
+}
