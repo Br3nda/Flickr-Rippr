@@ -382,6 +382,7 @@ function flickrrippr_user_settings($uid = NULL) {
     $a->flickrusername,
     $a->tag,
 //       print_r($a, 1),
+      drupal_get_form('flickrrippr_user_fetch_now', $uid), //l(t('Fetch Now'), 'user/'. $user->uid .'/flickrrippr/fetch/'. $a->flickrid),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
     );
     
@@ -389,6 +390,13 @@ function flickrrippr_user_settings($uid = NULL) {
   $output .= theme('table', $headers, $rows);
   return $output;
 
+}
+
+function flickrrippr_user_fetch_now($v, $uid) {
+  $form = array();
+  $form['uid'] = array('#type' => 'hidden', '#value' => $uid);
+  $form['fetch'] = array('#type' => 'submit', '#value' => t('Fetch now'));
+  return $form;
 }
 
 function flickrrippr_user_settings_form($a, $flickruser) {
