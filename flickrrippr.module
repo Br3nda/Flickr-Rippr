@@ -375,10 +375,11 @@ function flickrrippr_user_settings($uid = NULL) {
   }
   $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
 
-  $account = flickrrippr_get_flickr_accounts($user->uid);
-  $headers = array(t('Flickr username'), t('Tag'));
-  foreach($account as $a) {
+  $accounts = flickrrippr_get_flickr_accounts($user->uid);
+  $headers = array(t('Flickr ID'), t('Flickr username'), t('Tag'));
+  foreach($accounts as $a) {
     $rows[] = array(
+    $a->flickrid,
     $a->flickrusername,
     $a->tag,
 //       print_r($a, 1),
