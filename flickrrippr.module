@@ -240,45 +240,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
 }
 
-
-
-
-
-//
-//function flickrrippr_addcomments($photo_id, $nid) {
-//  $flickr = @flickrapi_phpFlickr();
-//    if (!$flickr) {
-//    drupal_set_message(t("Unable to query flickr.com, library missing"));
-//    return $output;
-//  }
-//  $comments = $flickr->photos_comments_getList($photo_id);
-//  if (!is_array($comments['comment'])) return;
-//  foreach($comments['comment'] as $c) {
-//   $result = db_query("SELECT cid from {flickrcomments} where flickrcomment_id = '%s'", $c['id']);
-//   if (!db_num_rows($result)) {
-//    $comment = array(
-//         'nid' => $nid,
-//	'status' => 1,
-//	'timestamp' => $c['datecreate'],
-//	'comment' => $c['_content'],
-//	'name' => $c['authorname'],
-//	'homepage' => 'http://flickr.com/photos/'. $c['author']);
-//     	$cid = comment_save($comment);
-//	if (!$cid) {
-//		drupal_set_message('comment save failed', 'error');
-//		return;
-//	}
-//
-//
-//      db_query("INSERT INTO {flickrcomments} (cid, flickrcomment_id, author, authorname, datecreate, permalink, content)
-// VALUES (%d, '%s', '%s', '%s', %d, '%s', '%s')", $cid, $c['id'], $c['author'], $c['authorname'], $c['datecreate'], $c['permalink'], $c['_content']);
-// 	 db_query("UPDATE {comments} set status =1, timestamp=%d where cid = %d", $c['datecreate'], $cid);
-//    	 db_query("UPDATE {ua_logger} SET ua='<a href=\"http://flickr.com/photos/taniwha/\">Flickr</a>' where xid=%d and type='comment'", $cid);
-//    }
-//   }
-//
-// }
-
 /**
  * Helper function, returns the flickr_id for a flickr username.
  */
