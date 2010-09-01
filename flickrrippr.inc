@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.19 2010/09/01 03:24:12 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.20 2010/09/01 04:25:54 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -32,6 +32,21 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
   return $user;
 }
 
+function flickrrippr_get_user_by_nsid($nsid) {
+    if (!$nsid) {
+    drupal_set_message(t("Refusing to search for blank nsid"));
+    return;
+  }
+  
+  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid = '%s'", $nsid));
+  if (!$flickruser) {
+    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)));
+    return;
+  }
+  
+  $user = user_load(array('uid' => $flickruser->uid));
+  return $user;
+}
 
 
 /**
@@ -125,14 +140,17 @@ function flickrrippr_makenode($photo_id) {
   }
   
   $flickr_context = $flickr->photos_getContext($photo_id);
+  
 
   //flickr username
   $flickrusername = $flickr_info['owner']['username'];
+  $flickrid = $flickr_info['owner']['nsid'];
   
-//   drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)));
+//   drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)), 'error');
 
   //get user details
-  $user = flickrrippr_get_user_by_flickrusername($flickrusername);
+//   $user = flickrrippr_get_user_by_flickrusername($flickrusername);
+  $user = flickrrippr_get_user_by_nsid($flickrid);
   if (!$user) {
     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
     return FALSE;

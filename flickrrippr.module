@@ -218,7 +218,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   );
 
   if ($flickruser->tag) {
-//     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
     $query['tags'] = check_plain($flickruser->tag);
   }
 
@@ -263,6 +262,9 @@ function flickrrippr_flickruser($username) {
  * Implementation of hook_cron().
  */
 function flickrrippr_cron() {
+  //get missing flickrids
+  flickrrippr_add_missing_flickrids();
+
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
 
   while ($fuser = db_fetch_object($result)) {
@@ -270,6 +272,22 @@ function flickrrippr_cron() {
   }
 }
 
+
+function flickrrippr_add_missing_flickrids() {
+  $result = db_query("SELECT * FROM {flickrusers} WHERE flickrid = '' OR flickrid IS NULL LIMIT 100");
+  while($fu = db_fetch_object($result)) {
+    drupal_set_message(t("Fetching nsid for %username", array('%username' => $fu->flickrusername)));
+    $flickr = flickrapi_phpFlickr();
+    if (!$flickr) {
+      drupal_set_message(t("Unable to query flickr.com, library missing"), 'error');
+      return;
+    }
+    $result = $flickr->people_findByUsername($fu->flickrusername);
+    $id = $result['id'];
+    drupal_set_message($id);
+    db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE uid=%d AND flickrusername='%s'", $id, $fu->uid, $fu->flickrusername); 
+  }
+}
 
 /**
  * administer global settings
