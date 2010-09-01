@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.17 2010/09/01 03:23:13 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.18 2010/09/01 03:23:57 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -116,6 +116,7 @@ function flickrrippr_makenode($photo_id) {
 
   //Info to put into the node
   $flickr_info = $flickr->photos_getInfo($photo_id);
+  //we can't get info from flickr -- mark this node as bad
   if (!$flickr_info) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
     db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
