@@ -219,8 +219,9 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   if ($flickruser->tag) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
-    $query['tags'] = check_plain($flickr_user->tag);
+    $query['tags'] = check_plain($flickruser->tag);
   }
+  drupal_set_message(print_r($query, 1));
   
 
   $photos = $flickr->photos_search($query);
@@ -372,10 +373,10 @@ function flickrrippr_user_settings($uid = NULL) {
   $headers = array(t('Flickr ID'), t('Flickr username'), t('Tag'));
   foreach($accounts as $a) {
     $rows[] = array(
-    $a->flickrid,
-    $a->flickrusername,
-    $a->tag,
-      drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid), //l(t('Fetch Now'), 'user/'. $user->uid .'/flickrrippr/fetch/'. $a->flickrid),
+      $a->flickrid,
+      $a->flickrusername,
+      $a->tag,
+      drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
     );
     
