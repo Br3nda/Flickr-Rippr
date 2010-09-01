@@ -459,7 +459,7 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   );
 
   $node->content['flickr_description'] = array(
-    '#value' => '<div class="flickrriprr_description">'. check_plain($photo->description)  .'</div>', //decode then encode
+    '#value' => '<div class="flickrrippr_description">'. check_plain($photo->description)  .'</div>', //decode then encode
     '#weight' => 5
   );
   
