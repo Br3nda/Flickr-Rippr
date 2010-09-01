@@ -447,12 +447,10 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   }
 
   if ($page) {
-    $image = '<img src="'. htmlentities($photo->photo_path) .'" />';
-    $image = '<a href="' . htmlentities($photo->page_url) .'">'. $image .'</a>';
+    $image = l(theme('image', $photo->photo_path, $teaser, $teaser, NULL, FALSE), $photo->page_url, array('html' => TRUE));
   }
   else {
-    $image = '<img src="'. htmlentities($photo->thumbnail_path) .'" />';
-    $image = '<a href="'. url('node/'. $node->nid) .'">'. $image .'</a>';
+    $image = l(theme('image', $photo->thumbnail_path, $teaser, $teaser, NULL, FALSE), 'node/'. $node->nid, array('html' => TRUE));
   }
 
   $node->content['flickr_photo'] = array(
