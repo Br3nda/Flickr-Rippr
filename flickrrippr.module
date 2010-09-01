@@ -221,8 +221,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
     $query['tags'] = check_plain($flickruser->tag);
   }
-  drupal_set_message(print_r($query, 1));
-  
 
   $photos = $flickr->photos_search($query);
 
