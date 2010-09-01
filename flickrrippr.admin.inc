@@ -81,7 +81,7 @@ function flickrrippr_admin() {
       $u->flickrusername,
       $u->flickrid,
       $u->tag,
-      ($u->flickrusername ? l(t('Fetch latest'), 'admin/content/flickrrippr/fetch/'. $u->flickrid) : ''),
+      drupal_get_form('flickrrippr_user_fetch_now', $u->uid, $u->flickrid, 'admin/content/flickrrippr'),
       l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. $u->flickrid),
     );
   }

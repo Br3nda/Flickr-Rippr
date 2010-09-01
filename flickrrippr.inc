@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.20 2010/09/01 04:25:54 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.21 2010/09/01 04:43:31 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -111,7 +111,7 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
 
-//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
+  drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
 // 
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid)) {
