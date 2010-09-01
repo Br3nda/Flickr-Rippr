@@ -91,7 +91,7 @@ function flickrrippr_node_refresh_perm($nid) {
   //TODO!
 }
 function flickrrippr_user_edit_account($uid, $flickrid) {
-  $fuser = flickrrippr_get_flickr_user($flickrid);
+  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
   $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
   return $output;
 }
@@ -103,24 +103,19 @@ function flickrrippr_user_add_account($uid) {
 
 function flickrrippr_admin_edit($uid, $flickrid) {
 
-  $fuser = flickrrippr_get_flickr_user($flickrid);
+  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
   return drupal_get_form('flickrrippr_user_settings_form', $fuser);
 }
 
-function flickrrippr_admin_fetch($flickrid) {
-  $fuser = flickrrippr_get_flickr_user($flickrid);
-  $max_loops = 100;
-  $new = true;
-  while ($new and $loop_count < $max_loops) {
-    $new = flickrrippr_fetch_latest($fuser);
-    $loop_count++;
-  }
-
+//TODO CHANGE TO FORM!
+function flickrrippr_admin_fetch($uid, $flickrid) {
+  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $new = flickrrippr_fetch_latest($fuser);
   drupal_goto('admin/content/flickrrippr');
 }
 
-function flickrrippr_get_flickr_user($flickrid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid='%s'", $flickrid));
+function flickrrippr_get_flickr_user($uid, $flickrid) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
 }
 
 /**
@@ -225,7 +220,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   if ($flickruser->tag) {
 //     drupal_set_message(t("Filter to tag=%tag", array('%tag' =>$flickr_settings->tag)));
-    $query['tags'] = check_plain($flickr_settings->tag);
+    $query['tags'] = check_plain($flickr_user->tag);
   }
   
 
@@ -401,12 +396,15 @@ function flickrrippr_user_fetch_now($v, $uid, $flickrid) {
   return $form;
 }
 function flickrrippr_user_fetch_now_submit($form_id, $fv) {
-  $flickrid = $fv['values']['flickrid'];
+//   $flickrid = $fv['values']['flickrid'];
+  $flickrid = $_POST['flickrid'];
   $uid = $fv['values']['uid'];
+  drupal_set_message(t("Post submitted flickrid = "). print_r($_POST['flickrid'], 1));
   drupal_set_message(t('Fetch for flickrid=%flickrid', array('%flickrid' => $flickrid)));
 
   //get user
-  $fuser = flickrrippr_get_flickr_user($flickrid);
+  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  drupal_set_message(print_r($fuser, 1)); 
   //and fetch
   flickrrippr_fetch_latest($fuser);
   drupal_goto('user/'. $uid .'/flickrrippr');
@@ -469,7 +467,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   }
 
   //TODO fix call to flickrrippr_get_flickr_accounts
-  $flickr_account = flickrrippr_get_flickr_user($form_state['values']['flickrid']);
+  $flickr_account = flickrrippr_get_flickr_user($form_state['values']['uid'], $form_state['values']['flickrid']);
 
   if (isset($flickr_account->flickrusername)) {
     $result = db_query("UPDATE {flickrusers} SET tag='%s' WHERE uid = %d AND flickrid='%s'",
