@@ -447,54 +447,6 @@ function flickrrippr_form(&$node) {
   $form = array();
   //TODO add instructions on edit the photo on flickr.com
 
-//   $form['flickr'] = array('#type' => 'fieldset',
-//                               '#collapsible' => TRUE,
-//                           '#title' => t('Flickr API queries'),
-//                          );
-//   $form['flickr']['cache'] = array(
-//                                    '#type' => 'checkbox',
-//                                    '#title' => t('Cache jpeg locally'),
-//                                   );
-/*
-  $form['flickr']['refresh'] = array(
-                                     '#type' => 'checkbox',
-                                     '#title' => t('Refresh details from flickr.com'),
-                                    );
-  $form['flickr']['jpeg_refresh'] = array(
-                                          '#type' => 'checkbox',
-                                          '#title' => t('Refresh cached jpeg'),
-                                         );
-  $form['flickr']['link'] = array(
-                                  '#type' => 'checkbox',
-                                  '#title' => t('Show link to flickr photo page'),
-                                 );*/
-
-//   $form['size'] = array('#type' => 'fieldset',
-//                         '#collapsible' => TRUE,
-//                         '#title' => t('Image sizes'),
-//                        );
-//   $sizes = array('t' => t('Thumbnail'),
-//                  's' => t('Square'),
-//                           'm' => t('Medium'),
-//                                    '' => t('Default')
-//                 );
-//   $form['size']['teaser_size'] = array(
-//                                        '#type' => 'select',
-//                                        '#options' => $sizes,
-//                                        '#title' => t('Teaser Size'),
-//                                            '#description' => t('Size of jpeg shown in node teaser'),
-//                                       );
-//   $form['size']['page_size'] = array(
-//                                      '#type' => 'select',
-//                                      '#options' => $sizes,
-//                                      '#title' => t('Page Size'),
-//                                          '#description' => t('Size of jpeg shown in node page and rss feed'),
-//                                     );
-//   $form['nid'] = array(
-//                        '#type' => 'hidden',
-//                        '#value' => $node->nid,
-//                       );
-
   return $form;
 }
 
