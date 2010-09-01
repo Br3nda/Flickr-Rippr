@@ -189,7 +189,6 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
   
  //fetches defails from our database
   $flickrusers =  flickrrippr_get_flickr_accounts($user_id);
-    drupal_set_message(print_r($flickrusers, 1));
 
   foreach($flickrusers as $fu) {
     flickrrippr_fetch_latest($fu);
@@ -225,7 +224,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   
 
   $photos = $flickr->photos_search($query);
-  //drupal_set_message(__FUNCTION__ .' photos: '. print_r($photos, 1));
 
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
@@ -377,7 +375,6 @@ function flickrrippr_user_settings($uid = NULL) {
     $a->flickrid,
     $a->flickrusername,
     $a->tag,
-//       print_r($a, 1),
       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid), //l(t('Fetch Now'), 'user/'. $user->uid .'/flickrrippr/fetch/'. $a->flickrid),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
     );
@@ -399,12 +396,8 @@ function flickrrippr_user_fetch_now_submit($form_id, $fv) {
 //   $flickrid = $fv['values']['flickrid'];
   $flickrid = $_POST['flickrid'];
   $uid = $fv['values']['uid'];
-  drupal_set_message(t("Post submitted flickrid = "). print_r($_POST['flickrid'], 1));
-  drupal_set_message(t('Fetch for flickrid=%flickrid', array('%flickrid' => $flickrid)));
-
   //get user
   $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
-  drupal_set_message(print_r($fuser, 1)); 
   //and fetch
   flickrrippr_fetch_latest($fuser);
   drupal_goto('user/'. $uid .'/flickrrippr');
