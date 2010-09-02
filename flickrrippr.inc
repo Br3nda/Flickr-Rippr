@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.23 2010/09/02 02:43:36 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.24 2010/09/02 02:58:11 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -52,11 +52,34 @@ function flickrrippr_get_user_by_nsid($nsid) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $size = FALSE) {
+function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
 
   $cache = variable_get('flickrrippr_cache_jpegs', FALSE);
-  
+  $image_module = variable_get('flickrrippr_use_image_module', FALSE);
+  if ($cache && $image_module) {
+    return flickrrippr_path_image_module($flickr_photo, $size, $node);
+  }
+  elseif($cache) {
+    return flickrrippr_path_cached($flickr_photo, $size);
+  }
+  else {
+    return flickrrippr_path_remote($flickr_photo, $size);
+  }
+}
 
+function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
+  $src = flickrrippr_path_remote($flickr_photo, $size);
+  drupal_set_message("TODO, local cache of $src");
+  return $src;
+}
+
+function flickrrippr_path_image_module($flickr_photo, $size=FALSE, $node) {
+  $src = flickrrippr_path_remote($flickr_photo, $size);
+  drupal_set_message("TODO, image module cache of $src");
+  return $src;
+}
+
+function flickrrippr_path_remote($flickr_photo, $size) {
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
   
