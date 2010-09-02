@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.26 2010/09/02 03:07:47 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.27 2010/09/02 03:09:47 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -73,13 +73,14 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
  */
 function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
   $src = flickrrippr_path_remote($flickr_photo, $size);
-  $result = drupal_http_request($src);
-  if ($result->code != 200) {
+  $response = drupal_http_request($src);
+  if ($response->code != 200) {
     drupal_set_message(t('Failed to fetch jpeg from flickr'), 'error');
     return $src;
   }
 
   $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
+  drupal_set_message(print_r($response, 1));
   //jpeg is now in $response->data
   $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
   drupal_set_message(t("Jpeg saved as %file", array('%file' => $file)));
