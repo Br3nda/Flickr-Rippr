@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.25 2010/09/02 03:06:13 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.26 2010/09/02 03:07:47 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -56,6 +56,7 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
 
   $cache = variable_get('flickrrippr_cache_jpegs', FALSE);
   $image_module = variable_get('flickrrippr_use_image_module', FALSE);
+
   if ($cache && $image_module) {
     return flickrrippr_path_image_module($flickr_photo, $size, $node);
   }
@@ -67,6 +68,9 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
   }
 }
 
+/**
+ * Save the file on the file system - not as a deep linking src to flickr.com
+ */
 function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
   $src = flickrrippr_path_remote($flickr_photo, $size);
   $result = drupal_http_request($src);
@@ -82,12 +86,19 @@ function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
   return $file;
 }
 
+/** 
+ * Save as a node under the image.module
+ * currently TODO/stub
+ */
 function flickrrippr_path_image_module($flickr_photo, $size=FALSE, $node) {
   $src = flickrrippr_path_remote($flickr_photo, $size);
   drupal_set_message("TODO, image module cache of $src");
   return $src;
 }
 
+/**
+ * Calculates path to photo on flickr
+ */
 function flickrrippr_path_remote($flickr_photo, $size) {
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
