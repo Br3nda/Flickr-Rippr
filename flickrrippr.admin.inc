@@ -92,11 +92,16 @@ function flickrrippr_admin_settings_form() {
     '#default_value' => variable_get('flickrrippr_cache_jpegs', FALSE),
   );
 
-  $form['jpegcache']['image_module'] = array('#type' => 'checkbox', '#title' => t('Use Image Module'));
+  $form['jpegcache']['image_module'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Use Image Module'),
+    '#default_value' => variable_get('flickrrippr_use_image_module', FALSE),
+  );
 
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
+
   );
   
   return $form;
@@ -106,7 +111,7 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
   $image_module = $form_values['values']['image_module'];
   if ($image_module) {
     if (! module_exists('image')) {
-      form_set_error('image_module', t('Image module is not enabled'));
+      form_set_error('image_module', t('Image module is not enabled. You may enable it on !link', array('!link' => l('the modules admin page', 'admin/build/modules'))));
     }
   }
 }
@@ -123,5 +128,7 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
   $cache_jpegs = $form_values['values']['cache_jpegs'];
   variable_set('flickrrippr_cache_jpegs', $cache_jpegs);
 
+  $image_module = $form_values['values']['image_module'];
+  variable_set('flickrrippr_use_image_module', $image_module);
   drupal_set_message('Flickr Rippr settings saved');
 }
