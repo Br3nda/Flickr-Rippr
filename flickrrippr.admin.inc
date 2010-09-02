@@ -16,32 +16,6 @@ function flickrrippr_admin_fetch($uid, $flickrid) {
 }
 
 
-/**
- * administer global settings
- */
-function flickrrippr_admin_form() {
-  $form = array();
-  $form['instructions'] = array('#type' => 'markup', '#value' => 'Get your own API key from '. l('http://www.flickr.com/services/api/', 'http://www.flickr.com/services/api/'));
-
-  $form['api_key'] = array(
-        '#title' => 'Flickr Api Key',
-        '#required' => TRUE,
-        '#type' => 'textfield',
-        '#default_value' => variable_get('flickrapikey', '')
-      );
-//   $form['jpegcache'] = array(
-//       '#title' => 'Allow Local Cache',
-//       '#type' => 'checkbox',
-//       '#default_value' => variable_get('flickrjpegcache', TRUE),
-//       '#description' => t('Allow users to cache flickr photo jpeg files locally'),
-//       );
-
-  $form['save'] = array(
-     '#type' => 'submit',
-     '#value' => t('Save'),
-      );
-  return $form;
-}
 
 /**
  * Validates the admin form
@@ -93,7 +67,8 @@ function flickrrippr_admin() {
 
 function flickrrippr_admin_settings_form() {
 
-  $form['import_tags'] = array(
+  $form['tags'] = array('#type' => 'fieldset', '#title' => t('Tags'));
+  $form['tags']['import_tags'] = array(
     '#title' => t('Import tags?'), 
     '#type' => 'checkbox',
     '#default_value' => variable_get('flickrrippr_import_tags', FALSE),
@@ -103,12 +78,20 @@ function flickrrippr_admin_settings_form() {
   foreach(taxonomy_get_vocabularies() as $v) {
     $options[$v->vid] = $v->name; 
   }
-  $form['vocab'] = array(
+  $form['tags']['vocab'] = array(
     '#title' => t('Vocabulary for tags'), 
     '#type' => 'select', 
     '#options' => $options,
     '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
   );
+
+  $form['jpegcache'] = array('#type' => 'fieldset', '#title' => t('Jpeg Cache'));
+  $form['jpegcache']['cache_jpegs'] = array(
+    '#title' => t('Cache Jpegs Locally?'), 
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('flickrrippr_cache_jpegs', FALSE),
+  );
+
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -125,5 +108,9 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
     $vocab = $form_values['values']['vocab'];
     variable_set('flickrrippr_tags_vocab', $vocab);  
   }
+
+  $cache_jpegs = $form_values['values']['cache_jpegs'];
+  variable_set('flickrrippr_cache_jpegs', $cache_jpegs);
+
   drupal_set_message('Flickr Rippr settings saved');
 }
