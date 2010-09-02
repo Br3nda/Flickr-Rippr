@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.19 2010/08/24 04:28:15 taniwha Exp $
+// $Id: flickrrippr.install,v 1.20 2010/09/02 04:39:12 taniwha Exp $
 
 /**
  * Implementation of hook_install().
@@ -40,6 +40,7 @@ function flickrrippr_schema() {
       'description' => array('type' => 'text'),
       'page_url' => array('type' => 'text'),
       'failed' => array('type' => 'int', 'default' => 0),
+      'image_nid' => array('type' => 'int'),
       ),
       'primary key' => array('flickrphoto_id'),
     );
@@ -97,5 +98,10 @@ function flickrrippr_update_9() {
 function flickrrippr_update_20() {
   db_add_column($ret, 'flickrphotos', 'failed', 'int');
   $ret[] = update_sql("UPDATE {flickrphotos} SET failed=0");
+  return $ret;
+}
+
+function flickrrippr_update_30() {
+  db_add_column($ret, 'flickrphotos', 'image_nid', 'int');
   return $ret;
 }
