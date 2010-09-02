@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.22 2010/09/02 00:23:13 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.23 2010/09/02 02:43:36 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -52,8 +52,10 @@ function flickrrippr_get_user_by_nsid($nsid) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $cache = TRUE, $size = FALSE) {
+function flickrrippr_path($flickr_photo, $size = FALSE) {
 
+  $cache = variable_get('flickrrippr_cache_jpegs', FALSE);
+  
 
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   $src =  'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
@@ -158,7 +160,7 @@ function flickrrippr_makenode($photo_id) {
 
   //Full (normal) sized image
   $photo_path =  flickrrippr_path($flickr_info);
-  $thumbnail_path =  flickrrippr_path($flickr_info, TRUE, 'm');
+  $thumbnail_path =  flickrrippr_path($flickr_info, 'm');
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];

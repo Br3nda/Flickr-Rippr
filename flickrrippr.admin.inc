@@ -92,12 +92,23 @@ function flickrrippr_admin_settings_form() {
     '#default_value' => variable_get('flickrrippr_cache_jpegs', FALSE),
   );
 
+  $form['jpegcache']['image_module'] = array('#type' => 'checkbox', '#title' => t('Use Image Module'));
+
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
   );
   
   return $form;
+}
+
+function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
+  $image_module = $form_values['values']['image_module'];
+  if ($image_module) {
+    if (! module_exists('image')) {
+      form_set_error('image_module', t('Image module is not enabled'));
+    }
+  }
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
