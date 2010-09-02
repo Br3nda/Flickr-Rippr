@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.21 2010/09/01 04:43:31 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.22 2010/09/02 00:23:13 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -201,6 +201,17 @@ function flickrrippr_makenode($photo_id) {
       $node->nid);
     drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
+
+  if (variable_get('flickrrippr_import_tags', FALSE)) {
+    include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.tags.inc');
+    $vocab = variable_get('flickrrippr_tags_vocab', 0);
+    if (!$vocab) {
+      return;
+    }
+
+    flickrrippr_photo_add_tags($nid, $flickr_info);
+  }
+
 }
 
 
