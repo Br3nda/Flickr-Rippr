@@ -92,13 +92,38 @@ function flickrrippr_admin() {
 }
 
 function flickrrippr_admin_settings_form() {
-  $form['import_tags'] = array('#title' => t('Import tags?'), '#type' => 'checkbox');
-  foreach(taxonomy_get_vocabularies() as $v) { $options[$v->vid] = $v->name; }
-  $form['taxonomy'] = array('#title' => t('Taxonomy for tags'), '#type' => 'select', '#options' => $options);
+
+  $form['import_tags'] = array(
+    '#title' => t('Import tags?'), 
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('flickrrippr_import_tags', FALSE),
+  );
+
+  $options = array();
+  foreach(taxonomy_get_vocabularies() as $v) {
+    $options[$v->vid] = $v->name; 
+  }
+  $form['vocab'] = array(
+    '#title' => t('Vocabulary for tags'), 
+    '#type' => 'select', 
+    '#options' => $options,
+    '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
+  );
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  
   return $form;
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
+  $import_tags = $form_values['values']['import_tags'];
   
-    
+  variable_set('flickrrippr_import_tags', $import_tags);
+  if ($import_tags) {
+    $vocab = $form_values['values']['vocab'];
+    variable_set('flickrrippr_tags_vocab', $vocab);  
+  }
+  drupal_set_message('Flickr Rippr settings saved');
 }
