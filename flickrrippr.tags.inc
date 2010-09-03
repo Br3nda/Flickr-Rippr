@@ -21,11 +21,8 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
         'vid' => $vid, // Voacabulary ID
         'name' => $raw, // Term Name 
         'synonyms' => $tag['_content'], // (Optional) Synonym of this term
-//         'parent' => 11, // (Optional) Term ID of a parent term  
         'relations' => array(15), // (Optional) Related Term IDs 
       );
-//       drupal_set_message(print_r($term, 1));
-
       taxonomy_save_term($term);
       //add to those we are gonna save
       $node_terms[] = $term;
@@ -38,10 +35,6 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
 
 
   }
-//     drupal_set_message('<pre>' . print_r($node_terms, 1) .'</pre>');
-
-//   drupal_set_message("will save with the following terms: " . print_r($node_terms, 1));
-
   taxonomy_node_save($node, $node_terms); 
 }
 
