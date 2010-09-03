@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.27 2010/09/02 03:09:47 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.28 2010/09/03 03:47:12 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -32,6 +32,12 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
   return $user;
 }
 
+/**
+ * Fetch info from our database about a user, by nsid
+ * 
+ * @param ndid string primary key flickr users
+ * @return User
+ */
 function flickrrippr_get_user_by_nsid($nsid) {
     if (!$nsid) {
     drupal_set_message(t("Refusing to search for blank nsid"));
