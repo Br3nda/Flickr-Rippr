@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.27 2010/09/02 03:09:47 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.22.4.1 2010/09/03 01:34:50 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
