@@ -1,18 +1,15 @@
 <?php
-// $Id: flickrrippr.inc,v 1.22.4.1 2010/09/03 01:34:50 taniwha Exp $
+<<<<<<< flickrrippr.inc
+// $Id: flickrrippr.inc,v 1.22.4.2 2010/09/03 03:51:39 taniwha Exp $
 
+=======
+>>>>>>> 1.29
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
  * PHP Flickr: http://phpflickr.com/docs/
  * Flickr API docs http://www.flickr.com/services/api/
  */
-//
-//
-///**
-// * Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
-// * NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
-// */
 /**
 * Helper function, to get drupal user details for a flickr user (string of their username of flickr)
 */
@@ -32,6 +29,12 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
   return $user;
 }
 
+/**
+ * Fetch info from our database about a user, by nsid
+ * 
+ * @param ndid string primary key flickr users
+ * @return User
+ */
 function flickrrippr_get_user_by_nsid($nsid) {
     if (!$nsid) {
     drupal_set_message(t("Refusing to search for blank nsid"));

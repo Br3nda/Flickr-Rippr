@@ -1,6 +1,4 @@
 <?php
-// $Id: flickrrippr.install,v 1.19.4.1 2010/09/03 01:34:50 taniwha Exp $
-
 /**
  * Implementation of hook_install().
  */
