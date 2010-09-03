@@ -1,9 +1,4 @@
 <?php
-<<<<<<< flickrrippr.inc
-// $Id: flickrrippr.inc,v 1.22.4.2 2010/09/03 03:51:39 taniwha Exp $
-
-=======
->>>>>>> 1.29
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
