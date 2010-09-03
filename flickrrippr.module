@@ -117,12 +117,14 @@ function flickrrippr_node_refresh($nid) {
   $node = node_load(array('nid' => $nid));
   $photo_id = $node->flickr_photo->flickrphoto_id;
 
- if (!$photo_id) {
-	 drupal_set_message(t('Photo not found. This should never happen'), 'error');
- }
- else {
-  flickrrippr_makenode($photo_id);
-}
+  if (!$photo_id) {
+    drupal_set_message(t('Photo not found. This should never happen'), 'error');
+  }
+  else {
+    flickrrippr_makenode($photo_id);
+  }
+  drupal_set_message("Flickr photo manually re-fetched from flickr.com");
+
  drupal_goto('node/' . $nid);
 }
 
