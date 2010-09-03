@@ -1,18 +1,10 @@
 <?php
-// $Id: flickrrippr.inc,v 1.27 2010/09/02 03:09:47 taniwha Exp $
-
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
  * PHP Flickr: http://phpflickr.com/docs/
  * Flickr API docs http://www.flickr.com/services/api/
  */
-//
-//
-///**
-// * Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
-// * NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
-// */
 /**
 * Helper function, to get drupal user details for a flickr user (string of their username of flickr)
 */
@@ -32,6 +24,12 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
   return $user;
 }
 
+/**
+ * Fetch info from our database about a user, by nsid
+ * 
+ * @param ndid string primary key flickr users
+ * @return User
+ */
 function flickrrippr_get_user_by_nsid($nsid) {
     if (!$nsid) {
     drupal_set_message(t("Refusing to search for blank nsid"));
@@ -80,7 +78,6 @@ function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
   }
 
   $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
-  drupal_set_message(print_r($response, 1));
   //jpeg is now in $response->data
   $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
   drupal_set_message(t("Jpeg saved as %file", array('%file' => $file)));
