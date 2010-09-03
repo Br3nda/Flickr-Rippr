@@ -1,18 +1,10 @@
 <?php
-// $Id: flickrrippr.inc,v 1.28 2010/09/03 03:47:12 taniwha Exp $
-
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
  * PHP Flickr: http://phpflickr.com/docs/
  * Flickr API docs http://www.flickr.com/services/api/
  */
-//
-//
-///**
-// * Works out img tags to display a photo - optionally wrapped in a link to the photo's page.
-// * NOTE: flickr requires links to flickr.com if you're not caching the file on your own server
-// */
 /**
 * Helper function, to get drupal user details for a flickr user (string of their username of flickr)
 */
