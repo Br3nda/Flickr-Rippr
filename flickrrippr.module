@@ -148,7 +148,7 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 }
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
-  $num_photos = 20; //TODO make customisable
+  $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
   
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
