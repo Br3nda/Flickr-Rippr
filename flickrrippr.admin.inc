@@ -102,13 +102,6 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Image Sizes'),
   );
-  $form['image_sizes']['page_size'] = array(
-    '#title' => t('Page image size'),
-    '#description' => t('What size should jpeg images be when viewing a flickr photo page?'),
-    '#type' => 'radios',
-    '#options' => _flickr_rippr_jpeg_sizes(),
-    '#default_value' => variable_get('flickrrippr_page_size', 'm'),
-  );
   $form['image_sizes']['teaser_size'] = array(
     '#title' => t('Teaser image size'),
     '#description' => t('What size should jpeg images be within teasers?'),
@@ -116,6 +109,14 @@ function flickrrippr_admin_settings_form() {
     '#options' => _flickr_rippr_jpeg_sizes(),
     '#default_value' => variable_get('flickrrippr_teaser_size', 't'),
   );
+  $form['image_sizes']['page_size'] = array(
+    '#title' => t('Page image size'),
+    '#description' => t('What size should jpeg images be when viewing a flickr photo page?'),
+    '#type' => 'radios',
+    '#options' => _flickr_rippr_jpeg_sizes(),
+    '#default_value' => variable_get('flickrrippr_page_size', 'm'),
+  );
+
 
   $form['save'] = array(
     '#type' => 'submit',
