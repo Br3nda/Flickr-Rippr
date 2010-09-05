@@ -1,5 +1,5 @@
 name = FlickrRippr
 description = Reads users's Flickr photo streams, and turns into nodes. Provides a block of thumbnails per user.
 package = Flickr
-core = 6.x
+core = 7.x
 dependencies[] = flickrapi
