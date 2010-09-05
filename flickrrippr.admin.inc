@@ -70,8 +70,16 @@ function flickrrippr_admin_settings_form() {
   $form['markup_trust'] = array(
     '#type' => 'checkbox',
     '#title' => t('Trust HTML markup from flickr.com'),
-    '#description' => t('Don\'t escape the html on flickr photo descriptions. use with care.'),
+    '#description' => t('When checked, Flickr Rippr will not escape markup from flickr.com photo descriptions. Use with care.'),
     '#default_value' => variable_get('flickrrippr_markup_trust', FALSE),
+  );
+
+  $form['num_per_fetch'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Number of photos to fetch'),
+    '#description' => t('Per account, on manual fetch or hook_cron'),
+    '#default_value' => variable_get('flickrrippr_num_per_fetch', 10),
+    '#required' => TRUE,
   );
 
   $form['tags'] = array('#type' => 'fieldset', '#title' => t('Tags'));
@@ -154,6 +162,12 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
       form_set_error('image_module', t('Image module is not enabled. You may enable it on !link', array('!link' => l('the modules admin page', 'admin/build/modules'))));
     }
   }
+
+  $num_per_fetch = $form_values['values']['num_pre_fetch'];
+  if(!is_numeric($num_per_fetch)) {
+    form_set_error('num_per_fetch', t('Num to fetch must be number'));
+  }
+  
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
