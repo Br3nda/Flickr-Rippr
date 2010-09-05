@@ -458,8 +458,11 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
    '#value' => '<div class="flickrrippr_photo">'. $image .'</div>',
   );
 
+
+  $markup_trust = variable_get('flickrrippr_markup_trust', FALSE);
+
   $node->content['flickr_description'] = array(
-    '#value' => '<div class="flickrrippr_description">'. check_plain($photo->description)  .'</div>', //decode then encode
+    '#value' => '<div class="flickrrippr_description">'. ($markup_trust ? $photo->description : check_plain($photo->description))  .'</div>', //decode then encode
     '#weight' => 5
   );
   

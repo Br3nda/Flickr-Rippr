@@ -67,6 +67,13 @@ function flickrrippr_admin() {
 
 function flickrrippr_admin_settings_form() {
 
+  $form['markup_trust'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Trust HTML markup from flickr.com'),
+    '#description' => t('Don\'t escape the html on flickr photo descriptions. use with care.'),
+    '#default_value' => variable_get('flickrrippr_markup_trust', FALSE),
+  );
+
   $form['tags'] = array('#type' => 'fieldset', '#title' => t('Tags'));
   $form['tags']['import_tags'] = array(
     '#title' => t('Import tags?'), 
@@ -101,6 +108,7 @@ function flickrrippr_admin_settings_form() {
   $form['image_sizes'] = array(
     '#type' => 'fieldset',
     '#title' => t('Image Sizes'),
+    '#collapsible' => TRUE,
   );
   $form['image_sizes']['teaser_size'] = array(
     '#title' => t('Teaser image size'),
@@ -149,8 +157,10 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
+  $markup_trust = $form_values['values']['markup_trust'];
+  variable_set('flickrrippr_markup_trust', $markup_trust);
+
   $import_tags = $form_values['values']['import_tags'];
-  
   variable_set('flickrrippr_import_tags', $import_tags);
   if ($import_tags) {
     $vocab = $form_values['values']['vocab'];
