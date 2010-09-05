@@ -168,14 +168,11 @@ function flickrrippr_makenode($photo_id) {
   
   $node->title = htmlentities($title);
   $node->created = strtotime($flickr_info['dates']['taken']);
-//   $node->name = $user->name;
+  if (!$node->name) {
+    $node->name = $user->name;
+  }
   $node->uid = $user->uid;
   $node->type = 'flickrrippr_photo';
-//   $node->published = 1;
-//   $node->status =1;
-//   $node->comment = 2;
-//   $node->promote = 1;
-//   $node->format = 2;
 
   node_save($node);
 
