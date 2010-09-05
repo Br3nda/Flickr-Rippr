@@ -127,7 +127,15 @@ function flickrrippr_admin_settings_form() {
 }
 
 function _flickr_rippr_jpeg_sizes(){
-  return array('s' => t('Square'), 't' => t('Thumbnail'), 'm' => t('Medium'), 0 => t('Default'), 'o' => t('Original'));
+  return array(
+    'sq' => t('Square (75 x 75)'), 
+    't'  => t('Thumbnail (100 x 75)'),      
+    's'  => t('Small (240 x 180)'),
+    'm'  => t('Medium 500 (500 x 375)'), 
+    'z'  => t('Medium 640 (640 x 480)'),
+    'l'  => t('Large (1024 x 768)'),    
+    'o'  => t('Original (2592 x 1944)')
+  );
 }
 
 function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
