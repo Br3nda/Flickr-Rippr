@@ -137,17 +137,6 @@ function flickrrippr_node_refresh($nid) {
  * until it finds a photo it already has saved as a node
  */
 function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
-
-  $output = '';
-
-
-  //This function will recurse, reading futher back into the flickr stream until it finds a photo it already has saved as a node
- //maximum of 5 fetches.
-  if ($pagenum > 5) {
-    return 'done';
-  }
-
-  
  //fetches defails from our database
   $flickrusers =  flickrrippr_get_flickr_accounts($user_id);
 
