@@ -163,7 +163,7 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
     }
   }
 
-  $num_per_fetch = $form_values['values']['num_pre_fetch'];
+  $num_per_fetch = $form_values['values']['num_per_fetch'];
   if(!is_numeric($num_per_fetch)) {
     form_set_error('num_per_fetch', t('Num to fetch must be number'));
   }
@@ -171,7 +171,7 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
-  $num_per_fetch = $form_values['values']['num_pre_fetch'];
+  $num_per_fetch = $form_values['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
 
   $markup_trust = $form_values['values']['markup_trust'];
