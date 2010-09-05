@@ -78,7 +78,6 @@ function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
   }
 
   $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
-  drupal_set_message(print_r($response, 1));
   //jpeg is now in $response->data
   $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
   drupal_set_message(t("Jpeg saved as %file", array('%file' => $file)));
