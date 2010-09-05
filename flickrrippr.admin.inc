@@ -153,5 +153,12 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
 
   $image_module = $form_values['values']['image_module'];
   variable_set('flickrrippr_use_image_module', $image_module);
-  drupal_set_message('Flickr Rippr settings saved');
+
+
+  $page_size = $form_values['values']['page_size'];
+  $teaser_size = $form_values['values']['teaser_size'];
+  variable_set('flickrrippr_page_size', $page_size);
+  variable_set('flickrrippr_teaser_size', $teaser_size);
+
+  drupal_set_message('Flickr Rippr settings saved');  
 }
