@@ -78,7 +78,6 @@ function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
   }
 
   $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
-  drupal_set_message(print_r($response, 1));
   //jpeg is now in $response->data
   $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
   drupal_set_message(t("Jpeg saved as %file", array('%file' => $file)));
@@ -160,8 +159,8 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info);
-  $thumbnail_path =  flickrrippr_path($flickr_info, 'm');
+  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];
@@ -169,14 +168,11 @@ function flickrrippr_makenode($photo_id) {
   
   $node->title = htmlentities($title);
   $node->created = strtotime($flickr_info['dates']['taken']);
-//   $node->name = $user->name;
+  if (!$node->name) {
+    $node->name = $user->name;
+  }
   $node->uid = $user->uid;
   $node->type = 'flickrrippr_photo';
-//   $node->published = 1;
-//   $node->status =1;
-//   $node->comment = 2;
-//   $node->promote = 1;
-//   $node->format = 2;
 
   node_save($node);
 
