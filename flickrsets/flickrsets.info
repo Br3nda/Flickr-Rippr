@@ -1,5 +1,0 @@
-name = Flickr Sets
-description = Bunch of utilities for reading sets of photos from flickr
-package = Flickr
-dependencies[] = flickrrippr
-core = 6.x
