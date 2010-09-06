@@ -76,11 +76,12 @@ function flickrrippr_admin_settings_form() {
 
 
   $path_options = flickrrippr_path_options();
-  $form['path'] = array(
+  $form['path_handler'] = array(
     '#type' => 'radios', 
     '#title' => t('Flickr photo handler'), 
     '#options' => $path_options,
     '#default_value' => variable_get('flickrrippr_path_handler', 0),
+    '#required' => TRUE,
   );
 
   drupal_set_message(print_r($options, 1));
@@ -179,6 +180,11 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
+
+  $path_handler = $form_values['values']['path_handler'];
+  variable_set('flickrrippr_path_handler', $path_handler);
+  
+
   $num_per_fetch = $form_values['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
 
