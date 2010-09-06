@@ -29,6 +29,12 @@ function flickrimage_get_path($flickr_photo, $size, $node) {
   $src = flickrrippr_path_remote($flickr_photo, 'o');
   $response = drupal_http_request($src);
   if ($response->code != 200) {
+    //try again without _o
+    $src = flickrrippr_path_remote($flickr_photo, FALSE);
+    $response = drupal_http_request($src);
+  }
+
+  if ($response->code != 200) {
     drupal_set_message(t('Failed to fetch jpeg from flickr. Src was %src', array('%src' => $src)), 'error');
     return flickrrippr_path_remote($flickr_photo, $size);
   }
