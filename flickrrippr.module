@@ -88,8 +88,12 @@ function flickrrippr_menu() {
 
 
 function flickrrippr_node_refresh_perm($nid) {
-  return true;
-  //TODO!
+  $node = node_load(array('nid' => $nid));
+  if ($node->type != 'flickrrippr_photo') {
+    return FALSE;
+  }
+
+  return node_access('update', $nid);
 }
 
 /** 
