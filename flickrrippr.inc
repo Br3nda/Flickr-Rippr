@@ -57,7 +57,6 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
     //none chose, use default
     return flickrrippr_path_remote();
   }
-  drupal_set_message(t('Path to be handled by '. $path_handler));
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
 
