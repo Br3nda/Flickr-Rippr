@@ -17,8 +17,7 @@ function flickrimage_get_path($flickr_photo, $size, $node) {
     $image_node = node_load(array('nid' => $node->flickr_photo->image_nid));
     
     if ($image_node) {
-      drupal_set_message(t("Existing image nid found: %nid", array('%nid' => $node->flickr_photo->image_nid)));
-  return $image_node->images[IMAGE_PREVIEW];;
+      return $image_node->images[IMAGE_PREVIEW];;
     }
     else {
       drupal_set_message(t("Image node %nid does not exist. Will attempt re-creating", array('%nid' => $node->flickr_photo->image_nid)), 'error');
