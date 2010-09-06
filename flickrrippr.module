@@ -142,7 +142,7 @@ function flickrrippr_node_refresh($nid) {
   else {
     flickrrippr_makenode($photo_id);
   }
-  drupal_set_message("Flickr photo manually re-fetched from flickr.com");
+//   drupal_set_message("Flickr photo manually re-fetched from flickr.com");
 
  drupal_goto('node/' . $nid);
 }
