@@ -65,7 +65,26 @@ function flickrrippr_admin() {
 
 }
 
+function flickrrippr_path_options() {
+  $options = array(t('None'));  
+  $options += module_invoke_all(__FUNCTION__);
+
+  return $options;
+}
+
 function flickrrippr_admin_settings_form() {
+
+
+  $path_options = flickrrippr_path_options();
+  $form['path'] = array(
+    '#type' => 'radios', 
+    '#title' => t('Flickr photo handler'), 
+    '#options' => $path_options,
+    '#default_value' => variable_get('flickrrippr_path_handler', 0),
+  );
+
+  drupal_set_message(print_r($options, 1));
+
 
   $form['markup_trust'] = array(
     '#type' => 'checkbox',
@@ -100,6 +119,7 @@ function flickrrippr_admin_settings_form() {
     '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
   );
 
+/*
   $form['jpegcache'] = array('#type' => 'fieldset', '#title' => t('Jpeg Cache'));
   $form['jpegcache']['cache_jpegs'] = array(
     '#title' => t('Cache Jpegs Locally?'), 
@@ -112,6 +132,7 @@ function flickrrippr_admin_settings_form() {
     '#title' => t('Use Image Module'),
     '#default_value' => variable_get('flickrrippr_use_image_module', FALSE),
   );
+*/
 
   $form['image_sizes'] = array(
     '#type' => 'fieldset',

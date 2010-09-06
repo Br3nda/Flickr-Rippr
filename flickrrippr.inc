@@ -47,10 +47,12 @@ function flickrrippr_get_user_by_nsid($nsid) {
 }
 
 
+
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
+  module_invoke_all(__FUNCTION__, $flickrphotos, $size, $node);
 
   $cache = variable_get('flickrrippr_cache_jpegs', FALSE);
   $image_module = variable_get('flickrrippr_use_image_module', FALSE);
