@@ -89,7 +89,7 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
 
-  drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
+//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
 // 
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid)) {
