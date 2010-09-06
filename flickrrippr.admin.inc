@@ -119,20 +119,7 @@ function flickrrippr_admin_settings_form() {
     '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
   );
 
-/*
-  $form['jpegcache'] = array('#type' => 'fieldset', '#title' => t('Jpeg Cache'));
-  $form['jpegcache']['cache_jpegs'] = array(
-    '#title' => t('Cache Jpegs Locally?'), 
-    '#type' => 'checkbox',
-    '#default_value' => variable_get('flickrrippr_cache_jpegs', FALSE),
-  );
 
-  $form['jpegcache']['image_module'] = array(
-    '#type' => 'checkbox', 
-    '#title' => t('Use Image Module'),
-    '#default_value' => variable_get('flickrrippr_use_image_module', FALSE),
-  );
-*/
 
   $form['image_sizes'] = array(
     '#type' => 'fieldset',
