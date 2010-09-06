@@ -60,16 +60,6 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
 
-/** 
- * Save as a node under the image.module
- * currently TODO/stub
- */
-function flickrrippr_path_image_module($flickr_photo, $size=FALSE, $node) {
-  $src = flickrrippr_path_remote($flickr_photo, $size);
-  drupal_set_message("TODO, image module cache of $src");
-  return $src;
-}
-
 /**
  * Calculates path to photo on flickr
  */
@@ -89,7 +79,7 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
 
-  drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
+//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
 // 
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid)) {
@@ -135,8 +125,8 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
-  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
+  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];

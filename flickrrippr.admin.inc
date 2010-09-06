@@ -162,7 +162,7 @@ function _flickr_rippr_jpeg_sizes(){
     'sq' => t('Square (75 x 75)'), 
     't'  => t('Thumbnail (100 x 75)'),      
     's'  => t('Small (240 x 180)'),
-    'm'  => t('Medium 500 (500 x 375)'), 
+    0  => t('Medium 500 (500 x 375)'), 
     'z'  => t('Medium 640 (640 x 480)'),
     'l'  => t('Large (1024 x 768)'),    
     'o'  => t('Original (2592 x 1944)')
@@ -170,13 +170,6 @@ function _flickr_rippr_jpeg_sizes(){
 }
 
 function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
-  $image_module = $form_values['values']['image_module'];
-  if ($image_module) {
-    if (! module_exists('image')) {
-      form_set_error('image_module', t('Image module is not enabled. You may enable it on !link', array('!link' => l('the modules admin page', 'admin/build/modules'))));
-    }
-  }
-
   $num_per_fetch = $form_values['values']['num_per_fetch'];
   if(!is_numeric($num_per_fetch)) {
     form_set_error('num_per_fetch', t('Num to fetch must be number'));
