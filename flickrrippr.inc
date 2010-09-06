@@ -60,16 +60,6 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
 
-/** 
- * Save as a node under the image.module
- * currently TODO/stub
- */
-function flickrrippr_path_image_module($flickr_photo, $size=FALSE, $node) {
-  $src = flickrrippr_path_remote($flickr_photo, $size);
-  drupal_set_message("TODO, image module cache of $src");
-  return $src;
-}
-
 /**
  * Calculates path to photo on flickr
  */
