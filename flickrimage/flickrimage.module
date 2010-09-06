@@ -45,7 +45,8 @@ function flickrimage_get_path($flickr_photo, $size, $node) {
     return flickrrippr_path_remote($flickr_photo, $size);
   }
 
-  db_query("UPDATE {flickrphotos} SET image_node=%d WHERE nid=%d", $image_node->nid, $node->nid);
+  db_query("UPDATE {flickrphotos} SET image_nid=%d WHERE nid=%d", $image_node->nid, $node->nid);
+
 
   return $file;
 }
