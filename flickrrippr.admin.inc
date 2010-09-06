@@ -102,7 +102,11 @@ function flickrrippr_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  $form['tags'] = array('#type' => 'fieldset', '#title' => t('Tags'));
+  $form['tags'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tags'),
+    '#collapsible' => TRUE,
+);
   $form['tags']['import_tags'] = array(
     '#title' => t('Import tags?'), 
     '#type' => 'checkbox',
