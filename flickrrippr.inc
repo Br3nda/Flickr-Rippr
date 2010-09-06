@@ -47,51 +47,17 @@ function flickrrippr_get_user_by_nsid($nsid) {
 }
 
 
+
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
-
-  $cache = variable_get('flickrrippr_cache_jpegs', FALSE);
-  $image_module = variable_get('flickrrippr_use_image_module', FALSE);
-
-  if ($cache && $image_module) {
-    return flickrrippr_path_image_module($flickr_photo, $size, $node);
+  $path_handler = variable_get('flickrrippr_path_handler', 0);
+  if (!$path_handler) {
+    //none chose, use default
+    return flickrrippr_path_remote();
   }
-  elseif($cache) {
-    return flickrrippr_path_cached($flickr_photo, $size);
-  }
-  else {
-    return flickrrippr_path_remote($flickr_photo, $size);
-  }
-}
-
-/**
- * Save the file on the file system - not as a deep linking src to flickr.com
- */
-function flickrrippr_path_cached($flickr_photo, $size=FALSE) {
-  $src = flickrrippr_path_remote($flickr_photo, $size);
-  $response = drupal_http_request($src);
-  if ($response->code != 200) {
-    drupal_set_message(t('Failed to fetch jpeg from flickr'), 'error');
-    return $src;
-  }
-
-  $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
-  //jpeg is now in $response->data
-  $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
-  drupal_set_message(t("Jpeg saved as %file", array('%file' => $file)));
-  return $file;
-}
-
-/** 
- * Save as a node under the image.module
- * currently TODO/stub
- */
-function flickrrippr_path_image_module($flickr_photo, $size=FALSE, $node) {
-  $src = flickrrippr_path_remote($flickr_photo, $size);
-  drupal_set_message("TODO, image module cache of $src");
-  return $src;
+  return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
 
 /**
@@ -113,7 +79,7 @@ function flickrrippr_makenode($photo_id) {
     return;
   }
 
-  drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
+//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
 // 
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid)) {
@@ -159,8 +125,8 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
-  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
+  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];
