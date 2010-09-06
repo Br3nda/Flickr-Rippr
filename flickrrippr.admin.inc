@@ -74,9 +74,13 @@ function flickrrippr_path_options() {
 
 function flickrrippr_admin_settings_form() {
 
-
+  $form['general'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Flickr Rippr Settings'),
+    '#collapsible' => TRUE,
+);
   $path_options = flickrrippr_path_options();
-  $form['path_handler'] = array(
+  $form['general']['path_handler'] = array(
     '#type' => 'radios', 
     '#title' => t('Flickr photo handler'), 
     '#options' => $path_options,
@@ -84,17 +88,14 @@ function flickrrippr_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  drupal_set_message(print_r($options, 1));
-
-
-  $form['markup_trust'] = array(
+  $form['general']['markup_trust'] = array(
     '#type' => 'checkbox',
     '#title' => t('Trust HTML markup from flickr.com'),
     '#description' => t('When checked, Flickr Rippr will not escape markup from flickr.com photo descriptions. Use with care.'),
     '#default_value' => variable_get('flickrrippr_markup_trust', FALSE),
   );
 
-  $form['num_per_fetch'] = array(
+  $form['general']['num_per_fetch'] = array(
     '#type' => 'textfield',
     '#title' => t('Number of photos to fetch'),
     '#description' => t('Per account, on manual fetch or hook_cron'),
