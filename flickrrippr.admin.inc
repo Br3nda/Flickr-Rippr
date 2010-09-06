@@ -82,10 +82,11 @@ function flickrrippr_admin_settings_form() {
   $path_options = flickrrippr_path_options();
   $form['general']['path_handler'] = array(
     '#type' => 'radios', 
-    '#title' => t('Flickr photo handler'), 
+    '#title' => t('Flickr Path Handler'), 
     '#options' => $path_options,
     '#default_value' => variable_get('flickrrippr_path_handler', 0),
     '#required' => TRUE,
+    '#description' => t('Note: Changing the path handler does not modify existing photos previously fetch from flickr.com.'),
   );
 
   $form['general']['markup_trust'] = array(
