@@ -1,14 +1,14 @@
 <?php
 
 /**
- * 
+ * Make visible to the Flickr Rippr module
  */
 function flickrimage_flickrrippr_path_options() {
   return array('flickrimage' => 'Image Module');
 }
 
 /**
- * implementatin of hook_flickrrippr_path
+ * implementation of hook_flickrrippr_path
  * Save the file on the file system - not as a deep linking src to flickr.com
  */
 function flickrimage_get_path($flickr_photo, $size, $node) {
