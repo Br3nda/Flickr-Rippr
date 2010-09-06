@@ -65,16 +65,37 @@ function flickrrippr_admin() {
 
 }
 
+function flickrrippr_path_options() {
+  $options = array(t('None'));  
+  $options += module_invoke_all(__FUNCTION__);
+
+  return $options;
+}
+
 function flickrrippr_admin_settings_form() {
 
-  $form['markup_trust'] = array(
+  $form['general'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Flickr Rippr Settings'),
+    '#collapsible' => TRUE,
+);
+  $path_options = flickrrippr_path_options();
+  $form['general']['path_handler'] = array(
+    '#type' => 'radios', 
+    '#title' => t('Flickr photo handler'), 
+    '#options' => $path_options,
+    '#default_value' => variable_get('flickrrippr_path_handler', 0),
+    '#required' => TRUE,
+  );
+
+  $form['general']['markup_trust'] = array(
     '#type' => 'checkbox',
     '#title' => t('Trust HTML markup from flickr.com'),
     '#description' => t('When checked, Flickr Rippr will not escape markup from flickr.com photo descriptions. Use with care.'),
     '#default_value' => variable_get('flickrrippr_markup_trust', FALSE),
   );
 
-  $form['num_per_fetch'] = array(
+  $form['general']['num_per_fetch'] = array(
     '#type' => 'textfield',
     '#title' => t('Number of photos to fetch'),
     '#description' => t('Per account, on manual fetch or hook_cron'),
@@ -82,7 +103,11 @@ function flickrrippr_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  $form['tags'] = array('#type' => 'fieldset', '#title' => t('Tags'));
+  $form['tags'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tags'),
+    '#collapsible' => TRUE,
+);
   $form['tags']['import_tags'] = array(
     '#title' => t('Import tags?'), 
     '#type' => 'checkbox',
@@ -100,18 +125,7 @@ function flickrrippr_admin_settings_form() {
     '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
   );
 
-  $form['jpegcache'] = array('#type' => 'fieldset', '#title' => t('Jpeg Cache'));
-  $form['jpegcache']['cache_jpegs'] = array(
-    '#title' => t('Cache Jpegs Locally?'), 
-    '#type' => 'checkbox',
-    '#default_value' => variable_get('flickrrippr_cache_jpegs', FALSE),
-  );
 
-  $form['jpegcache']['image_module'] = array(
-    '#type' => 'checkbox', 
-    '#title' => t('Use Image Module'),
-    '#default_value' => variable_get('flickrrippr_use_image_module', FALSE),
-  );
 
   $form['image_sizes'] = array(
     '#type' => 'fieldset',
@@ -171,6 +185,11 @@ function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
 }
 
 function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
+
+  $path_handler = $form_values['values']['path_handler'];
+  variable_set('flickrrippr_path_handler', $path_handler);
+  
+
   $num_per_fetch = $form_values['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
 
