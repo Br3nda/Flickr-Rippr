@@ -3,3 +3,4 @@ description = Reads users's Flickr photo streams, and turns into nodes. Provides
 package = Flickr
 core = 6.x
 dependencies[] = flickrapi
+dependencies[] = taxonomy
