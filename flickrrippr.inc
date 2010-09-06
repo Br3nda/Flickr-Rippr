@@ -125,8 +125,8 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
-  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
+  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];
