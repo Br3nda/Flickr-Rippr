@@ -162,7 +162,7 @@ function _flickr_rippr_jpeg_sizes(){
     'sq' => t('Square (75 x 75)'), 
     't'  => t('Thumbnail (100 x 75)'),      
     's'  => t('Small (240 x 180)'),
-    'm'  => t('Medium 500 (500 x 375)'), 
+    0  => t('Medium 500 (500 x 375)'), 
     'z'  => t('Medium 640 (640 x 480)'),
     'l'  => t('Large (1024 x 768)'),    
     'o'  => t('Original (2592 x 1944)')
