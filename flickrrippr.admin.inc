@@ -46,17 +46,19 @@ function flickrrippr_admin() {
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
     array('data' => t('Tag'), 'field' => 'tag'),
   );
-  $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u LEFT OUTER JOIN {flickrusers} f  ON u.uid = f.uid AND u.uid > 0". tablesort_sql($headers), 50);
+  $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u 
+      LEFT OUTER JOIN {flickrusers} f  
+      ON u.uid = f.uid AND u.uid > 0 WHERE u.name <> '' ". tablesort_sql($headers), 50);
 
 
   while ($u = db_fetch_object($result)) {
     $rows[] = array(
-      $u->name,
-      $u->flickrusername,
-      $u->flickrid,
-      $u->tag,
+      theme('username', $u),
+      check_plain($u->flickrusername),
+      check_plain($u->flickrid),
+      check_plain($u->tag),
       drupal_get_form('flickrrippr_user_fetch_now', $u->uid, $u->flickrid, 'admin/content/flickrrippr'),
-      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. $u->flickrid),
+      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. check_plain($u->flickrid)),
     );
   }
   $output .= theme('table', $headers, $rows);
