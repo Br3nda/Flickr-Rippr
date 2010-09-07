@@ -73,28 +73,15 @@ function flickrrippr_path_remote($flickr_photo, $size) {
  */
 function flickrrippr_makenode($photo_id) {
 
-
   if (!$photo_id) {
     drupal_set_message(t("Photo_id required"), 'error');
-    return;
-  }
-
-//   drupal_set_message(t("Fetching data from flickr .com for photoid=%photo_id", array('%photo_id' => $photo_id)));
-// 
-  $nid = flickrrippr_photo_get_nid($photo_id) ;
-  if (!empty($nid)) {
-//     //already exists
-    $node = node_load(array('nid' => $nid));
-//     drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
-  }
-  else {
-  
+    return FALSE;
   }
 
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to query flickr.com, library missing"));
-    return $output;
+    drupal_set_message(t("Unable to query flickr.com, library missing"), 'error');
+    return FALSE;
   }
 
   //Info to put into the node
@@ -104,9 +91,10 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
     db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
     node_save($node);
-    return;
+    return FALSE;
   }
   
+
   $flickr_context = $flickr->photos_getContext($photo_id);
   
 
@@ -114,10 +102,8 @@ function flickrrippr_makenode($photo_id) {
   $flickrusername = $flickr_info['owner']['username'];
   $flickrid = $flickr_info['owner']['nsid'];
   
-//   drupal_set_message(t("Making a node for photo by %flickrusername", array('%flickrusername' => $flickrusername)), 'error');
-
   //get user details
-//   $user = flickrrippr_get_user_by_flickrusername($flickrusername);
+
   $user = flickrrippr_get_user_by_nsid($flickrid);
   if (!$user) {
     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
@@ -131,16 +117,37 @@ function flickrrippr_makenode($photo_id) {
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];
 
-  
-  $node->title = htmlentities($title);
-  $node->created = strtotime($flickr_info['dates']['taken']);
-  if (!$node->name) {
-    $node->name = $user->name;
+
+  //assemble everything to pass to hook
+  $details = array(
+    'photo_id' => $photo_id,
+    'flickrid' => $flickrid,
+    'flickrusername' => $flickrusername,
+    'context' => $flickr_context,
+    'info' => $flickr_info,
+    'title' => $title,
+    'description' => $description,
+    'user' => $user,
+    'photo_path' => $photo_path,
+    'thumbnail_path' => $thumbnail_path,
+    'page_url' => $page_url,
+
+  );
+
+
+  //call the hook
+  $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
+  drupal_set_message(t("Our node handler = $node_handler"));
+  $node = module_invoke($node_handler, 'node_save_handler', $details);
+
+
+  if (!$node) {
+    drupal_set_message("Make node failed, giving up", 'error');
+    return FALSE;
   }
-  $node->uid = $user->uid;
-  $node->type = 'flickrrippr_photo';
 
   node_save($node);
+  drupal_set_message(print_r($node->nid, 1));
 
   if ($node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
@@ -179,6 +186,34 @@ function flickrrippr_makenode($photo_id) {
 
 }
 
+function flickrrippr_node_save_handler($details) {
+  $photo_id = $details['photo_id'];
+  drupal_set_message("Photo_id = $photo_id");
+  if (!$photo_id) {
+    drupal_set_message("refusing to update/create node for null photo_id", 'error');
+    return FALSE;
+  }
+
+  $nid = flickrrippr_photo_get_nid($photo_id) ;
+  if (!empty($nid) && $nid) {
+    //already exists
+    $node = node_load(array('nid' => $nid));
+    drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
+  }
+
+  $node->type = 'flickrrippr_photo';
+
+  $node->title = htmlentities($details['title']);
+  $node->created = strtotime($details['info']['dates']['taken']);
+
+  //if owner not set, then set it.
+  if (!$node->uid) {
+    $node->uid = $details['user']->uid;
+    $node->name = $details['user']->name;
+  }
+
+  return $node;
+}
 
 
 /**

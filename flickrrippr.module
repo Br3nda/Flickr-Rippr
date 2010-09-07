@@ -88,14 +88,26 @@ function flickrrippr_menu() {
 
 
 function flickrrippr_node_refresh_perm($nid) {
-  return true;
-  //TODO!
+  $node = node_load(array('nid' => $nid));
+  if ($node->type != 'flickrrippr_photo') {
+    return FALSE;
+  }
+
+  return node_access('update', $nid);
 }
+
+/** 
+ * For editing one account
+ */
 function flickrrippr_user_edit_account($uid, $flickrid) {
   $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
   $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
   return $output;
 }
+
+/** 
+ * Add a new account
+ */
 function flickrrippr_user_add_account($uid) {
   $flickruser->uid = $uid;
   $output = drupal_get_form('flickrrippr_user_settings_form', $flickruser);
@@ -103,16 +115,23 @@ function flickrrippr_user_add_account($uid) {
 }
 
 
-
+/**
+ * Get the details of a flickr user from the database
+ */
 function flickrrippr_get_flickr_user($uid, $flickrid) {
   return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
 }
 
-
+/**
+ * Loading of the node
+ */
 function flickrrippr_load(&$node) {
   $node->flickr_photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
 }
 
+/**
+ * Re-fetch a photo from flickr
+ */
 function flickrrippr_node_refresh($nid) {
   $node = node_load(array('nid' => $nid));
   $photo_id = $node->flickr_photo->flickrphoto_id;
@@ -123,7 +142,7 @@ function flickrrippr_node_refresh($nid) {
   else {
     flickrrippr_makenode($photo_id);
   }
-  drupal_set_message("Flickr photo manually re-fetched from flickr.com");
+//   drupal_set_message("Flickr photo manually re-fetched from flickr.com");
 
  drupal_goto('node/' . $nid);
 }
@@ -146,6 +165,10 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
   return '';
 
 }
+
+/**
+ * Get the latest from flickr.com for one user
+ */
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
@@ -183,9 +206,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
     return FALSE;
   }
   return true;
-  //recursive - call this function again to get the next 10;
-  //flickrrippr_check_latest_for_user($user_id, $pagenum +1);
-
 }
 
 /**
@@ -277,6 +297,11 @@ function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
   $form['fetch'] = array('#type' => 'submit', '#value' => t('Fetch now'));
   return $form;
 }
+
+
+/**
+ * Manually fetch all the latest for a user
+ */
 function flickrrippr_user_fetch_now_submit($form_id, $fv) {
 //   $flickrid = $fv['values']['flickrid'];
   $flickrid = $_POST['flickrid'];
@@ -296,6 +321,9 @@ function flickrrippr_user_fetch_now_submit($form_id, $fv) {
   drupal_goto(check_plain($dest));
 }
 
+/**
+ * Form for a user editing their own settings
+ */
 function flickrrippr_user_settings_form($a, $flickruser) {
   
   $form = array();
@@ -303,7 +331,13 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
   $form['uid'] = array('#type' => 'hidden', '#value' => $flickruser->uid);
 
-  if (!$flickruser->flickrid) {
+  if ($flickruser->flickrid) {
+    $form['flickr_username'] = array(
+      '#type' => 'markup', 
+      '#value' => '<p><strong>' . t('Flickr Username: ').'</strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
+    );
+  }
+  else {
     $form['flickr_username'] = array(
       '#type' => 'textfield',
       '#title' => t('Flickr Username'),
@@ -344,6 +378,9 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
   //query api
   //and store the 3432@N00 uid then
 }
+/**
+ * Save submission of a user editting their own settings
+ */
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['uid'])) {
     $user = user_load(array('uid' => intval($form_state['values']['uid'])));
@@ -395,6 +432,9 @@ function flickrrippr_node_info() {
 
 }
 
+/**
+ * Instead of displaying a damaged node, display a form for deleting it
+ */
 function flickrrippr_failed_form($form, $node) {
   $form = array();
   $form['message'] = array(

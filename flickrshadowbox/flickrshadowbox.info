@@ -1,0 +1,6 @@
+name = Flickr Rippr - Shadow Box 
+description = Saves flickr photos as shadowbox 
+package = Flickr
+core = 6.x
+dependencies[] = flickrrippr
+dependencies[] = shadowbox 

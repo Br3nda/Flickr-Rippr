@@ -1,0 +1,11 @@
+<?php
+/**
+ * Make visible to the Flickr Rippr module
+ */
+function flickrshadow_flickrrippr_node_handler_options() {
+  return array('flickrshadowbox' => 'Shadow Box');
+}
+
+function flickrshadow_flickrrippr_make_node($details) {
+  drupal_set_message(t("TODO"));
+}
