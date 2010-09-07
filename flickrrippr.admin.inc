@@ -99,7 +99,7 @@ function flickrrippr_admin_settings_form() {
   $node_handlers = flickrrippr_node_handler_options();
   $form['general']['node_handler'] = array(
     '#type' => 'radios', 
-    '#title' => t('Flickr Path Handler'), 
+    '#title' => t('Flickr Node Handler'), 
     '#options' => $node_handlers,
     '#default_value' => variable_get('flickrrippr_node_handler', 'flickrrippr'),
     '#required' => TRUE,
