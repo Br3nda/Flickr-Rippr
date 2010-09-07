@@ -7,23 +7,11 @@ function flickrimage_flickrrippr_node_handler_options() {
   return array('flickrimage' => 'Image Module');
 }
 
-/**
- * implementation of hook_flickrrippr_path
- * Save the file on the file system - not as a deep linking src to flickr.com
- */
-function flickrimage_get_path($flickr_photo, $size, $node) {
+function flickrimage_flickrrippr_make_node($details) {
 
-  if ($node->flickr_photo->image_nid) {
-    $image_node = node_load(array('nid' => $node->flickr_photo->image_nid));
+  
+  $image_node = node_load(array('nid' => $node->flickr_photo->image_nid));
     
-    if ($image_node) {
-      return $image_node->images[IMAGE_PREVIEW];;
-    }
-    else {
-      drupal_set_message(t("Image node %nid does not exist. Will attempt re-creating", array('%nid' => $node->flickr_photo->image_nid)), 'error');
-    }
-  }
-
   //get original jpeg
   $src = flickrrippr_path_remote($flickr_photo, 'o');
   $response = drupal_http_request($src);
@@ -60,5 +48,5 @@ function flickrimage_get_path($flickr_photo, $size, $node) {
   db_query("UPDATE {flickrphotos} SET image_nid=%d WHERE nid=%d", $image_node->nid, $node->nid);
 
   $image_node = node_load(array('nid' => $image_node->nid));
-  return $image_node->images[IMAGE_PREVIEW];;
+  return $image_node;
 }

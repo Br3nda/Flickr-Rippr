@@ -118,6 +118,7 @@ function flickrrippr_makenode($photo_id) {
   $page_url = $flickr_info['urls']['url'][0]['_content'];
 
 
+  //assemble everything to pass to hook
   $details = array(
     'photo_id' => $photo_id,
     'flickrid' => $flickrid,
@@ -134,9 +135,12 @@ function flickrrippr_makenode($photo_id) {
   );
 
 
+  //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
   drupal_set_message(t("Our node handler = $node_handler"));
   $node = module_invoke($node_handler, 'node_save_handler', $details);
+
+
   if (!$node) {
     drupal_set_message("Make node failed, giving up", 'error');
     return FALSE;
