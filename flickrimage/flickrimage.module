@@ -3,7 +3,7 @@
 /**
  * Make visible to the Flickr Rippr module
  */
-function flickrimage_flickrrippr_path_options() {
+function flickrimage_flickrrippr_node_handler_options() {
   return array('flickrimage' => 'Image Module');
 }
 
@@ -48,7 +48,7 @@ function flickrimage_get_path($flickr_photo, $size, $node) {
     return flickrrippr_path_remote($flickr_photo, $size);
   }
 
-  drupal_set_message("Saving new image node");
+//   drupal_set_message("Saving new image node");
 //function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy = NULL) {
   $image_node = image_create_node_from($file, $flickr_photo['title'], $flickr_photo['description']);
   if (!$image_node) {
@@ -56,7 +56,7 @@ function flickrimage_get_path($flickr_photo, $size, $node) {
     return flickrrippr_path_remote($flickr_photo, $size);
   }
 
-  drupal_set_message("linking to new image node");
+//   drupal_set_message("linking to new image node");
   db_query("UPDATE {flickrphotos} SET image_nid=%d WHERE nid=%d", $image_node->nid, $node->nid);
 
   $image_node = node_load(array('nid' => $image_node->nid));
