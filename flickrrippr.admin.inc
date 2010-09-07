@@ -84,7 +84,8 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Flickr Rippr Settings'),
     '#collapsible' => TRUE,
-);
+  );
+
   $path_options = flickrrippr_path_options();
   $form['general']['path_handler'] = array(
     '#type' => 'radios', 
@@ -200,7 +201,7 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
   variable_set('flickrrippr_path_handler', $path_handler);
 
   $node_handler = $form_values['values']['node_handler'];
-  variable_set('flickrrippr_path_handler', $node_handler);
+  variable_set('flickrrippr_node_handler', $node_handler);
 
   $num_per_fetch = $form_values['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
