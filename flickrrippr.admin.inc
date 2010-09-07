@@ -15,24 +15,6 @@ function flickrrippr_admin_fetch($uid, $flickrid) {
   drupal_goto('admin/content/flickrrippr');
 }
 
-
-
-/**
- * Validates the admin form
- */
-function flickrrippr_admin_form_validate() {
-}
-
-/**
- * This runs after admin form is submitted, and saves our module's settings
- */
-function flickrrippr_admin_form_submit($form, &$form_state) {
-  $form_values = &$form_state['values'];
-  variable_set('flickrapikey', $form_state['values']['api_key']);
-//   variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
-  drupal_set_message(t('Settings saved'));
-}
-
 /**
  * This is called from admin menu, and will refresh the 20 oldest photos
  * TODO check this work in drupal6
