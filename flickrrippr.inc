@@ -38,12 +38,11 @@ function flickrrippr_get_user_by_nsid($nsid) {
   
   $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid = '%s'", $nsid));
   if (!$flickruser) {
-    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)));
+    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
     return;
   }
-  
-  $user = user_load(array('uid' => $flickruser->uid));
-  return $user;
+ 
+  return  user_load(array('uid' => $flickruser->uid));
 }
 
 
