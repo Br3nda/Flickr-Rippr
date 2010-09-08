@@ -187,7 +187,6 @@ function flickrrippr_makenode($photo_id) {
 
 function flickrrippr_node_save_handler($details) {
   $photo_id = $details['photo_id'];
-  drupal_set_message("Photo_id = $photo_id");
   if (!$photo_id) {
     drupal_set_message("refusing to update/create node for null photo_id", 'error');
     return FALSE;
