@@ -15,24 +15,6 @@ function flickrrippr_admin_fetch($uid, $flickrid) {
   drupal_goto('admin/content/flickrrippr');
 }
 
-
-
-/**
- * Validates the admin form
- */
-function flickrrippr_admin_form_validate() {
-}
-
-/**
- * This runs after admin form is submitted, and saves our module's settings
- */
-function flickrrippr_admin_form_submit($form, &$form_state) {
-  $form_values = &$form_state['values'];
-  variable_set('flickrapikey', $form_state['values']['api_key']);
-//   variable_set('flickrjpegcache', $form_state['values']['jpegcache']);
-  drupal_set_message(t('Settings saved'));
-}
-
 /**
  * This is called from admin menu, and will refresh the 20 oldest photos
  * TODO check this work in drupal6
@@ -46,17 +28,19 @@ function flickrrippr_admin() {
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
     array('data' => t('Tag'), 'field' => 'tag'),
   );
-  $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u LEFT OUTER JOIN {flickrusers} f  ON u.uid = f.uid AND u.uid > 0". tablesort_sql($headers), 50);
+  $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u 
+      LEFT OUTER JOIN {flickrusers} f  
+      ON u.uid = f.uid AND u.uid > 0 WHERE u.name <> '' ". tablesort_sql($headers), 50);
 
 
   while ($u = db_fetch_object($result)) {
     $rows[] = array(
-      $u->name,
-      $u->flickrusername,
-      $u->flickrid,
-      $u->tag,
+      theme('username', $u),
+      check_plain($u->flickrusername),
+      check_plain($u->flickrid),
+      check_plain($u->tag),
       drupal_get_form('flickrrippr_user_fetch_now', $u->uid, $u->flickrid, 'admin/content/flickrrippr'),
-      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. $u->flickrid),
+      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. check_plain($u->flickrid)),
     );
   }
   $output .= theme('table', $headers, $rows);

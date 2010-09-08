@@ -54,8 +54,8 @@ function flickrrippr_get_user_by_nsid($nsid) {
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
-    //none chose, use default
-    return flickrrippr_path_remote();
+    //none chosen, use default
+    return flickrrippr_path_remote($flickr_photo, $size);
   }
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
@@ -188,7 +188,6 @@ function flickrrippr_makenode($photo_id) {
 
 function flickrrippr_node_save_handler($details) {
   $photo_id = $details['photo_id'];
-  drupal_set_message("Photo_id = $photo_id");
   if (!$photo_id) {
     drupal_set_message("refusing to update/create node for null photo_id", 'error');
     return FALSE;
