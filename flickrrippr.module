@@ -46,6 +46,7 @@ function flickrrippr_menu() {
     'title' => t('Flickr Rippr'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'flickrrippr_user_settings',
+    'page arguments' => array(1),
     'access arguments' => array('Configure own blogged flickr stream'),
   );
   $items['user/%/flickrrippr/add'] = array(
