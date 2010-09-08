@@ -54,8 +54,8 @@ function flickrrippr_get_user_by_nsid($nsid) {
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
-    //none chose, use default
-    return flickrrippr_path_remote();
+    //none chosen, use default
+    return flickrrippr_path_remote($flickr_photo, $size);
   }
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
@@ -147,7 +147,6 @@ function flickrrippr_makenode($photo_id) {
   }
 
   node_save($node);
-  drupal_set_message(print_r($node->nid, 1));
 
   if ($node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
