@@ -11,7 +11,6 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
 
   foreach($photo_info['tags']['tag'] as $tag) {
     $raw = $tag['raw'];
-    drupal_set_message($raw);
     $terms = taxonomy_get_term_by_name($raw);
 
     //if we got some terms back, check if they're in our vocab or not
