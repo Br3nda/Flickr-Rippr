@@ -20,8 +20,7 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
     return;
   }
   
-  $user = user_load(array('uid' => $flickruser->uid));
-  return $user;
+  return user_load(array('uid' => $flickruser->uid));
 }
 
 /**
@@ -136,7 +135,7 @@ function flickrrippr_makenode($photo_id) {
 
   //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
-  drupal_set_message(t("Our node handler = $node_handler"));
+//   drupal_set_message(t("Our node handler = $node_handler"));
   $node = module_invoke($node_handler, 'node_save_handler', $details);
 
   if (!$node) {
@@ -195,7 +194,7 @@ function flickrrippr_node_save_handler($details) {
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load(array('nid' => $nid));
-    drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
+//     drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
   }
 
   $node->type = 'flickrrippr_photo';
