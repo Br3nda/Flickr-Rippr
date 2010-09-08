@@ -177,8 +177,9 @@ function flickrrippr_makenode($photo_id) {
       return;
     }
 
-    flickrrippr_photo_add_tags($nid, $flickr_info);
+    flickrrippr_photo_add_tags($node->nid, $flickr_info);
   }
+
   return $node;
 
 }
@@ -212,7 +213,7 @@ function flickrrippr_node_save_handler($details) {
 }
 
 /**
- * get the node id for a flickr photo id
+ * get the photo id for a nid
  */
 function flickrrippr_node_get_photoid($nid) {
   $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid = %d", $nid));
