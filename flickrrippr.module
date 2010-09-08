@@ -82,14 +82,16 @@ function flickrrippr_menu() {
     'file' => 'flickrrippr.admin.inc',
   );
 
-//   $items['admin/settings/flickrapi']['description'] .= ' '. t('Also Flickr Rippr settings');
   return $items;
 }
 
 
 function flickrrippr_node_refresh_perm($nid) {
-  $node = node_load(array('nid' => $nid));
-  if ($node->type != 'flickrrippr_photo') {
+
+  //check if this has a photo id
+  $photo_id = flickrrippr_node_get_photoid($nid);
+  
+  if (!$photo_id) {
     return FALSE;
   }
 
