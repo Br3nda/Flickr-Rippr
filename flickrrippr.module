@@ -133,16 +133,18 @@ function flickrrippr_load(&$node) {
  * Re-fetch a photo from flickr
  */
 function flickrrippr_node_refresh($nid) {
-  $node = node_load(array('nid' => $nid));
-  $photo_id = $node->flickr_photo->flickrphoto_id;
+
+  $photo_id = flickrrippr_node_get_photoid($nid);
 
   if (!$photo_id) {
     drupal_set_message(t('Photo not found. This should never happen'), 'error');
   }
   else {
-    flickrrippr_makenode($photo_id);
+    $node = flickrrippr_makenode($photo_id);
   }
-//   drupal_set_message("Flickr photo manually re-fetched from flickr.com");
+
+  return '<pre>'. print_r($node, 1) .'</pre>';
+// //   drupal_set_message("Flickr photo manually re-fetched from flickr.com");
 
  drupal_goto('node/' . $nid);
 }

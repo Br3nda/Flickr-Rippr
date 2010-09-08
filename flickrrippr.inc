@@ -139,15 +139,12 @@ function flickrrippr_makenode($photo_id) {
   drupal_set_message(t("Our node handler = $node_handler"));
   $node = module_invoke($node_handler, 'node_save_handler', $details);
 
-
   if (!$node) {
     drupal_set_message("Make node failed, giving up", 'error');
     return FALSE;
   }
 
   node_save($node);
-  drupal_set_message(print_r($node->nid, 1));
-
   if ($node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path, description, page_url)
@@ -182,6 +179,7 @@ function flickrrippr_makenode($photo_id) {
 
     flickrrippr_photo_add_tags($nid, $flickr_info);
   }
+  return $node;
 
 }
 
@@ -213,11 +211,18 @@ function flickrrippr_node_save_handler($details) {
   return $node;
 }
 
+/**
+ * get the node id for a flickr photo id
+ */
+function flickrrippr_node_get_photoid($nid) {
+  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid = %d", $nid));
+  return (!empty($rec->flickrphoto_id) ? $rec->flickrphoto_id : NULL);
+}
 
 /**
  * get the node id for a flickr photo id
  */
 function flickrrippr_photo_get_nid($photo_id) {
-  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
+  $rec = db_fetch_object(db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
   return (!empty($rec->nid) ? $rec->nid : NULL);
 }
