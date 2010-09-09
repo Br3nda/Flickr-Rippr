@@ -46,6 +46,7 @@ function flickrrippr_menu() {
     'title' => t('Flickr Rippr'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'flickrrippr_user_settings',
+    'page arguments' => array(1),
     'access arguments' => array('Configure own blogged flickr stream'),
   );
   $items['user/%/flickrrippr/add'] = array(
@@ -82,18 +83,20 @@ function flickrrippr_menu() {
     'file' => 'flickrrippr.admin.inc',
   );
 
-//   $items['admin/settings/flickrapi']['description'] .= ' '. t('Also Flickr Rippr settings');
   return $items;
 }
 
 
 function flickrrippr_node_refresh_perm($nid) {
-  $node = node_load(array('nid' => $nid));
-  if ($node->type != 'flickrrippr_photo') {
+  //check if this has a photo id
+  $photo_id = flickrrippr_node_get_photoid($nid);
+  
+  if (!$photo_id) {
     return FALSE;
   }
 
-  return node_access('update', $nid);
+  $node = node_load(array('nid' => $nid));
+  return node_access('update', $node);
 }
 
 /** 
@@ -133,8 +136,8 @@ function flickrrippr_load(&$node) {
  * Re-fetch a photo from flickr
  */
 function flickrrippr_node_refresh($nid) {
-  $node = node_load(array('nid' => $nid));
-  $photo_id = $node->flickr_photo->flickrphoto_id;
+
+  $photo_id = flickrrippr_node_get_photoid($nid);
 
   if (!$photo_id) {
     drupal_set_message(t('Photo not found. This should never happen'), 'error');
@@ -142,9 +145,8 @@ function flickrrippr_node_refresh($nid) {
   else {
     flickrrippr_makenode($photo_id);
   }
-//   drupal_set_message("Flickr photo manually re-fetched from flickr.com");
 
- drupal_goto('node/' . $nid);
+  drupal_goto('node/' . $nid);
 }
 
 
@@ -429,7 +431,6 @@ function flickrrippr_node_info() {
       'has_body' => FALSE,
       )
     );
-
 }
 
 /**
@@ -508,16 +509,20 @@ function flickrrippr_node_form(&$form_state, $node) {
  * 
  */
 function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
-  if (!preg_match('!^flickrrippr_!', $node->type)) {
+  if (!isset($node->nid)) {
     return;
   }
-  
+  $photo_id = flickrrippr_node_get_photoid($node->nid);
+  if (!$photo_id) {
+    //not a flickr photo
+    return;
+  }
   switch ($op) {
     case 'delete':
       //delete where there is no node.. THIS WON'T SCALE
       //how to get around drupal's lack of referential integrity?
       db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
-      drupal_set_message("Flickr photo deleted");
+      drupal_set_message("Flickr Rippr photo deleted.");
     break;
     case 'view':
       flickrrippr_view($node, $teaser, $page);

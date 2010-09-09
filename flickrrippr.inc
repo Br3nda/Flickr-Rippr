@@ -20,8 +20,7 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
     return;
   }
   
-  $user = user_load(array('uid' => $flickruser->uid));
-  return $user;
+  return user_load(array('uid' => $flickruser->uid));
 }
 
 /**
@@ -38,12 +37,11 @@ function flickrrippr_get_user_by_nsid($nsid) {
   
   $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid = '%s'", $nsid));
   if (!$flickruser) {
-    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)));
+    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
     return;
   }
-  
-  $user = user_load(array('uid' => $flickruser->uid));
-  return $user;
+ 
+  return  user_load(array('uid' => $flickruser->uid));
 }
 
 
@@ -54,8 +52,8 @@ function flickrrippr_get_user_by_nsid($nsid) {
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
-    //none chose, use default
-    return flickrrippr_path_remote();
+    //none chosen, use default
+    return flickrrippr_path_remote($flickr_photo, $size);
   }
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
@@ -74,13 +72,13 @@ function flickrrippr_path_remote($flickr_photo, $size) {
 function flickrrippr_makenode($photo_id) {
 
   if (!$photo_id) {
-    drupal_set_message(t("Photo_id required"), 'error');
+    drupal_set_message(t("Photo_id required."), 'error');
     return FALSE;
   }
 
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to query flickr.com, library missing"), 'error');
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
     return FALSE;
   }
 
@@ -90,7 +88,6 @@ function flickrrippr_makenode($photo_id) {
   if (!$flickr_info) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
     db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
-    node_save($node);
     return FALSE;
   }
   
@@ -111,8 +108,8 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
-  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
+  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];
@@ -125,29 +122,25 @@ function flickrrippr_makenode($photo_id) {
     'flickrusername' => $flickrusername,
     'context' => $flickr_context,
     'info' => $flickr_info,
-    'title' => $title,
+    'title' => $flickr_info['title'],
     'description' => $description,
     'user' => $user,
     'photo_path' => $photo_path,
     'thumbnail_path' => $thumbnail_path,
-    'page_url' => $page_url,
+    'page_url' => $flickr_info['urls']['url'][0]['_content'],
 
   );
 
 
   //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
-  drupal_set_message(t("Our node handler = $node_handler"));
-  $node = module_invoke($node_handler, 'node_save_handler', $details);
-
+//   drupal_set_message("Node handler = $node_handler");
+  $node = module_invoke($node_handler, 'flickrrippr_node_save_handler', $details);
 
   if (!$node) {
-    drupal_set_message("Make node failed, giving up", 'error');
+    drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
   }
-
-  node_save($node);
-  drupal_set_message(print_r($node->nid, 1));
 
   if ($node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
@@ -171,7 +164,7 @@ function flickrrippr_makenode($photo_id) {
       $page_url,
       $photo_id,
       $node->nid);
-    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+    drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
 
   if (variable_get('flickrrippr_import_tags', FALSE)) {
@@ -181,45 +174,50 @@ function flickrrippr_makenode($photo_id) {
       return;
     }
 
-    flickrrippr_photo_add_tags($nid, $flickr_info);
+    flickrrippr_photo_add_tags($node->nid, $flickr_info);
   }
+
+  return $node;
 
 }
 
-function flickrrippr_node_save_handler($details) {
+function flickrrippr_flickrrippr_node_save_handler($details) {
   $photo_id = $details['photo_id'];
-  drupal_set_message("Photo_id = $photo_id");
   if (!$photo_id) {
-    drupal_set_message("refusing to update/create node for null photo_id", 'error');
+    drupal_set_message(t("Refusing to update/create node for null photo_id"), 'error');
     return FALSE;
   }
-
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load(array('nid' => $nid));
-    drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
   }
-
   $node->type = 'flickrrippr_photo';
 
   $node->title = htmlentities($details['title']);
   $node->created = strtotime($details['info']['dates']['taken']);
 
   //if owner not set, then set it.
-  if (!$node->uid) {
+  if (!isset($node->uid)) {
     $node->uid = $details['user']->uid;
     $node->name = $details['user']->name;
   }
-
+  node_save($node);
   return $node;
 }
 
+/**
+ * get the photo id for a nid
+ */
+function flickrrippr_node_get_photoid($nid) {
+  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid = %d", $nid));
+  return (!empty($rec->flickrphoto_id) ? $rec->flickrphoto_id : NULL);
+}
 
 /**
  * get the node id for a flickr photo id
  */
 function flickrrippr_photo_get_nid($photo_id) {
-  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
+  $rec = db_fetch_object(db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
   return (!empty($rec->nid) ? $rec->nid : NULL);
 }

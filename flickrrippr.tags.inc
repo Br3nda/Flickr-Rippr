@@ -1,6 +1,10 @@
 <?php
 
 function flickrrippr_photo_add_tags($nid, $photo_info=null) {
+  if (!$nid) {
+    drupal_set_message(t('Refusing to add tags to a null nid'), 'error');
+    return;
+  }
   $node = node_load(array('nid' => $nid));
   $vid = variable_get('flickrrippr_tags_vocab', 0);
 //   $node_terms = $node->taxonomy;
