@@ -200,9 +200,6 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
     variable_set('flickrrippr_tags_vocab', $vocab);  
   }
 
-  $cache_jpegs = $form_values['values']['cache_jpegs'];
-  variable_set('flickrrippr_cache_jpegs', $cache_jpegs);
-
   $image_module = $form_values['values']['image_module'];
   variable_set('flickrrippr_use_image_module', $image_module);
 
