@@ -199,11 +199,6 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
     $vocab = $form_values['values']['vocab'];
     variable_set('flickrrippr_tags_vocab', $vocab);  
   }
-
-  $image_module = $form_values['values']['image_module'];
-  variable_set('flickrrippr_use_image_module', $image_module);
-
-
   $page_size = $form_values['values']['page_size'];
   $teaser_size = $form_values['values']['teaser_size'];
   variable_set('flickrrippr_page_size', $page_size);
