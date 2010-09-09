@@ -72,13 +72,13 @@ function flickrrippr_path_remote($flickr_photo, $size) {
 function flickrrippr_makenode($photo_id) {
 
   if (!$photo_id) {
-    drupal_set_message(t("Photo_id required"), 'error');
+    drupal_set_message(t("Photo_id required."), 'error');
     return FALSE;
   }
 
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
-    drupal_set_message(t("Unable to query flickr.com, library missing"), 'error');
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
     return FALSE;
   }
 
@@ -88,7 +88,6 @@ function flickrrippr_makenode($photo_id) {
   if (!$flickr_info) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
     db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
-    node_save($node);
     return FALSE;
   }
   
@@ -109,8 +108,8 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
-  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'), $node);
+  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
   $description = $flickr_info['description'];
   $title = $flickr_info['title'];
   $page_url = $flickr_info['urls']['url'][0]['_content'];
@@ -123,20 +122,19 @@ function flickrrippr_makenode($photo_id) {
     'flickrusername' => $flickrusername,
     'context' => $flickr_context,
     'info' => $flickr_info,
-    'title' => $title,
+    'title' => $flickr_info['title'],
     'description' => $description,
     'user' => $user,
     'photo_path' => $photo_path,
     'thumbnail_path' => $thumbnail_path,
-    'page_url' => $page_url,
+    'page_url' => $flickr_info['urls']['url'][0]['_content'],
 
   );
 
 
   //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
-//   drupal_set_message(t("Our node handler = $node_handler"));
-  $node = module_invoke($node_handler, 'node_save_handler', $details);
+  $node = module_invoke($node_handler, 'flickrrippr_node_save_handler', $details);
 
   if (!$node) {
     drupal_set_message("Make node failed, giving up", 'error');
@@ -166,7 +164,7 @@ function flickrrippr_makenode($photo_id) {
       $page_url,
       $photo_id,
       $node->nid);
-    drupal_set_message(t("Updated photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+    drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
 
   if (variable_get('flickrrippr_import_tags', FALSE)) {
@@ -194,7 +192,6 @@ function flickrrippr_node_save_handler($details) {
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load(array('nid' => $nid));
-//     drupal_set_message(t('Existing node id = !nid. !link.', array('!nid' => $nid, '!link' => l(check_plain($node->title), 'node/'. $nid))));
   }
 
   $node->type = 'flickrrippr_photo';
