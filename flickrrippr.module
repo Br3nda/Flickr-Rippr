@@ -95,7 +95,8 @@ function flickrrippr_node_refresh_perm($nid) {
     return FALSE;
   }
 
-  return node_access('update', $nid);
+  $node = node_load(array('nid' => $nid));
+  return node_access('update', $node);
 }
 
 /** 

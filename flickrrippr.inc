@@ -134,14 +134,14 @@ function flickrrippr_makenode($photo_id) {
 
   //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
+//   drupal_set_message("Node handler = $node_handler");
   $node = module_invoke($node_handler, 'flickrrippr_node_save_handler', $details);
 
   if (!$node) {
-    drupal_set_message("Make node failed, giving up", 'error');
+    drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
   }
 
-  node_save($node);
   if ($node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
     $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path, description, page_url)
@@ -181,30 +181,28 @@ function flickrrippr_makenode($photo_id) {
 
 }
 
-function flickrrippr_node_save_handler($details) {
+function flickrrippr_flickrrippr_node_save_handler($details) {
   $photo_id = $details['photo_id'];
   if (!$photo_id) {
-    drupal_set_message("refusing to update/create node for null photo_id", 'error');
+    drupal_set_message(t("Refusing to update/create node for null photo_id"), 'error');
     return FALSE;
   }
-
   $nid = flickrrippr_photo_get_nid($photo_id) ;
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load(array('nid' => $nid));
   }
-
   $node->type = 'flickrrippr_photo';
 
   $node->title = htmlentities($details['title']);
   $node->created = strtotime($details['info']['dates']['taken']);
 
   //if owner not set, then set it.
-  if (!$node->uid) {
+  if (!isset($node->uid)) {
     $node->uid = $details['user']->uid;
     $node->name = $details['user']->name;
   }
-
+  node_save($node);
   return $node;
 }
 

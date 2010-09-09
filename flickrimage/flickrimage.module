@@ -79,20 +79,11 @@ function flickrimage_flickrrippr_node_save_handler($details) {
     return FALSE;
   }
 
-  drupal_set_message("save jpeg = ". print_r($file, 1));
-
   if ($nid) {
     $node = node_load(array('nid' => $nid));
     $node->title = $details['info']['title'];
     $node->new_file = TRUE;
     $node->images[IMAGE_ORIGINAL] = $file;
-    // Remove all the existing images.
-//     $result = db_query("SELECT f.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
-//     while ($file = db_fetch_object($result)) {
-//       db_query("DELETE FROM {image} WHERE nid = %d AND fid = %d", $node->nid, $file->fid);
-//       _image_file_remove($file);
-//     }
-;
     node_save($node);
     
     return $node;
@@ -106,10 +97,7 @@ function flickrimage_flickrrippr_node_save_handler($details) {
     drupal_set_message(t('Failed to save as an image node.'), 'error');
     return flickrrippr_path_remote($flickr_photo, $size);
   }
-
-//   node_save($node);
-  drupal_set_message(print_r($node, 1));
-
+  drupal_set_message(print_r($node->images, 1));
   return $node;
   
 }
