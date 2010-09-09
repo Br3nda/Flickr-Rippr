@@ -6,6 +6,57 @@
 function flickrimage_flickrrippr_node_handler_options() {
   return array('flickrimage' => 'Image Module');
 }
+function _flickrimage_get_latest_image($details) {
+
+  $sizes = array('o', 'b', FALSE);
+  $response->code = null;
+  while($response->code != 200) {
+    $sz = array_shift($sizes);
+
+//     drupal_set_message("Trying $sz size");
+
+    $src = flickrrippr_path_remote($details['info'], 'o');
+  //   drupal_set_message("Src = $src");
+    $response = drupal_http_request($src);
+    if ($response->code != 200) {
+//       drupal_set_message(t("Failed to get large image at %src, going for smaller one.", array('%src' => $src)));
+      //failed to get _o, try for default image instead
+      $src = flickrrippr_path_remote($details['info'], FALSE);
+      $response = drupal_http_request($src);
+    }
+
+    if (!$sz) {
+      //we've go to the default, and still not found one -- let's give up
+      drupal_set_message(t('Failed to fetch jpeg from flickr. URL was %url', array('%url' => $src)), 'error');
+      return FALSE;
+    }
+  }
+
+
+    //get original jpeg
+
+
+
+  if ($response->code != 200) {
+    drupal_set_message(t('Failed to fetch jpeg from flickr. URL was %url', array('%url' => $src)), 'error');
+    return;
+  }
+
+  //we got this far, then it's a new node.
+  $filename = 'flickrrippr_'. $details['info']['id'] .'.jpg';
+  //jpeg is now in $response->data
+  $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
+
+  if (!$file) {
+    drupal_set_message(t('Failed to save file %filename', array('%filename' => $filename)), 'error');
+    watchdog('flickrimage', t('Failed to save file %filename', array('%filename' => $filename)));
+    return false;
+//     return flickrrippr_path_remote($flickr_photo, $size);
+  }
+
+  return $file;
+}
+
 
 /**
  * Implementation of hook_flickrrippr_node_save_handler().
@@ -13,51 +64,52 @@ function flickrimage_flickrrippr_node_handler_options() {
  */
 function flickrimage_flickrrippr_node_save_handler($details) {
 
-  
+//     drupal_seT_message(nl2br(print_r($details, 1)));
+
   $nid = flickrrippr_photo_get_nid($details['photo_id']);
-  drupal_set_message(__FUNCTION__);
 
-
-    //get original jpeg
-  $src = flickrrippr_path_remote($details['info'], 'o');
-  drupal_set_message("Src = $src");
-  $response = drupal_http_request($src);
-  if ($response->code != 200) {
-    drupal_set_message(t('Failed to fetch jpeg from flickr. URL was %url', array('%url' => $src)), 'error');
-    return;
+  //this function saves the jpeg from flickr, also replacing previously fetch images.
+  $file = _flickrimage_get_latest_image($details);
+  if (!$file) {
+    return false;
   }
 
-  drupal_set_message(__FUNCTION__);
-  return;
+  if (!file_exists($file)) {
+    drupal_set_message(t("File does not exist! %filename", array('%filename' => $file)));
+    return FALSE;
+  }
+
+  drupal_set_message("save jpeg = ". print_r($file, 1));
 
   if ($nid) {
-    drupal_set_message("Existing node = $nid");
     $node = node_load(array('nid' => $nid));
-    $node->type = 'image';
+    $node->title = $details['info']['title'];
+    $node->new_file = TRUE;
+    $node->images[IMAGE_ORIGINAL] = $file;
+    // Remove all the existing images.
+//     $result = db_query("SELECT f.fid, f.filepath FROM {image} i INNER JOIN {files} f ON i.fid = f.fid WHERE i.nid = %d", $node->nid);
+//     while ($file = db_fetch_object($result)) {
+//       db_query("DELETE FROM {image} WHERE nid = %d AND fid = %d", $node->nid, $file->fid);
+//       _image_file_remove($file);
+//     }
+;
+    node_save($node);
+    
     return $node;
-//     node_save($node);
   }
-  else {
 
-
-
-    $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . '_o.jpg';
-    //jpeg is now in $response->data
-    $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
-
-    if (!$file) {
-      drupal_set_message(t('Failed to save file %filename', array('%filename' => $filename)), 'error');
-      watchdog('flickrimage', t('Failed to save file %filename', array('%filename' => $filename)));
-      return flickrrippr_path_remote($flickr_photo, $size);
-    }
-
-    drupal_set_message(t("Saving new image node."));
-  //function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy = NULL) {
-    $image_node = image_create_node_from($file, $flickr_photo['title'], $flickr_photo['description']);
-    if (!$image_node) {
-      drupal_set_message(t('Failed to save as an image node.'), 'error');
-      return flickrrippr_path_remote($flickr_photo, $size);
-    }
-    return $image_node;
+  drupal_set_message(t("Saving new image node."));
+//function image_create_node_from($filepath, $title = NULL, $body = '', $taxonomy = NULL) {
+  $node = image_create_node_from($file, $details['info']['title'], $details['info']['description']);
+  
+  if (!$node) {
+    drupal_set_message(t('Failed to save as an image node.'), 'error');
+    return flickrrippr_path_remote($flickr_photo, $size);
   }
+
+//   node_save($node);
+  drupal_set_message(print_r($node, 1));
+
+  return $node;
+  
 }
