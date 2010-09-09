@@ -88,7 +88,6 @@ function flickrrippr_menu() {
 
 
 function flickrrippr_node_refresh_perm($nid) {
-
   //check if this has a photo id
   $photo_id = flickrrippr_node_get_photoid($nid);
   
@@ -146,7 +145,7 @@ function flickrrippr_node_refresh($nid) {
     flickrrippr_makenode($photo_id);
   }
 
- drupal_goto('node/' . $nid);
+  drupal_goto('node/' . $nid);
 }
 
 
@@ -431,7 +430,6 @@ function flickrrippr_node_info() {
       'has_body' => FALSE,
       )
     );
-
 }
 
 /**
@@ -510,16 +508,20 @@ function flickrrippr_node_form(&$form_state, $node) {
  * 
  */
 function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
-  if (!preg_match('!^flickrrippr_!', $node->type)) {
+  if (!isset($node->nid)) {
     return;
   }
-  
+  $photo_id = flickrrippr_node_get_photoid($node->nid);
+  if (!$photo_id) {
+    //not a flickr photo
+    return;
+  }
   switch ($op) {
     case 'delete':
       //delete where there is no node.. THIS WON'T SCALE
       //how to get around drupal's lack of referential integrity?
       db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
-      drupal_set_message("Flickr photo deleted");
+      drupal_set_message("Flickr Rippr photo deleted.");
     break;
     case 'view':
       flickrrippr_view($node, $teaser, $page);
