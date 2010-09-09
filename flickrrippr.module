@@ -202,11 +202,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   drupal_set_message(t('!count Photos saved or updated', array('!count' => $num_photos)));
 
-  //if we found a photo that wasn't new, then don't recurse
-  if (!$new) {
-    return FALSE;
-  }
-  return true;
 }
 
 /**
