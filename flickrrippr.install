@@ -26,7 +26,7 @@ function flickrrippr_schema() {
       'tag' => array('type' => 'text'),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       ),
-    'primary key' => array('uid')
+    'primary key' => array('uid', 'flickrid')
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
@@ -101,5 +101,11 @@ function flickrrippr_update_20() {
 
 function flickrrippr_update_30() {
   db_add_column($ret, 'flickrphotos', 'image_nid', 'int');
+  return $ret;
+}
+
+function flickrrippr_update_40() {
+  db_drop_primary_key($ret, 'flickrusers');
+  db_add_primary_key($ret, 'flickrusers', array('uid', 'flickrid'));
   return $ret;
 }
