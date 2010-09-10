@@ -64,6 +64,16 @@ function flickrrippr_menu() {
     'access arguments' => array('Configure own blogged flickr stream'),
   );
 
+  $items['user/%/flickrrippr/delete/%'] = array(
+    'title' => t('edit'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_user_delete_account', 1, 4),
+    'access arguments' => array('Configure own blogged flickr stream'),
+    'type' => MENU_CALLBACK,
+  );
+
+
   $items['node/%/flickrrefresh'] = array(
     'title' => 'Re-fetch from Flickr',
     'page callback' => 'flickrrippr_node_refresh',
@@ -86,6 +96,30 @@ function flickrrippr_menu() {
   return $items;
 }
 
+function flickrrippr_user_delete_account($form, $uid, $flickrid) {
+  $form = array();
+  $form['uid'] = array('#type' => 'hidden', '#value' => $uid);
+  $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickrid);
+  
+  $form['message'] = array(
+    '#type' => 'markup',
+    '#value' => '<p>'. t('Are you sure you want to delete all this account?') . '</p>'
+  );
+
+  $form['confirm'] = array(
+    '#type'=> 'submit',
+    '#value' => t('Delete'),
+  );
+
+  return $form;
+}
+
+function flickrrippr_user_delete_account_submit($form_id, $form_state) {
+  $uid = $form_state['values']['uid'];
+  $flickrid = $form_state['values']['flickrid'];
+  db_query("DELETE FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid);
+  drupal_goto('user/'. $uid .'/flickrrippr');
+}
 
 function flickrrippr_node_refresh_perm($nid) {
   //check if this has a photo id
@@ -365,6 +399,11 @@ function flickrrippr_user_settings_form($a, $flickruser) {
     '#type' => 'submit',
     '#value' => t('Save'),
     );
+
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
+    );
   return $form;
 }
 
@@ -390,12 +429,21 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
  * Save submission of a user editting their own settings
  */
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
+
   if (!empty($form_state['values']['uid'])) {
     $user = user_load(array('uid' => intval($form_state['values']['uid'])));
   }
   else {
     GLOBAL $user;
   }
+
+  //delete button 
+  if ($form_state['values']['op'] == 'Delete') {
+    drupal_goto('user/'. $user->uid .'/flickrrippr/delete/'. $form_state['values']['flickrid']);
+  }
+
+
+
 
   //TODO fix call to flickrrippr_get_flickr_accounts
   $flickr_account = flickrrippr_get_flickr_user($form_state['values']['uid'], $form_state['values']['flickrid']);
