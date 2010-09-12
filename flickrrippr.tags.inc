@@ -9,6 +9,7 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
   $vid = variable_get('flickrrippr_tags_vocab', 0);
 //   $node_terms = $node->taxonomy;
 
+  $node_terms = array();
   foreach($photo_info['tags']['tag'] as $tag) {
     $raw = $tag['raw'];
     $terms = taxonomy_get_term_by_name($raw);
