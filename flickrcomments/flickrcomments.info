@@ -1,7 +1,7 @@
-name = Flickr Rippr
-description = Reads users's Flickr photo streams, and turns into nodes. Provides a block of thumbnails per user.
+name = Flickr Comments Ripper
+description = Syncs comments on flickr to photos imported via Flickr Rippr module
 package = Flickr
 
 core = 6.x
-dependencies[] = flickrapi
-dependencies[] = taxonomy
+dependencies[] = flickrrippr
+dependencies[] = comment
