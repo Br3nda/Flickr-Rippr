@@ -25,7 +25,6 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
         'vid' => $vid, // Voacabulary ID
         'name' => $raw, // Term Name 
         'synonyms' => $tag['_content'], // (Optional) Synonym of this term
-        'relations' => array(15), // (Optional) Related Term IDs 
       );
       taxonomy_save_term($term);
       //add to those we are gonna save
