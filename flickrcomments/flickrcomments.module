@@ -1,0 +1,6 @@
+<?php
+
+
+function flickrcomments_flickrrippr_node_alter($node, $details) {
+  drupal_set_message(__FUNCTION__);
+}
