@@ -1,6 +1,20 @@
 <?php
 
-function flickrrippr_photo_add_tags($nid, $photo_info=null) {
+
+function flickrtags_flickrrippr_node_alter($node, $details) {
+  
+  //TODO make the tags a hook
+  if (variable_get('flickrrippr_import_tags', FALSE)) {
+    include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.tags.inc');
+    $vocab = variable_get('flickrrippr_tags_vocab', 0);
+    if (!$vocab) {
+      return;
+    }
+    flickrtags_photo_add_tags($node->nid, $flickr_info);
+  }
+}
+
+function flickrtags_photo_add_tags($nid, $photo_info=null) {
   if (!$nid) {
     drupal_set_message(t('Refusing to add tags to a null nid'), 'error');
     return;
@@ -16,7 +30,7 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
 
     //if we got some terms back, check if they're in our vocab or not
     if (sizeof($terms)) {
-      $term = flickrrippr_matching_vid($terms, $vid);
+      $term = flickrtags_matching_vid($terms, $vid);
     }
     
     //if we still don't have a term, create it.
@@ -36,14 +50,11 @@ function flickrrippr_photo_add_tags($nid, $photo_info=null) {
       $node_terms[] = $term;
     }
 
-    
-
-
   }
   taxonomy_node_save($node, $node_terms); 
 }
 
-function flickrrippr_matching_vid($terms, $vid) {
+function flickrtags_matching_vid($terms, $vid) {
   foreach($terms as $t) {
     if ($t->vid == $vid) {
       return $t;

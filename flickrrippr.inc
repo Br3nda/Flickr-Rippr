@@ -173,15 +173,6 @@ function flickrrippr_makenode($photo_id) {
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
 
-  //TODO make the tags a hook
-  if (variable_get('flickrrippr_import_tags', FALSE)) {
-    include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.tags.inc');
-    $vocab = variable_get('flickrrippr_tags_vocab', 0);
-    if (!$vocab) {
-      return;
-    }
-    flickrrippr_photo_add_tags($node->nid, $flickr_info);
-  }
 
   return $node;
 
