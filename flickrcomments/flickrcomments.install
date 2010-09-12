@@ -24,6 +24,7 @@ function flickrcomments_schema() {
       'flickrcommentid' => array('type' => 'text', 'not null' => TRUE),
       'authorname' => array('type' => 'text', 'not null' => TRUE), 
       'permalink' => array('type' => 'text', 'not null' => TRUE),
+      'cid' => array('type' => 'int', 'not null' => TRUE, 'unique' => TRUE), //references comment.cid
       ),
     'primary key' => array('flickrcommentid')
   );
