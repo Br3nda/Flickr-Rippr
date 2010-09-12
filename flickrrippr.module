@@ -205,8 +205,13 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
  */
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
+  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+  //update their user info
+  flickrrippr_fetch_user_info_and_save($flickruser);
+
+
   $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
-  
+
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
@@ -214,7 +219,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
     watchdog('flickrrippr', 'Unable to query flickr.com');
     return FALSE;
   }
-  
+
   $query = array(
     'user_id' => $flickruser->flickrid,
     'per_page' => $num_photos,
