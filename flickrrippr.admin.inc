@@ -105,28 +105,6 @@ function flickrrippr_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  $form['tags'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Tags'),
-    '#collapsible' => TRUE,
-);
-  $form['tags']['import_tags'] = array(
-    '#title' => t('Import tags?'), 
-    '#type' => 'checkbox',
-    '#default_value' => variable_get('flickrrippr_import_tags', FALSE),
-  );
-
-  $options = array();
-  foreach(taxonomy_get_vocabularies() as $v) {
-    $options[$v->vid] = $v->name; 
-  }
-  $form['tags']['vocab'] = array(
-    '#title' => t('Vocabulary for tags'), 
-    '#type' => 'select', 
-    '#options' => $options,
-    '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
-  );
-
 
 
   $form['image_sizes'] = array(
@@ -193,12 +171,7 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
   $markup_trust = $form_values['values']['markup_trust'];
   variable_set('flickrrippr_markup_trust', $markup_trust);
 
-  $import_tags = $form_values['values']['import_tags'];
-  variable_set('flickrrippr_import_tags', $import_tags);
-  if ($import_tags) {
-    $vocab = $form_values['values']['vocab'];
-    variable_set('flickrrippr_tags_vocab', $vocab);  
-  }
+
   $page_size = $form_values['values']['page_size'];
   $teaser_size = $form_values['values']['teaser_size'];
   variable_set('flickrrippr_page_size', $page_size);

@@ -83,17 +83,56 @@ function flickrrippr_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
   );
-
+/*
 
   $items['admin/settings/flickrrippr'] = array(
     'title' => t('Flickr Rippr Settings'),
-    'type' => MENU_NORMAL_ITEM,
     'access arguments' => array('Administer global flickr api settings'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrrippr_admin_settings_form'),
     'file' => 'flickrrippr.admin.inc',
   );
 
+
+  $items['admin/settings/flickrrippr/global'] = array(
+    'title' => t('Flickr Rippr Settings'),
+    'access arguments' => array('Administer global flickr api settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'file' => 'flickrrippr.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+*/
+
+  $items['admin/settings/flickrrippr'] = array(
+    'title' => 'Flickr Rippr',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'access arguments' => array('Administer global flickr api settings'),
+    'description' => 'Configure the settings for Shadowbox.',
+    'file' => 'flickrrippr.admin.inc',
+  );
+  $items['admin/settings/flickrrippr/global'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'access arguments' => array('Administer global flickr api settings'),
+    'description' => 'Configure the settings for Shadowbox.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+    'file' => 'flickrrippr.admin.inc',
+  );
+
+  if (module_exists('flickrtags')) {
+    $items['admin/settings/flickrrippr/tags'] = array(
+      'title' => 'Tag Rippr',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('flickrtags_admin_form'),
+      'access arguments' => array('Administer global flickr api settings'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 1,
+    );
+  }
   return $items;
 }
 
