@@ -198,8 +198,6 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
   foreach($flickrusers as $fu) {
     flickrrippr_fetch_latest($fu);
   }
-  return '';
-
 }
 
 /**
@@ -213,7 +211,8 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com"), 'error');
-    return $output;
+    watchdog('flickrrippr', 'Unable to query flickr.com');
+    return FALSE;
   }
   
   $query = array(
