@@ -177,6 +177,9 @@ function flickrrippr_makenode($photo_id) {
     flickrrippr_photo_add_tags($node->nid, $flickr_info);
   }
 
+  //the extra hookes
+  module_invoke_all('flickrrippr_node_alter', $node, $details);
+
   return $node;
 
 }
