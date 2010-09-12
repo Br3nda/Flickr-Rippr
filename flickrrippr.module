@@ -569,12 +569,12 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   $markup_trust = variable_get('flickrrippr_markup_trust', FALSE);
 
-  $node->content['flickr_description'] = array(
-    '#value' => '<div class="flickrrippr_description">'. ($markup_trust ? $photo->description : check_plain($photo->description))  .'</div>', //decode then encode
+  $node->content['body'] = array(
+    '#value' => '<div class="flickrrippr_description">'. nl2br($markup_trust ? $photo->description : check_plain($photo->description))  .'</div>', //decode then encode
     '#weight' => 5
   );
   
-  $node->content['body'] = array();
+//   $node->content['body'] = array();
   
   return $node;
 }
