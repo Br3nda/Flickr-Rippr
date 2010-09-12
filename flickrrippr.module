@@ -62,6 +62,7 @@ function flickrrippr_menu() {
     'page callback' => 'flickrrippr_user_edit_account',
     'page arguments' => array(1, 4),
     'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrrippr.user.inc',
   );
 
   $items['user/%/flickrrippr/delete/%'] = array(
@@ -133,14 +134,7 @@ function flickrrippr_node_refresh_perm($nid) {
   return node_access('update', $node);
 }
 
-/** 
- * For editing one account
- */
-function flickrrippr_user_edit_account($uid, $flickrid) {
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
-  $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
-  return $output;
-}
+
 
 /** 
  * Add a new account

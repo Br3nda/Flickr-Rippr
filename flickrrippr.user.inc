@@ -29,3 +29,12 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   );
 }
 
+
+/** 
+ * For editing one account
+ */
+function flickrrippr_user_edit_account($uid, $flickrid) {
+  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
+  return $output;
+}
