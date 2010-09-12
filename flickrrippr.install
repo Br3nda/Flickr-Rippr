@@ -25,6 +25,10 @@ function flickrrippr_schema() {
       'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(
       'tag' => array('type' => 'text'),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
+      'flickrispro' => array('type' => 'int', 'size' => 'tiny', 'default' => 0),
+      'flickrphotosurl' => array('type' => 'text'),
+      'flickrprofileurl' => array('type' => 'text'),
+      'flickravatar' => array('type' => 'text'),
       ),
     'primary key' => array('uid', 'flickrid')
 );
@@ -107,5 +111,13 @@ function flickrrippr_update_30() {
 function flickrrippr_update_40() {
   db_drop_primary_key($ret, 'flickrusers');
   db_add_primary_key($ret, 'flickrusers', array('uid', 'flickrid'));
+  return $ret;
+}
+
+function flickrrippr_update_50() {
+  db_add_column($ret, 'flickrusers', 'flickrispro', 'int');
+  db_add_column($ret, 'flickrusers', 'flickrphotosurl', 'text');
+  db_add_column($ret, 'flickrusers', 'flickrprofileurl','text');
+  db_add_column($ret, 'flickrusers', 'flickravatar', 'text');
   return $ret;
 }
