@@ -14,7 +14,6 @@
 // }
 
 function flickrtags_flickrrippr_node_alter($node, $details) {
-  drupal_set_message(__FUNCTION__);
   //TODO make the tags a hook
   if (variable_get('flickrrippr_import_tags', FALSE)) {
     $vocab = variable_get('flickrrippr_tags_vocab', 0);
