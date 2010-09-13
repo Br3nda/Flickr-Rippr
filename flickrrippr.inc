@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.inc,v 1.32.2.12 2010/09/13 03:10:00 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.13 2010/09/13 03:16:10 taniwha Exp $
 
 /**
  * @file flickrriprr.inc 
@@ -232,6 +232,7 @@ function flickrrippr_photo_get_nid($photo_id) {
  */
 function flickrrippr_get_flickr_accounts($uid) {
   $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d ORDER BY lower(flickrusername)", $uid);
+  $flickr_users = array();
   while ($fuser = db_fetch_object($result)) {
     $flickr_users[] = $fuser;
   }

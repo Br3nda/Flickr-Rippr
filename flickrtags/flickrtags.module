@@ -44,7 +44,7 @@ function flickrtags_photo_add_tags($nid, $photo_info=null) {
     }
     
     //if we still don't have a term, create it.
-    if (!$term or !sizeof($terms)) {
+    if (!isset($term) or !sizeof($terms)) {
       drupal_set_message("Creating new term $raw");
       $term = array(
         'vid' => $vid, // Voacabulary ID

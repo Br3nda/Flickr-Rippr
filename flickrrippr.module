@@ -48,6 +48,7 @@ function flickrrippr_menu() {
     'page callback' => 'flickrrippr_user_settings',
     'page arguments' => array(1),
     'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrrippr.user.inc',
   );
   $items['user/%/flickrrippr/add'] = array(
     'title' => t('add'),
@@ -55,6 +56,7 @@ function flickrrippr_menu() {
     'page callback' => 'flickrrippr_user_add_account',
     'page arguments' => array(1),
     'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrrippr.user.inc',
   );
   $items['user/%/flickrrippr/edit/%'] = array(
     'title' => t('edit'),
@@ -337,6 +339,7 @@ function flickrrippr_user_settings($uid = NULL) {
 
 
   $headers = array('', t('Flickr ID'), t('Flickr username'), t('Tag'));
+  $rows = array();
   foreach ($accounts as $a) {
 
     $tag_links = '';
