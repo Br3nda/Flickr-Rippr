@@ -7,7 +7,7 @@ function flickrcomments_flickrrippr_node_alter($node, $details) {
     return;
   }
 
-  $photo_id = $details['flickrid'];
+  $photo_id = $details['photo_id'];
   drupal_set_message("Going to get comments for $photo_id");
 
   $flickr = @flickrapi_phpFlickr();
