@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.27 2010/09/13 22:41:55 taniwha Exp $
+// $Id: flickrrippr.install,v 1.28 2010/09/13 22:43:01 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -298,7 +298,6 @@ function flickrrippr_update_60() {
   db_add_field($ret, 'flickrphotos', 'photopage', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'media', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'page_url', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'owner_nsid', array('type' => 'text'));
 
   return $ret;
