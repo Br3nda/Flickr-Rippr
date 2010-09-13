@@ -167,15 +167,12 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
 
-  if (variable_get('flickrrippr_import_tags', FALSE)) {
-    include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.tags.inc');
-    $vocab = variable_get('flickrrippr_tags_vocab', 0);
-    if (!$vocab) {
-      return;
-    }
 
-    flickrrippr_photo_add_tags($node->nid, $flickr_info);
-  }
+
+  //the extra hookes
+  module_invoke_all('flickrrippr_node_alter', $node, $details);
+
+
 
   return $node;
 

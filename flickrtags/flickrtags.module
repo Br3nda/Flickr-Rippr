@@ -1,0 +1,117 @@
+<?php
+
+// function flickrrags_menu() {
+//   $items['admin/settings/flickrrippr/tags'] = array(
+//     'title' => t('Tags'),
+//     'page callback' => 'drupal_get_form',
+//     'page arguments' => array('flickrtags_admin_form'),
+//     'access arguments' => array('Administer global flickr api settings'),
+//     'type' => MENU_LOCAL_TASK,
+//   );
+// 
+// 
+//   return $items;
+// }
+
+function flickrtags_flickrrippr_node_alter($node, $details) {
+  //TODO make the tags a hook
+  if (variable_get('flickrrippr_import_tags', FALSE)) {
+    $vocab = variable_get('flickrrippr_tags_vocab', 0);
+    if (!$vocab) {
+      return;
+    }
+    flickrtags_photo_add_tags($node->nid, $details['info']);
+  }
+}
+
+function flickrtags_photo_add_tags($nid, $photo_info=null) {
+  if (!$nid) {
+    drupal_set_message(t('Refusing to add tags to a null nid'), 'error');
+    return;
+  }
+  $node = node_load(array('nid' => $nid));
+  $vid = variable_get('flickrrippr_tags_vocab', 0);
+//   $node_terms = $node->taxonomy;
+
+  $node_terms = array();
+  foreach($photo_info['tags']['tag'] as $tag) {
+    $raw = $tag['raw'];
+    $terms = taxonomy_get_term_by_name($raw);
+
+    //if we got some terms back, check if they're in our vocab or not
+    if (sizeof($terms)) {
+      $term = flickrtags_matching_vid($terms, $vid);
+    }
+    
+    //if we still don't have a term, create it.
+    if (!$term or !sizeof($terms)) {
+      drupal_set_message("Creating new term $raw");
+      $term = array(
+        'vid' => $vid, // Voacabulary ID
+        'name' => $raw, // Term Name 
+        'synonyms' => $tag['_content'], // (Optional) Synonym of this term
+        'relations' => array(15), // (Optional) Related Term IDs 
+      );
+      taxonomy_save_term($term);
+      //add to those we are gonna save
+      $node_terms[] = $term;
+    }
+    else {
+      $node_terms[] = $term;
+    }
+
+  }
+//   drupal_set_message("Tags = ". print_r($node_terms, 1));
+  taxonomy_node_save($node, $node_terms); 
+}
+
+function flickrtags_matching_vid($terms, $vid) {
+  foreach($terms as $t) {
+    if ($t->vid == $vid) {
+      return $t;
+    }
+  }
+}
+
+function flickrtags_admin_form() {
+  $form['tags'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Tags'),
+    '#collapsible' => TRUE,
+);
+  $form['tags']['import_tags'] = array(
+    '#title' => t('Import tags?'), 
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('flickrrippr_import_tags', FALSE),
+  );
+
+  $options = array();
+  foreach(taxonomy_get_vocabularies() as $v) {
+    $options[$v->vid] = $v->name; 
+  }
+  $form['tags']['vocab'] = array(
+    '#title' => t('Vocabulary for tags'), 
+    '#type' => 'select', 
+    '#options' => $options,
+    '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
+  );
+
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+
+  );
+
+  return $form;
+}
+
+function flickrtags_admin_form_submit($form_id, $form_state) {
+
+  $import_tags = $form_state['values']['import_tags'];
+  variable_set('flickrrippr_import_tags', $import_tags);
+  if ($import_tags) {
+    $vocab = $form_state['values']['vocab'];
+    variable_set('flickrrippr_tags_vocab', $vocab);  
+  }
+
+}

@@ -62,6 +62,7 @@ function flickrrippr_menu() {
     'page callback' => 'flickrrippr_user_edit_account',
     'page arguments' => array(1, 4),
     'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrrippr.user.inc',
   );
 
   $items['user/%/flickrrippr/delete/%'] = array(
@@ -82,17 +83,56 @@ function flickrrippr_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
   );
-
+/*
 
   $items['admin/settings/flickrrippr'] = array(
     'title' => t('Flickr Rippr Settings'),
-    'type' => MENU_NORMAL_ITEM,
     'access arguments' => array('Administer global flickr api settings'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrrippr_admin_settings_form'),
     'file' => 'flickrrippr.admin.inc',
   );
 
+
+  $items['admin/settings/flickrrippr/global'] = array(
+    'title' => t('Flickr Rippr Settings'),
+    'access arguments' => array('Administer global flickr api settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'file' => 'flickrrippr.admin.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+*/
+
+  $items['admin/settings/flickrrippr'] = array(
+    'title' => 'Flickr Rippr',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'access arguments' => array('Administer global flickr api settings'),
+    'description' => 'Configure the settings for Shadowbox.',
+    'file' => 'flickrrippr.admin.inc',
+  );
+  $items['admin/settings/flickrrippr/global'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrrippr_admin_settings_form'),
+    'access arguments' => array('Administer global flickr api settings'),
+    'description' => 'Configure the settings for Shadowbox.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+    'file' => 'flickrrippr.admin.inc',
+  );
+
+  if (module_exists('flickrtags')) {
+    $items['admin/settings/flickrrippr/tags'] = array(
+      'title' => 'Tag Rippr',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('flickrtags_admin_form'),
+      'access arguments' => array('Administer global flickr api settings'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 1,
+    );
+  }
   return $items;
 }
 
@@ -103,7 +143,7 @@ function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   
   $form['message'] = array(
     '#type' => 'markup',
-    '#value' => '<p>'. t('Are you sure you want to delete all this account?') . '</p>'
+    '#value' => '<p>'. t('Are you sure you want to delete this account?') . '</p>'
   );
 
   $form['confirm'] = array(
@@ -133,14 +173,7 @@ function flickrrippr_node_refresh_perm($nid) {
   return node_access('update', $node);
 }
 
-/** 
- * For editing one account
- */
-function flickrrippr_user_edit_account($uid, $flickrid) {
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
-  $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
-  return $output;
-}
+
 
 /** 
  * Add a new account
@@ -323,7 +356,7 @@ function flickrrippr_user_settings($uid = NULL) {
     }
   
     $rows[] = array(
-      l(theme('image', check_plain($a->flickravatar), check_plain($a->flickrusername), check_plain($a->flickr_username), array(), FALSE), $a->flickrprofileurl, array('html' => TRUE)),
+      l(theme('image', check_plain($a->flickravatar), check_plain($a->flickrusername), check_plain($a->flickrusername), array(), FALSE), $a->flickrprofileurl, array('html' => TRUE)),
       $a->flickrid,
       $a->flickrusername,
       $tag_links,
@@ -569,12 +602,12 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   $markup_trust = variable_get('flickrrippr_markup_trust', FALSE);
 
-  $node->content['flickr_description'] = array(
-    '#value' => '<div class="flickrrippr_description">'. ($markup_trust ? $photo->description : check_plain($photo->description))  .'</div>', //decode then encode
+  $node->content['body'] = array(
+    '#value' => '<div class="flickrrippr_description">'. nl2br($markup_trust ? $photo->description : check_plain($photo->description))  .'</div>', //decode then encode
     '#weight' => 5
   );
   
-  $node->content['body'] = array();
+//   $node->content['body'] = array();
   
   return $node;
 }
