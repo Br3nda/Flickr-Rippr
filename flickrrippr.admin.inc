@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.32 2010/09/13 01:20:07 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.33 2010/09/13 02:43:49 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -8,6 +8,7 @@
 function flickrrippr_admin_edit($uid, $flickrid) {
 
   $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
   return drupal_get_form('flickrrippr_user_settings_form', $fuser);
 }
 
