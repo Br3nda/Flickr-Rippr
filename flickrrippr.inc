@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.55 2010/09/13 22:52:38 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.56 2010/09/13 22:53:49 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -160,18 +160,7 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
   }*/
-
-  $node = node_load(array('nid' => 30626));
-
-    if (count($fields) != count($values)) {
-      drupal_set_message('Fields != Values');
-      drupal_set_message(nl2br(print_r($fields, 1)));
-      drupal_set_message(nl2br(print_r($values, 1)));
-      return FALSE;
-    }
-
-
-  
+ 
   if (isset($node->is_new) && $node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
   
@@ -202,13 +191,8 @@ function flickrrippr_makenode($photo_id) {
 
     drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
-
-
-
   //the extra hookes
-//   module_invoke_all('flickrrippr_node_alter', $node, $details);
-
-
+  module_invoke_all('flickrrippr_node_alter', $node, $details);
 
   return $node;
 
