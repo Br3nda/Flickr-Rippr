@@ -5,6 +5,11 @@
  * PHP Flickr: http://phpflickr.com/docs/
  * Flickr API docs http://www.flickr.com/services/api/
  */
+
+
+function flickrrippr_get_avatar($user_info) {
+  return 'http://farm'. $user_info['iconfarm'] .'.static.flickr.com/'. $user_info['iconserver'] .'/buddyicons/'. $user_info['nsid'] .'.jpg';
+}
 /**
 * Helper function, to get drupal user details for a flickr user (string of their username of flickr)
 */
@@ -49,7 +54,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $size = FALSE, $node=null) {
+function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
     //none chosen, use default

@@ -117,7 +117,7 @@ function flickrrippr_update_40() {
 function flickrrippr_update_50() {
   db_add_column($ret, 'flickrusers', 'flickrispro', 'int');
   db_add_column($ret, 'flickrusers', 'flickrphotosurl', 'text');
-  db_add_column($ret, 'flickrusers', 'flickrprofileurl','text');
+  db_add_column($ret, 'flickrusers', 'flickrprofileurl', 'text');
   db_add_column($ret, 'flickrusers', 'flickravatar', 'text');
   return $ret;
 }

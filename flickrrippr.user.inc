@@ -15,7 +15,7 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   $user_info = $flickr->people_getInfo($flickruser->flickrid);
   //e.g. Array ( [id] => 95198959@N00 [nsid] => 95198959@N00 [ispro] => 1 [iconserver] => 5 [iconfarm] => 1 [path_alias] => alan50 [username] => Alan50 [realname] => Alan [location] => Hamilton, New Zealand [photosurl] => http://www.flickr.com/photos/alan50/ [profileurl] => http://www.flickr.com/people/alan50/ [mobileurl] => http://m.flickr.com/photostream.gne?id=274055 [photos] => Array ( [firstdatetaken] => 2002-11-23 12:11:53 [firstdate] => 1111902587 [count] => 941 ) )
   
-  $avatar = 'http://farm'. $user_info['iconfarm'] .'.static.flickr.com/'. $user_info['iconserver'] .'/buddyicons/'. $user_info['nsid']. '.jpg';
+  $avatar = flickrrippr_get_avatar($user_info);
 //   drupal_set_message(print_r($user_info, 1));
   $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrispro=%d, flickrphotosurl='%s', flickrprofileurl='%s', flickravatar='%s'
     WHERE uid=%d AND flickrid='%s'",
@@ -58,11 +58,11 @@ function flickrrippr_user_add_account($uid) {
 function flickrrippr_user_settings_form($a, $flickruser) {
   
   $form = array();
-  if(isset($flickruser->flickrusername)) {
+  if (isset($flickruser->flickrusername)) {
     drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $flickruser->flickrusername)));
   }
 
-  if(isset($flickruser->flickrid)) {
+  if (isset($flickruser->flickrid)) {
     $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
   }
   $form['uid'] = array('#type' => 'hidden', '#value' => $flickruser->uid);
@@ -70,7 +70,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   if (isset($flickruser->flickrid)) {
     $form['flickr_username'] = array(
       '#type' => 'markup', 
-      '#value' => '<p><strong>' . t('Flickr Username: ').'</strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
+      '#value' => '<p><strong>'. t('Flickr Username: ') .'</strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
     );
   }
   else {
