@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.56 2010/09/13 22:53:49 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.57 2010/09/13 22:55:42 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -180,8 +180,6 @@ function flickrrippr_makenode($photo_id) {
       $sql .= "$v = '%s', ";
     }
     $sql .= " lastfetched=%d WHERE flickrphoto_id=%d AND nid=%d";
-
-    drupal_set_message($sql . "... ". implode($values, ", "));
 
     $values[] = strtotime('now');
     $values[] = $details['flickrid'];
