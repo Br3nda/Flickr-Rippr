@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.57 2010/09/13 22:55:42 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.58 2010/09/13 23:08:33 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -146,11 +146,8 @@ function flickrrippr_makenode($photo_id) {
   foreach ($fields as $f) {
     $values[$f] = $details[$f];
   }
-//     drupal_set_message("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, ". implode($fields, ', ') . ")
-//       VALUES ('%s', %d, %d, " . str_repeat("'%s', ",  count($fields) ). "'%s' )"      );
 
-
-/*  
+  
   //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
 //   drupal_set_message("Node handler = $node_handler");
@@ -159,7 +156,7 @@ function flickrrippr_makenode($photo_id) {
   if (!$node) {
     drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
-  }*/
+  }
  
   if (isset($node->is_new) && $node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
@@ -197,12 +194,13 @@ function flickrrippr_makenode($photo_id) {
 }
 
 function flickrrippr_flickrrippr_node_save_handler($details) {
-  $photo_id = $details['photo_id'];
+  $photo_id = $details['id'];
   if (!$photo_id) {
     drupal_set_message(t("Refusing to update/create node for null photo_id"), 'error');
     return FALSE;
   }
   $nid = flickrrippr_photo_get_nid($photo_id) ;
+
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load(array('nid' => $nid));
@@ -210,7 +208,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   $node->type = 'flickrrippr_photo';
 
   $node->title = htmlentities($details['title']);
-  $node->created = strtotime($details['info']['dates']['taken']);
+  $node->created = strtotime($details['date_taken']);
 
   //if owner not set, then set it.
   if (!isset($node->uid)) {
