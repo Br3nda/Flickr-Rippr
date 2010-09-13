@@ -445,6 +445,17 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   
   $photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
 
+
+  if (!$photo['farm'] || !$photo['server'] || !$photo['secret']) {
+      GLOBAL $_FR_refresh_count;
+
+      if ($_FR_refresh_count  < 5) {
+        flickrrippr_makenode($photo['flickrphoto_id']);
+        $photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
+        $_FR_refresh_count++;
+      }
+  }
+
   if (!$photo || $photo['failed'] == 1) {
     if (node_access('delete', $node)) {
       drupal_set_message(t("Failed to find flickr photo info for !link", array('!link' => l($node->title, 'node/'. $node->nid))), 'error');
@@ -453,9 +464,8 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
         '#weight' => -10,
       );
     }
-//     return $node;
+    return $node;
   }
-
 
   if ($page) {
     $size = variable_get('flickrrippr_page_size', 'm');
