@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.58 2010/09/13 23:08:33 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.59 2010/09/13 23:19:40 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -57,6 +57,12 @@ function flickrrippr_get_user_by_nsid($nsid) {
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
+  drupal_set_message(print_r($flickr_photo, 1));
+
+  if (!$flickr_photo['farm'] ||  !$flickr_photos['secret']) {
+    drupal_set_message("Cannot calculate path without farm and secret.", 'error');
+    return '';
+  }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
     //none chosen, use default
@@ -176,10 +182,10 @@ function flickrrippr_makenode($photo_id) {
     foreach($fields as $v) {
       $sql .= "$v = '%s', ";
     }
-    $sql .= " lastfetched=%d WHERE flickrphoto_id=%d AND nid=%d";
+    $sql .= " lastfetched=%d WHERE flickrphoto_id=%d AND nid=%d ";
 
     $values[] = strtotime('now');
-    $values[] = $details['flickrid'];
+    $values[] = $details['id'];
     $values[] = $node->nid;
 
     $result = db_query($sql, $values);
