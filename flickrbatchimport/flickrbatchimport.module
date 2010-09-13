@@ -30,7 +30,10 @@ function flickrbatchimport_page() {
 //     drupal_set_message(print_r($account, 1));
     $search = $flickr->photos_search(array('user_id' => $account->flickrid, 'page'=>1, 'per_page' => 1));
     $count[$account->flickrid] = $search['pages'];
-    $operations[] = array('flickrbatchimport_process', array($account));
+    $account->total_pages = $search['pages'];
+    for ($i=0; $i<=100 & $i<=$search['pages']; $i++) {
+      $operations[] = array('flickrbatchimport_process', array($account));
+    }
   }
 //   return nl2br(print_r($operations, 1));
   $batch = array(
@@ -59,7 +62,7 @@ function flickrbatchimport_process($account, &$context) {
   $flickr = @flickrapi_phpFlickr();
   
   $num_photos = 10;
-  $pagenum = variable_get('flickrbatchimport_pagenum_'. $account->flickrid, 1);
+  $pagenum = variable_get('flickrbatchimport_pagenum_'. $num_photos . '_'. $account->flickrid, 1);
   error_log("Page num = $pagenum");
   $query = array(
     'user_id' => $account->flickrid,
@@ -68,38 +71,48 @@ function flickrbatchimport_process($account, &$context) {
     'sort' => 'date-taken-asc',
   );
 
-
-
 //   error_log("Flickr Query = ". print_r($query, 1));
   $photos = $flickr->photos_search($query);
 
-  $context['sandbox']['pagenum']++;
+  $total = $photos['pages'];
+  $percent = ($pagenum * $num_photos) / $total;
 
+  $context['message'] = t("Processed %percent of photos by %user", array('%percent' => sprintf('%.4f', $percent) .'%', '%user' => $account->flickrusername));;
 
+  error_log("$account->flickrusername Percentage done = $percent %  ($pagenum * $num_photos) / $total");
+  $context['progress'] = $percent;
+
+//   $context['sandbox']['pagenum']++;
 
   if (!count($photos['photo'])) {
+
+    error_log(print_r($photos, 1));
+
     error_log("Marking finished!");
     $context['sandbox']['progress'] = 1.0;
 //     $context['finished'] = 1.0;
     $context['progress'] = 1.0;
   }
   else {
+    
     foreach ($photos['photo'] as $p) {
       
       $node = flickrrippr_makenode($p['id']);
   
-      error_log('page ' . $pagenum .' '. $p['title'] . ' by '. $account->flickrusername .' ' . url('node/'. $node->nid));
+      error_log('Page ' . $pagenum .' of '. $total .'. "'. $p['title'] . '" by '. $account->flickrusername .' ' . url('node/'. $node->nid));
 
-      $context['results'][] = print_r($p, 1);
-      $context['sandbox']['progress']++;
+      $context['results'][] = $p['title'] . ' by '. $account->flickrusername .' ' . url('node/'. $node->nid);
+//       $context['sandbox']['progress']++;
       $processed = $context['sandbox']['progress'] * $num_photos;
-      $context['message'] = t("$pagenum Processed %title by %user", array('%title' => $p['title'], '%user' => $account->flickrusername));;
+      
     }
 
-    variable_set('flickrbatchimport_pagenum_'. $account->flickrid, $pagenum+1);
+
+
+    variable_set('flickrbatchimport_pagenum_'. $num_photos . '_'. $account->flickrid, $pagenum+1);
 
   }
-  $context['sandbox']['progress']++;
+//   $context['sandbox']['progress']++;
 
 //   $context['sandbox']['pagenum']++;
 
