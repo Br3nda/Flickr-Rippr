@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.54 2010/09/13 22:48:04 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.55 2010/09/13 22:52:38 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -182,8 +182,6 @@ function flickrrippr_makenode($photo_id) {
     $result = db_query("INSERT INTO {flickrphotos} (". implode($fields, ', ') . ", flickrphoto_id, nid, lastfetched)
       VALUES ('%s', %d, %d, " . str_repeat("'%s', ",  count($fields) -1 ). "'%s' )",
       $values);
-
-
       drupal_set_message(t("Saved new photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
   else {
@@ -200,7 +198,7 @@ function flickrrippr_makenode($photo_id) {
     $values[] = $details['flickrid'];
     $values[] = $node->nid;
 
-//     $result = db_query($sql, $values);
+    $result = db_query($sql, $values);
 
     drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
