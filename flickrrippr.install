@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.3 2010/09/13 01:22:11 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.4 2010/09/13 03:10:00 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */

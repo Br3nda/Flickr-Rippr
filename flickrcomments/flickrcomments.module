@@ -13,7 +13,7 @@ function flickrcomments_flickrrippr_node_alter($node, $details) {
 //       drupal_set_message('all = '. nl2br(print_r($comments['comment'], 1)));
 
   //no comments? get out of here
-  if (!is_array($comments['comment'])) {
+  if (!isset($comments['comment']) or !is_array($comments['comment'])) {
     return;
   }
   foreach($comments['comment'] as $c) {
