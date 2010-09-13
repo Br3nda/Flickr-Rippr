@@ -1,0 +1,6 @@
+name = Flickr Rippr Batch Import
+description = Import all of a flickr stream, in batch mode
+package = Flickr
+
+core = 6.x
+dependencies[] = flickrrippr
