@@ -2,7 +2,7 @@
 
 
 function flickrcomments_flickrrippr_node_alter($node, $details) {
-  if ($details['comments'] === 0) {
+  if ($details['comments'] == 0) {
     //no comments
     return;
   }
