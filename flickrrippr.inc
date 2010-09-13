@@ -218,3 +218,16 @@ function flickrrippr_photo_get_nid($photo_id) {
   $rec = db_fetch_object(db_query("SELECT nid FROM {flickrphotos} WHERE flickrphoto_id = '%s'", $photo_id));
   return (!empty($rec->nid) ? $rec->nid : NULL);
 }
+
+
+/**
+ * Get a user's flickr settings from our database
+ */
+function flickrrippr_get_flickr_accounts($uid) {
+  $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d ORDER BY lower(flickrusername)", $uid);
+  while ($fuser = db_fetch_object($result)) {
+    $flickr_users[] = $fuser;
+  }
+  return $flickr_users;
+  
+}
