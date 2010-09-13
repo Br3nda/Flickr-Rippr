@@ -1,0 +1,126 @@
+<?php
+
+function flickrbatchimport_menu() {
+  $items['flickrbatchimport'] = array(
+    'page callback' => 'flickrbatchimport_page',
+    'page arguments' => array(1),
+    'title' => 'Flickr Batch Import',
+    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('Run Flickr batch import'),
+    
+  );
+  return $items;
+}
+
+function flickrbatchimport_perm() {
+  return array('Run Flickr batch import');
+}
+
+function flickrbatchimport_page() {
+  $operations = array();
+
+
+  //the functions from flickr rippr
+  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
+  $flickr = @flickrapi_phpFlickr();
+
+
+  $result = db_query("SELECT * FROM {flickrusers}");
+  while($account = db_fetch_object($result)) {
+//     drupal_set_message(print_r($account, 1));
+    $search = $flickr->photos_search(array('user_id' => $account->flickrid, 'page'=>1, 'per_page' => 1));
+    $count[$account->flickrid] = $search['pages'];
+    $operations[] = array('flickrbatchimport_process', array($account));
+  }
+//   return nl2br(print_r($operations, 1));
+  $batch = array(
+    'title' => t('Flickr Batch Importing'),
+      'operations' => $operations,
+      'finished' => 'flickrbatchimport_finished',
+//     'file' => 'path_to_file_containing_myfunctions',
+    );
+  batch_set($batch);
+
+  // only needed if not inside a form _submit handler :
+  batch_process();
+  //   return '';
+}
+
+function flickrbatchimport_process($account, &$context) {
+
+  if (empty($context['sandbox'])) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['current_node'] = 0;
+    $context['sandbox']['pagenum'] = 0;
+  }
+
+  //the functions from flickr rippr
+  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
+  $flickr = @flickrapi_phpFlickr();
+  
+  $num_photos = 10;
+  $pagenum = variable_get('flickrbatchimport_pagenum_'. $account->flickrid, 1);
+  error_log("Page num = $pagenum");
+  $query = array(
+    'user_id' => $account->flickrid,
+    'per_page' => $num_photos,
+    'page' =>  $pagenum,
+    'sort' => 'date-taken-asc',
+  );
+
+
+
+//   error_log("Flickr Query = ". print_r($query, 1));
+  $photos = $flickr->photos_search($query);
+
+  $context['sandbox']['pagenum']++;
+
+
+
+  if (!count($photos['photo'])) {
+    error_log("Marking finished!");
+    $context['sandbox']['progress'] = 1.0;
+//     $context['finished'] = 1.0;
+    $context['progress'] = 1.0;
+  }
+  else {
+    foreach ($photos['photo'] as $p) {
+      
+      $node = flickrrippr_makenode($p['id']);
+  
+      error_log($p['title'] . ' '. url('node/'. $node->nid));
+
+      $context['results'][] = print_r($p, 1);
+      $context['sandbox']['progress']++;
+      $processed = $context['sandbox']['progress'] * $num_photos;
+      $context['message'] = t("$pagenum Processed %title by %user", array('%title' => $p['title'], '%user' => $account->flickrusername));;
+    }
+
+    variable_set('flickrbatchimport_pagenum_'. $account->flickrid, $pagenum+1);
+
+  }
+  $context['sandbox']['progress']++;
+
+//   $context['sandbox']['pagenum']++;
+
+  if (1 != $context['finished'] && $context['sandbox']['progress'] != $context['sandbox']['max']) {
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+}
+
+
+function flickrbatchimport_finished() {
+  if ($success) {
+    $message = format_plural(count($results), 'One post processed.', '@count posts processed.');
+  }
+  else {
+    $message = t('Finished with an error.');
+  }
+  drupal_set_message($message);
+  // Providing data for the redirected page is done through $_SESSION.
+  foreach ($results as $result) {
+    $items[] = t('Loaded node %title.', array('%title' => $result));
+  }
+  $_SESSION['my_batch_results'] = $items;
+
+}
