@@ -1,6 +1,6 @@
 <?php
-// $Id: flickrrippr.inc,v 1.52 2010/09/13 01:20:07 taniwha Exp $
 
+// $Id: flickrrippr.inc,v 1.53 2010/09/13 05:32:08 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -232,6 +232,7 @@ function flickrrippr_photo_get_nid($photo_id) {
  */
 function flickrrippr_get_flickr_accounts($uid) {
   $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d ORDER BY lower(flickrusername)", $uid);
+  $flickr_users = array();
   while ($fuser = db_fetch_object($result)) {
     $flickr_users[] = $fuser;
   }
