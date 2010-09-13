@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.28 2010/09/13 22:43:01 taniwha Exp $
+// $Id: flickrrippr.install,v 1.29 2010/09/13 23:26:10 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -45,6 +45,8 @@ function flickrrippr_schema() {
       'lastfetched' => array('type' => 'int', 'not null' => TRUE), //can has timestamp? :-(
 /*      'photo_path' => array('type' => 'text'),
       'thumbnail_path' => array('type' => 'text'),*/
+      'farm' => array('type' => 'text', 'not null' => TRUE),
+      'server' => array('type' => 'text', 'not null' => TRUE),
       'secret' => array('type' => 'text', 'not null' => TRUE),
       'dateuploaded' => array('type' => 'text'),
       'license' => array('type' => 'text'),
@@ -283,7 +285,10 @@ function flickrrippr_update_60() {
   db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
   db_drop_field($ret, 'flickrphotos', 'image_nid');
 
+
   //add new ones
+  db_add_field($ret, 'flickrphotos', 'farm', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'server', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'secret', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'dateuploaded', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'license', array('type' => 'text'));

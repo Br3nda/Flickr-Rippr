@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.59 2010/09/13 23:19:40 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.60 2010/09/13 23:26:10 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -59,7 +59,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
   drupal_set_message(print_r($flickr_photo, 1));
 
-  if (!$flickr_photo['farm'] ||  !$flickr_photos['secret']) {
+  if (!$flickr_photo['farm'] ||  !$flickr_photo['secret']) {
     drupal_set_message("Cannot calculate path without farm and secret.", 'error');
     return '';
   }
@@ -131,6 +131,7 @@ function flickrrippr_makenode($photo_id) {
   //assemble everything to pass to hook
   $details = array(
     'flickrid' => $flickrid,
+    'photo_id' => $flickr_info['id'],
     'flickrusername' => $flickrusername,
     'context' => $flickr_context,
 //     'info' => $flickr_info,
@@ -148,7 +149,7 @@ function flickrrippr_makenode($photo_id) {
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
 //   drupal_set_message(print_r($flickr_info, 1));
 
-  $fields = array('secret', 'dateuploaded', 'license', 'originalsecret', 'originalformat', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
+  $fields = array('farm', 'server', 'secret', 'dateuploaded', 'license', 'originalsecret', 'originalformat', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
   foreach ($fields as $f) {
     $values[$f] = $details[$f];
   }
