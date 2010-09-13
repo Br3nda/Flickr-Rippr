@@ -1,4 +1,9 @@
 <?php
+// $Id: flickrrippr.admin.inc,v 1.18.2.11 2010/09/13 01:22:11 taniwha Exp $
+/**
+ * @file Admin of Flickr Rippr
+ */
+
 
 function flickrrippr_admin_edit($uid, $flickrid) {
 
@@ -23,7 +28,7 @@ function flickrrippr_admin() {
   $output = '';
 
   $headers = array(
-    array('data' => t('Name'), 'field' => 'name', 'sort'=>'asc'),
+    array('data' => t('Name'), 'field' => 'name', 'sort' => 'asc'),
     array('data' => t('Flickr Username'), 'field' => 'flickrusername'),
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
     array('data' => t('Tag'), 'field' => 'tag'),
@@ -137,9 +142,9 @@ function flickrrippr_admin_settings_form() {
   return $form;
 }
 
-function _flickr_rippr_jpeg_sizes(){
+function _flickr_rippr_jpeg_sizes() {
   return array(
-    'sq' => t('Square (75 x 75)'), 
+//     'sq' => t('Square (75 x 75)'), 
     't'  => t('Thumbnail (100 x 75)'),      
     's'  => t('Small (240 x 180)'),
     0  => t('Medium 500 (500 x 375)'), 
@@ -151,7 +156,7 @@ function _flickr_rippr_jpeg_sizes(){
 
 function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
   $num_per_fetch = $form_values['values']['num_per_fetch'];
-  if(!is_numeric($num_per_fetch)) {
+  if (!is_numeric($num_per_fetch)) {
     form_set_error('num_per_fetch', t('Num to fetch must be number'));
   }
   

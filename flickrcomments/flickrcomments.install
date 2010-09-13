@@ -1,4 +1,9 @@
 <?php
+// $Id: flickrcomments.install,v 1.1.2.4 2010/09/13 01:22:11 taniwha Exp $
+/**
+ * @file DB stuff for flickr comments
+ */
+
 /**
  * Implementation of hook_install().
  */

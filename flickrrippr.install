@@ -1,4 +1,10 @@
 <?php
+// $Id: flickrrippr.install,v 1.21.2.3 2010/09/13 01:22:11 taniwha Exp $
+/**
+ * @file DB stuff for Flickr Rippr
+ */
+
+
 /**
  * Implementation of hook_install().
  */
@@ -117,7 +123,7 @@ function flickrrippr_update_40() {
 function flickrrippr_update_50() {
   db_add_column($ret, 'flickrusers', 'flickrispro', 'int');
   db_add_column($ret, 'flickrusers', 'flickrphotosurl', 'text');
-  db_add_column($ret, 'flickrusers', 'flickrprofileurl','text');
+  db_add_column($ret, 'flickrusers', 'flickrprofileurl', 'text');
   db_add_column($ret, 'flickrusers', 'flickravatar', 'text');
   return $ret;
 }
