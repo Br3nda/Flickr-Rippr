@@ -2,9 +2,15 @@
 
 
 function flickrcomments_flickrrippr_node_alter($node, $details) {
-  $photo_id = $details['photo_id'];
+  if ($details['comments'] === 0) {
+    //no comments
+    return;
+  }
+
+  $photo_id = $details['flickrid'];
   drupal_set_message("Going to get comments for $photo_id");
-  $flickr = flickrapi_phpFlickr();
+
+  $flickr = @flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
     return FALSE;
