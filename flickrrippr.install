@@ -1,4 +1,10 @@
 <?php
+// $Id: flickrrippr.install,v 1.25 2010/09/13 01:20:07 taniwha Exp $
+/**
+ * @file DB stuff for Flickr Rippr
+ */
+
+
 /**
  * Implementation of hook_install().
  */

@@ -1,4 +1,6 @@
 <?php
+// $Id: flickrrippr.inc,v 1.52 2010/09/13 01:20:07 taniwha Exp $
+
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.

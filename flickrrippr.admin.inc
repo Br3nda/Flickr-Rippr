@@ -1,4 +1,9 @@
 <?php
+// $Id: flickrrippr.admin.inc,v 1.32 2010/09/13 01:20:07 taniwha Exp $
+/**
+ * @file Admin of Flickr Rippr
+ */
+
 
 function flickrrippr_admin_edit($uid, $flickrid) {
 

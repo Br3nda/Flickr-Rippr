@@ -1,4 +1,9 @@
 <?php
+// $Id: flickrrippr.user.inc,v 1.7 2010/09/13 01:20:07 taniwha Exp $
+/**
+ * @file functions related to users of flickr rippr
+ */
+
 
 function flickrrippr_fetch_user_info_and_save($flickruser) {
 
