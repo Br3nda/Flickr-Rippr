@@ -12,6 +12,10 @@ function flickrcomments_flickrrippr_node_alter($node, $details) {
   $comments = $flickr->photos_comments_getList($photo_id);
 //       drupal_set_message('all = '. nl2br(print_r($comments['comment'], 1)));
 
+  //no comments? get out of here
+  if (!is_array($comments['comment'])) {
+    return;
+  }
   foreach($comments['comment'] as $c) {
 //     drupal_set_message('comment  = '. print_r($c, 1));
     $existing_comment = _flickrcomments_get_comment($c['id']);

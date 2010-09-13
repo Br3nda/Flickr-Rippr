@@ -38,3 +38,121 @@ function flickrrippr_user_edit_account($uid, $flickrid) {
   $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
   return $output;
 }
+
+
+
+
+/** 
+ * Add a new account
+ */
+function flickrrippr_user_add_account($uid) {
+  $flickruser->uid = $uid;
+  $output = drupal_get_form('flickrrippr_user_settings_form', $flickruser);
+  return $output;
+}
+
+
+/**
+ * Form for a user editing their own settings
+ */
+function flickrrippr_user_settings_form($a, $flickruser) {
+  
+  $form = array();
+  if(isset($flickruser->flickrusername)) {
+    drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $flickruser->flickrusername)));
+  }
+
+  if(isset($flickruser->flickrid)) {
+    $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
+  }
+  $form['uid'] = array('#type' => 'hidden', '#value' => $flickruser->uid);
+
+  if (isset($flickruser->flickrid)) {
+    $form['flickr_username'] = array(
+      '#type' => 'markup', 
+      '#value' => '<p><strong>' . t('Flickr Username: ').'</strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
+    );
+  }
+  else {
+    $form['flickr_username'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Flickr Username'),
+      '#default_value' => isset($flickruser->flickrusername) ? $flickruser->flickrusername : '',
+      '#required' => TRUE
+    );
+  }
+
+  $form['flickr_tag'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Filter by Tag'),
+      '#description' => t('If entered, only photos that have this tag will be imported. Be aware that your friends and family on flickr may also be allowed to tag your photos.'),
+      '#default_value' => isset($flickruser->tag) ? $flickruser->tag : '',
+    );
+
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    );
+
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
+    );
+  return $form;
+}
+
+
+
+
+function flickrrippr_user_settings_form_validate($form, &$form_state) {
+  //TODO, check the submitted username exists on flickr?
+  //query api
+  //and store the 3432@N00 uid then
+}
+/**
+ * Save submission of a user editting their own settings
+ */
+function flickrrippr_user_settings_form_submit($form, &$form_state) {
+
+  if (!empty($form_state['values']['uid'])) {
+    $user = user_load(array('uid' => intval($form_state['values']['uid'])));
+  }
+  else {
+    GLOBAL $user;
+  }
+
+  //delete button 
+  if ($form_state['values']['op'] == 'Delete') {
+    drupal_goto('user/'. $user->uid .'/flickrrippr/delete/'. $form_state['values']['flickrid']);
+  }
+
+
+  //is editing existing
+  if (isset($form_state['values']['flickrid'])) {
+  $flickr_account = flickrrippr_get_flickr_user($form_state['values']['uid'], $form_state['values']['flickrid']);
+  }
+
+  if (isset($flickr_account->flickrusername)) {
+    $flickr = flickrapi_phpFlickr();
+    $flickr_response = $flickr->people_getInfo($form_state['values']['flickrid']);
+    $result = db_query("UPDATE {flickrusers} SET tag='%s', flickrusername='%s' WHERE uid = %d AND flickrid='%s'",
+      $form_state['values']['flickr_tag'],
+      $flickr_response['username'],
+      $user->uid,
+      $form_state['values']['flickrid']);
+    drupal_set_message(t("Flickr account updated"));
+  }
+  else {
+    $flickr = flickrapi_phpFlickr();
+    $flickr_response = $flickr->people_findByUsername($form_state['values']['flickr_username']);
+    $flickrid = $flickr_response['id'];
+
+    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s', %d)",
+      $form_state['values']['flickr_username'],
+      $flickrid,
+      $form_state['values']['flickr_tag'],
+      $user->uid);
+    drupal_set_message(t("Flickr username set"));
+  }
+  drupal_goto('user/'. $user->uid .'/flickrrippr');
+}
