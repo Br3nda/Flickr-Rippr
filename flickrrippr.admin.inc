@@ -1,9 +1,8 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.33 2010/09/13 02:43:49 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.34 2010/09/13 08:02:11 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
-
 
 function flickrrippr_admin_edit($uid, $flickrid) {
 

@@ -75,9 +75,9 @@ function flickrbatchimport_process($account, &$context) {
   $photos = $flickr->photos_search($query);
 
   $total = $photos['pages'];
-  $percent = ($pagenum * $num_photos) / $total;
+  $percent = ($pagenum / $total) * 100;
 
-  $context['message'] = t("Processed %percent of photos by %user", array('%percent' => sprintf('%.2f', $percent) .'%', '%user' => $account->flickrusername));;
+  $context['message'] = t("Imported %percent of photos by %user", array('%percent' => sprintf('%.2f', $percent) .'%', '%user' => $account->flickrusername));;
 
   error_log("$account->flickrusername Percentage done = $percent %  ($pagenum * $num_photos) / $total");
   $context['progress'] = $percent;
