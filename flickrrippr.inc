@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.60 2010/09/13 23:26:10 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.61 2010/09/13 23:27:01 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -57,8 +57,6 @@ function flickrrippr_get_user_by_nsid($nsid) {
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
-  drupal_set_message(print_r($flickr_photo, 1));
-
   if (!$flickr_photo['farm'] ||  !$flickr_photo['secret']) {
     drupal_set_message("Cannot calculate path without farm and secret.", 'error');
     return '';
@@ -76,7 +74,7 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
  */
 function flickrrippr_path_remote($flickr_photo, $size) {
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
-  return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
+  return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
 }
 
 /**
