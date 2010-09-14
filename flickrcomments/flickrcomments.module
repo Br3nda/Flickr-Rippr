@@ -28,6 +28,9 @@ function flickrcomments_flickrrippr_node_alter($node, $details) {
     if (!$existing_comment) {
       _flickrcomments_save_new_comment($node, $c);
     }
+    else {
+      _flickrcomments_update_comment($node, $c, $existing_comment);
+    }
 
   }
 }
@@ -35,6 +38,24 @@ function flickrcomments_flickrrippr_node_alter($node, $details) {
 
 function _flickrcomments_get_comment($comment_id) {
   return db_fetch_object(db_query("SELECT * FROM {flickrcomments} where flickrcommentid='%s'", $comment_id));
+}
+
+function _flickrcomments_update_comment($node, $details, $existing_comment) {
+    $comment = array(
+    'subject' => t('Flickr comment'),
+    'homepage' => check_plain($details['permalink']),
+    'name' => check_plain($details['authorname']),
+    'cid' => FALSE, //needed to be set, so core doesn't E_STRICT splatter
+    'pid' => 0,
+    'nid' => $node->nid,
+    'uid' => 0,
+    'comment' => check_plain($details['_content']),
+    'format' => 0, //THIS IS BAD.. fix before any release.
+    'timestamp' => $details['datecreate'],
+    'cid' => $existing_comment->cid
+  );
+  $cid = comment_save($comment);
+
 }
 
 function _flickrcomments_save_new_comment($node, $details) {
@@ -48,6 +69,7 @@ function _flickrcomments_save_new_comment($node, $details) {
     'uid' => 0,
     'comment' => check_plain($details['_content']),
     'format' => 0, //THIS IS BAD.. fix before any release.
+    'timestamp' => $details['datecreate'],
   );
   
   
