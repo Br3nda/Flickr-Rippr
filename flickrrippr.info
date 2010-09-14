@@ -4,4 +4,3 @@ package = Flickr
 
 core = 6.x
 dependencies[] = flickrapi
-dependencies[] = taxonomy
