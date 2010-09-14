@@ -469,15 +469,18 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   if ($page) {
     $size = variable_get('flickrrippr_page_size', 'm');
+    $link = $photo['photopage'];
   }
   else {
     $size = variable_get('flickrrippr_teaser_size', 't');
+    $link = 'node/'. $node->nid;
   }
 
 //   drupal_set_message(print_r($photo, 1));
   $jpeg_path = flickrrippr_path($photo, $size);
 
-  $image = l(theme('image', $jpeg_path, $teaser, $teaser, NULL, FALSE), 'node/'. $node->nid, array('html' => TRUE));
+  
+  $image = l(theme('image', $jpeg_path, $teaser, $teaser, NULL, FALSE), $link, array('html' => TRUE));
 
   $node->content['flickr_photo'] = array(
     '#weight' => 0,
