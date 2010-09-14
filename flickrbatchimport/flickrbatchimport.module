@@ -17,6 +17,39 @@ function flickrbatchimport_perm() {
 }
 
 function flickrbatchimport_page() {
+  return drupal_get_form('flickrbatchimport_form');
+}
+function flickrbatchimport_form() {
+  //the functions from flickr rippr
+  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
+  $flickr = @flickrapi_phpFlickr();
+
+  $result = db_query("SELECT * FROM {flickrusers}");
+
+  $form['accounts'] = array('#type' => 'fieldset', '#title' => t('Flickr Accounts'));
+  while($account = db_fetch_object($result)) {
+//     drupal_set_message(print_r($account, 1));
+    $search = $flickr->photos_search(array('user_id' => $account->flickrid, 'page'=>1, 'per_page' => 1));
+    $count[$account->flickrid] = $search['pages'];
+    $form['accounts'][$account->flickrid] = array(
+      '#type' => 'checkbox',
+      '#value' => TRUE,
+      '#title' => t("!username (%count photos)", array('!username' => check_plain($account->flickrusername), '%count' => number_format($search['pages']))),
+    );
+  }
+
+  $form['config'] = array('#type' => 'fieldset', '#title' => t('Config'));
+  $form['config']['num_photos'] = array(
+    '#type' => 'textfield', 
+    '#title' => t('Number of photos per request'),
+    '#description' => t('How many photos per request to the flickr api? Higher numbers mean less requests, but require more memory on your webserver. If import is failing, try settings this number lower.'),
+    '#default_value' => 50,
+  );
+
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Import'));
+  return $form;
+}
+function flickrbatchimport_form_submit() {
   $operations = array();
 
 
