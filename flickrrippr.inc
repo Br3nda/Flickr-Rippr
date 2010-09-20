@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.61 2010/09/13 23:27:01 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.62 2010/09/20 01:38:53 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -181,7 +181,7 @@ function flickrrippr_makenode($photo_id) {
     foreach($fields as $v) {
       $sql .= "$v = '%s', ";
     }
-    $sql .= " lastfetched=%d WHERE flickrphoto_id=%d AND nid=%d ";
+    $sql .= " lastfetched=%d, failed=0 WHERE flickrphoto_id=%d AND nid=%d ";
 
     $values[] = strtotime('now');
     $values[] = $details['id'];
