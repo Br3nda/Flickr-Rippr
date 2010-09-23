@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.64 2010/09/23 23:06:57 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.65 2010/09/23 23:29:11 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -86,6 +86,16 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("Photo_id required."), 'error');
     return FALSE;
   }
+
+  //TODO, this code is in two place -- make a function
+  $local_cached_details = flickrrippr_get_photo_details_by_photoid($photo_id);
+  $age = strtotime('now') - $local_cached_details->lastfetched;
+  watchdog('flickrrippr', t('Photo was fetched %age seconds ago', array('%age' => $age)));
+  //if it's already been fetched in the last hour....
+  if ($age < 60*60) {
+    return FALSE;
+  }
+
 
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
@@ -228,7 +238,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
  * get the photo id for a nid
  */
 function flickrrippr_node_get_photoid($nid) {
-  $rec = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid = %d", $nid));
+  $rec = db_fetch_object(db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE nid = %d", $nid));
   return (!empty($rec->flickrphoto_id) ? $rec->flickrphoto_id : NULL);
 }
 
@@ -240,6 +250,12 @@ function flickrrippr_photo_get_nid($photo_id) {
   return (!empty($rec->nid) ? $rec->nid : NULL);
 }
 
+/**
+ * get the photo id for a nid
+ */
+function flickrrippr_get_photo_details_by_photoid($pid) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = %d", $pid));
+}
 
 /**
  * Get a user's flickr settings from our database

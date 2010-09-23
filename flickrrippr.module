@@ -213,7 +213,7 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   //update their user info
-  flickrrippr_fetch_user_info_and_save($flickruser);
+  job_queue('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser));
 
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
@@ -240,7 +240,13 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   $num_photos = 0;
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
-      job_queue_add('flickrrippr_makenode', t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => $flickruser->flickrusername)), array($p['id']));
+      $local_cached_details = flickrrippr_get_photo_details_by_photoid($p['id']);
+      $age = strtotime('now') - $local_cached_details->lastfetched;
+      watchdog('flickrrippr', t('Photo was fetched %age seconds ago', array('%age' => $age)));
+      //only queue if it hasn't been fetched in last hour.
+      if ($age > 60*60) {
+        job_queue_add('flickrrippr_makenode', t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => print_r($flickruser, 1))), array($p['id']));
+      }
       //$num_photos++;
     }
   }
