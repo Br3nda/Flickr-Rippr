@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.30 2010/09/23 03:48:02 taniwha Exp $
+// $Id: flickrrippr.install,v 1.31 2010/09/23 03:49:41 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -320,7 +320,7 @@ if (!isset($sandbox['progress'])) {
   }
 
   error_log(print_r($sandbox, 1));
-  $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE farm IS NULL and failed = 0 LIMIT 2");
+  $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE farm IS NULL and failed = 0 LIMIT 5");
   while($photo = db_fetch_object($result)) {
     flickrrippr_makenode($photo->flickrphoto_id);
     $sandbox['progress']++;
