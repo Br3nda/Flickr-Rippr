@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.6 2010/09/13 03:10:00 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.7 2010/09/23 23:11:40 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */

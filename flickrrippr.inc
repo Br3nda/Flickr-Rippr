@@ -1,6 +1,6 @@
 <?php
-// $Id: flickrrippr.inc,v 1.32.2.13 2010/09/13 03:16:10 taniwha Exp $
 
+// $Id: flickrrippr.inc,v 1.32.2.14 2010/09/23 23:11:40 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -57,6 +57,10 @@ function flickrrippr_get_user_by_nsid($nsid) {
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
+  if (!$flickr_photo['farm'] ||  !$flickr_photo['secret']) {
+    drupal_set_message("Cannot calculate path without farm and secret.", 'error');
+    return '';
+  }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
     //none chosen, use default
@@ -70,7 +74,7 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
  */
 function flickrrippr_path_remote($flickr_photo, $size) {
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
-  return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
+  return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
 }
 
 /**
@@ -115,30 +119,40 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Full (normal) sized image
-  $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
-  $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_teaser_size', 'm'));
-  $description = $flickr_info['description'];
-  $title = $flickr_info['title'];
+//   $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
+//   $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_teaser_size', 'm'));
+
   $page_url = $flickr_info['urls']['url'][0]['_content'];
 
+  
 
   //assemble everything to pass to hook
   $details = array(
-    'photo_id' => $photo_id,
     'flickrid' => $flickrid,
+    'photo_id' => $flickr_info['id'],
     'flickrusername' => $flickrusername,
     'context' => $flickr_context,
-    'info' => $flickr_info,
-    'title' => $flickr_info['title'],
-    'description' => $description,
+//     'info' => $flickr_info,
     'user' => $user,
-    'photo_path' => $photo_path,
-    'thumbnail_path' => $thumbnail_path,
-    'page_url' => $flickr_info['urls']['url'][0]['_content'],
-
   );
 
+  $details += $flickr_info;
+  $details += $flickr_context;
+  foreach($flickr_info['dates'] as $key => $d) {
+    $details['date_'. $key] = $d;
+  }
+  foreach($flickr_info['owner'] as $key => $o) {
+    $details['owner_'. $key] = $o;
+  }
+  $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
+//   drupal_set_message(print_r($flickr_info, 1));
 
+  $fields = array('farm', 'server', 'secret', 'dateuploaded', 'license', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
+  foreach ($fields as $f) {
+    $values[$f] = $details[$f];
+  }
+
+  
   //call the hook
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
 //   drupal_set_message("Node handler = $node_handler");
@@ -148,50 +162,50 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
   }
-
-  if ($node->is_new) {
+ 
+  if (isset($node->is_new) && $node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
-    $result = db_query("INSERT INTO {flickrphotos} (flickrphoto_id, nid, lastfetched, photo_path, thumbnail_path, description, page_url)
-      VALUES ('%s', %d, %d, '%s', '%s', '%s', '%s')",
-      $photo_id, $node->nid, strtotime('now'), $photo_path, $thumbnail_path, $description, $page_url);
+  
+    $values[] = $details['id'];
+    $values[] = $node->nid;
+    $values[] = strtotime('now');
+
+    $result = db_query("INSERT INTO {flickrphotos} (". implode($fields, ', ') . ", flickrphoto_id, nid, lastfetched)
+      VALUES (". str_repeat("'%s', ",  count($fields) ). " %d, %d, %d )",
+      $values);
       drupal_set_message(t("Saved new photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
   else {
-    $result = db_query("UPDATE {flickrphotos} SET
-      lastfetched=%d,
-      photo_path='%s',
-      thumbnail_path='%s',
-      description = '%s',
-      page_url = '%s'
-      WHERE flickrphoto_id=%d AND nid=%d",
-      strtotime('now'),
-      $photo_path,
-      $thumbnail_path,
-      $description,
-      $page_url,
-      $photo_id,
-      $node->nid);
+
+    $sql = "UPDATE {flickrphotos} SET ";
+    foreach($fields as $v) {
+      $sql .= "$v = '%s', ";
+    }
+    $sql .= " lastfetched=%d, failed=0 WHERE flickrphoto_id=%d AND nid=%d ";
+
+    $values[] = strtotime('now');
+    $values[] = $details['id'];
+    $values[] = $node->nid;
+
+    $result = db_query($sql, $values);
+
     drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
-
-
-
   //the extra hookes
   module_invoke_all('flickrrippr_node_alter', $node, $details);
-
-
 
   return $node;
 
 }
 
 function flickrrippr_flickrrippr_node_save_handler($details) {
-  $photo_id = $details['photo_id'];
+  $photo_id = $details['id'];
   if (!$photo_id) {
     drupal_set_message(t("Refusing to update/create node for null photo_id"), 'error');
     return FALSE;
   }
   $nid = flickrrippr_photo_get_nid($photo_id) ;
+
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load(array('nid' => $nid));
@@ -199,7 +213,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   $node->type = 'flickrrippr_photo';
 
   $node->title = htmlentities($details['title']);
-  $node->created = strtotime($details['info']['dates']['taken']);
+  $node->created = strtotime($details['date_taken']);
 
   //if owner not set, then set it.
   if (!isset($node->uid)) {

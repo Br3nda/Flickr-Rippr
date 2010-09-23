@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.4 2010/09/13 03:10:00 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.5 2010/09/23 23:11:40 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -43,15 +43,165 @@ function flickrrippr_schema() {
       'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
       'nid' => array('type' => 'int', 'not null' => TRUE),
       'lastfetched' => array('type' => 'int', 'not null' => TRUE), //can has timestamp? :-(
-      'photo_path' => array('type' => 'text'),
-      'thumbnail_path' => array('type' => 'text'),
+/*      'photo_path' => array('type' => 'text'),
+      'thumbnail_path' => array('type' => 'text'),*/
+      'farm' => array('type' => 'text', 'not null' => TRUE),
+      'server' => array('type' => 'text', 'not null' => TRUE),
+      'secret' => array('type' => 'text', 'not null' => TRUE),
+      'dateuploaded' => array('type' => 'text'),
+      'license' => array('type' => 'text'),
+      'originalsecret' => array('type' => 'text'),
+      'originalformat' => array('type' => 'text'),
+      'rotation' => array('type' => 'text'),
+      'title' => array('type' => 'text'),
+      'date_posted' => array('type' => 'text'),
+      'date_taken' => array('type' => 'text'),
+      'date_lastupdate' => array('type' => 'text'),
+      'views' => array('type' => 'text'),
+      'photopage' => array('type' => 'text'),
+      'media' => array('type' => 'text'),
       'description' => array('type' => 'text'),
-      'page_url' => array('type' => 'text'),
+//       'page_url' => array('type' => 'text'),
       'failed' => array('type' => 'int', 'default' => 0),
-      'image_nid' => array('type' => 'int'),
+//       'image_nid' => array('type' => 'int'),
+      'owner_nsid' => array('type' => 'text'),
       ),
       'primary key' => array('flickrphoto_id'),
     );
+
+/*
+Array
+(
+    [id] => 3371958338
+    [secret] => fe246384ea
+    [server] => 3465
+    [farm] => 4
+    [dateuploaded] => 1237602707
+    [isfavorite] => 0
+    [license] => 4
+    [rotation] => 0
+    [originalsecret] => c0604ae53d
+    [originalformat] => jpg
+    [owner] => Array
+        (
+            [nsid] => 36251685@N00
+            [username] => Br3nda
+            [realname] => Brenda Wallace
+            [location] => Taumatawhakatangihangakoauauotamateapokaiwhenuakitanatahu, Aotearoa
+        )
+
+    [title] => DSC_1006.JPG
+    [description] => 
+    [visibility] => Array
+        (
+            [ispublic] => 1
+            [isfriend] => 0
+            [isfamily] => 0
+        )
+
+    [dates] => Array
+        (
+            [posted] => 1237602707
+            [taken] => 2009-03-21 12:05:29
+            [takengranularity] => 0
+            [lastupdate] => 1237607105
+        )
+
+    [views] => 19
+    [editability] => Array
+        (
+            [cancomment] => 0
+            [canaddmeta] => 0
+        )
+
+    [usage] => Array
+        (
+            [candownload] => 1
+            [canblog] => 0
+            [canprint] => 0
+            [canshare] => 0
+        )
+
+    [comments] => 0
+    [notes] => Array
+        (
+            [note] => Array
+                (
+                )
+
+        )
+
+    [tags] => Array
+        (
+            [tag] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 126545-3371958338-3179191
+                            [author] => 36251685@N00
+                            [raw] => Eye-Fi
+                            [_content] => eyefi
+                            [machine_tag] => 0
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 126545-3371958338-1997
+                            [author] => 36251685@N00
+                            [raw] => zoo
+                            [_content] => zoo
+                            [machine_tag] => 0
+                        )
+
+                    [2] => Array
+                        (
+                            [id] => 126545-3371958338-16439
+                            [author] => 36251685@N00
+                            [raw] => wellington
+                            [_content] => wellington
+                            [machine_tag] => 0
+                        )
+
+                    [3] => Array
+                        (
+                            [id] => 126545-3371958338-211826
+                            [author] => 36251685@N00
+                            [raw] => wellingtonzoo
+                            [_content] => wellingtonzoo
+                            [machine_tag] => 0
+                        )
+
+                    [4] => Array
+                        (
+                            [id] => 126545-3371958338-14591
+                            [author] => 36251685@N00
+                            [raw] => redpanda
+                            [_content] => redpanda
+                            [machine_tag] => 0
+                        )
+
+                )
+
+        )
+
+    [urls] => Array
+        (
+            [url] => Array
+                (
+                    [0] => Array
+                        (
+                            [type] => photopage
+                            [_content] => http://www.flickr.com/photos/taniwha/3371958338/
+                        )
+
+                )
+
+        )
+
+    [media] => photo
+)*/
+
+
   return $schema;
 }
 
@@ -86,31 +236,31 @@ function flickrrippr_update_6() {
 
 function flickrrippr_update_7() {
   $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid text");
-  db_add_column($ret, 'flickrphotos', 'photo_path', 'text');
-  db_add_column($ret, 'flickrphotos', 'thumbnail_path', 'text');
+  db_add_field($ret, 'flickrphotos', 'photo_path', 'text');
+  db_add_field($ret, 'flickrphotos', 'thumbnail_path', array('type' => 'text'));
   
   
   return $ret;
 }
 function flickrrippr_update_8() {
-  db_add_column($ret, 'flickrphotos', 'description', 'text');
-  db_add_column($ret, 'flickrphotos', 'page_url', 'text');
+  db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'page_url', array('type' => 'text'));
   return $ret;
 }
 
 function flickrrippr_update_9() {
-  db_add_column($ret, 'flickrusers', 'tag', 'text');
+  db_add_field($ret, 'flickrusers', 'tag', array('type' => 'text'));
   return $ret;
 }
 
 function flickrrippr_update_20() {
-  db_add_column($ret, 'flickrphotos', 'failed', 'int');
+  db_add_field($ret, 'flickrphotos', 'failed', array('type' => 'int'));
   $ret[] = update_sql("UPDATE {flickrphotos} SET failed=0");
   return $ret;
 }
 
 function flickrrippr_update_30() {
-  db_add_column($ret, 'flickrphotos', 'image_nid', 'int');
+  db_add_field($ret, 'flickrphotos', 'image_nid', array('type' => 'int'));
   return $ret;
 }
 
@@ -121,9 +271,63 @@ function flickrrippr_update_40() {
 }
 
 function flickrrippr_update_50() {
-  db_add_column($ret, 'flickrusers', 'flickrispro', 'int');
-  db_add_column($ret, 'flickrusers', 'flickrphotosurl', 'text');
-  db_add_column($ret, 'flickrusers', 'flickrprofileurl', 'text');
-  db_add_column($ret, 'flickrusers', 'flickravatar', 'text');
+  db_add_field($ret, 'flickrusers', 'flickrispro', array('type' => 'int'));
+  db_add_field($ret, 'flickrusers', 'flickrphotosurl', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrprofileurl', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickravatar', array('type' => 'text'));
+  return $ret;
+}
+
+function flickrrippr_update_60() {
+
+  //add new ones
+  db_add_field($ret, 'flickrphotos', 'farm', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'server', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'secret', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'dateuploaded', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'license', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'originalsecret', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'originalformat', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'rotation', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'title', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'date_posted', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'date_taken', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'date_lastupdate', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'views', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'photopage', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'media', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'owner_nsid', array('type' => 'text'));
+
+  //TODO migrate photos
+
+  //remove old columns
+  db_drop_field($ret, 'flickrphotos', 'page_url');
+  db_drop_field($ret, 'flickrphotos', 'photo_path');
+  db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
+  db_drop_field($ret, 'flickrphotos', 'image_nid');
+  return $ret;
+}
+
+function flickrrippr_update_6070(&$sandbox) {
+
+if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['photoid'] = 0;
+    
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(flickrphoto_id) FROM {flickrphotos} WHERE farm IS NULL and failed = 0 '));
+    error_log("Max = ".  $sandbox['max']);
+  }
+  $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE flickrphoto_id > %d AND farm IS NULL and failed = 0 ORDER BY flickrphoto_id LIMIT 50", $sandbox['photoid']);
+  
+  while($photo = db_fetch_object($result)) {
+    error_log("Photo number ". $photo->flickrphoto_id);
+    job_queue_add('flickrrippr_makenode', t('Updating photo %id', array('%id' => $photo->flickrphoto_id)), array($photo->flickrphoto_id));
+    $sandbox['progress']++;
+    $sandbox['photoid'] = $photo->flickrphoto_id;
+    
+    $sandbox['message'] = t('Queued %count photos for refetching', array('%count' => $sandbox['progress']));
+  }
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
   return $ret;
 }
