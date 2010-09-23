@@ -1,0 +1,107 @@
+<?php
+
+
+function flickrcreativecommons_flickrrippr_node_alter($node, $details) {
+
+  $available_license_types = creativecommons_get_available_license_types();
+  $license_array_keys = creativecommons_get_licenses(array('jurisdiction' => variable_get('creativecommons_default_jurisdiction', '')), TRUE);
+  if (! count($available_license_types)) {
+    drupal_set_message(l(t('Please configure the Creative Commons module'), 'admin/settings/creativecommons'), 'error');
+    return;
+  }
+
+  if (!creativecommons_node_type_is_enabled($node->type)) {
+    drupal_set_message(t("Creative commons needs to be enable for this node type: !link", array('!link' => l('configure', 'admin/settings/creativecommons/types'))), 'error');
+    return;
+  }
+//   drupal_set_message(__FUNCTION__);
+//   drupal_set_message(print_r($details['license'], 1));
+  if ($node->is_new) {
+    $op = 'insert';
+  }
+  else {
+    $op = 'update';
+  }
+
+  $license = _flickrcreativecommons_licence($details['license']);
+//   drupal_set_message(print_r($license, 1));
+
+  $fetched = creativecommons_get_license_type_from_uri($license['url']);
+//   drupal_set_message(print_r($details, 1));
+
+//   [creativecommons] => Array
+//         (
+//             [select_license_form] => Array
+//                 (
+//                     [cc_license_uri] => http://creativecommons.org/licenses/by/3.0/
+//                 )
+// 
+//             [metadata] => Array
+//                 (
+//                     [attributionName] => 
+//                     [attributionURL] => 
+//                     [morePermissions] => 
+//                     [title] => 
+//                     [type] => 
+//                     [source] => 
+//                 )
+// 
+//         )
+
+  $node->creativecommons = array(
+    'select_license_form' => array('cc_license_uri' => $license['url']),
+    'metadata' => array(
+      'attributionName' => $details['owner']['realname'],
+      'creator' => $details['owner']['realname'],
+      'attributionURL' => $details['photopage'],
+      'title' => $details['title'],
+      'description' => $details['description'],
+      'morePermissions' => $details['description'],
+      'source' => 'flickr',
+      'type' => $fetched,
+      'rights' => null,
+      'date' => $details['date_taken'],
+    ),
+  );
+
+
+//  | attributionname | attributionurl | morepermissions | title | type | description | creator | rights | date | source 
+
+//   $cc->save($node->nid, $op);
+  creativecommons_save($node, $op);
+
+//   creativecommons_get_license_type_from_uri($uri);
+}
+function _flickrcreativecommons_licence($photo_license) {
+  $flickr = @flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
+    return FALSE;
+  }
+  $licenses = $flickr->photos_licenses_getInfo();
+//   drupal_set_message(print_r($licenses, 1));
+  foreach($licenses as $l) {
+    if ($l['id'] == $photo_license) {
+      return $l;
+    }
+    
+  }
+//   return $licences[$l];
+// <licenses>
+//         <license id="4" name="Attribution License"
+//                 url="http://creativecommons.org/licenses/by/2.0/" /> 
+//         <license id="6" name="Attribution-NoDerivs License"
+//                 url="http://creativecommons.org/licenses/by-nd/2.0/" /> 
+//         <license id="3" name="Attribution-NonCommercial-NoDerivs License"
+//                 url="http://creativecommons.org/licenses/by-nc-nd/2.0/" /> 
+//         <license id="2" name="Attribution-NonCommercial License"
+//                 url="http://creativecommons.org/licenses/by-nc/2.0/" /> 
+//         <license id="1" name="Attribution-NonCommercial-ShareAlike License"
+//                 url="http://creativecommons.org/licenses/by-nc-sa/2.0/" /> 
+//         <license id="5" name="Attribution-ShareAlike License"
+//                 url="http://creativecommons.org/licenses/by-sa/2.0/" /> 
+//         <license id="7" name="No known copyright restrictions"
+//                 url="http://flickr.com/commons/usage/" />
+// </licenses>
+
+}
