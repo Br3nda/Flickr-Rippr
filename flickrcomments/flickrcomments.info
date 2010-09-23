@@ -1,4 +1,4 @@
-name = Flickr Comments Ripper
+name = Flickr Rippr - Comments
 description = Syncs comments on flickr to photos imported via Flickr Rippr module
 package = Flickr
 
