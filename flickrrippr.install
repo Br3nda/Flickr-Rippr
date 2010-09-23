@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.29 2010/09/13 23:26:10 taniwha Exp $
+// $Id: flickrrippr.install,v 1.30 2010/09/23 03:48:02 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -279,12 +279,6 @@ function flickrrippr_update_50() {
 }
 
 function flickrrippr_update_60() {
-  //remove old columns
-  db_drop_field($ret, 'flickrphotos', 'page_url');
-  db_drop_field($ret, 'flickrphotos', 'photo_path');
-  db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
-  db_drop_field($ret, 'flickrphotos', 'image_nid');
-
 
   //add new ones
   db_add_field($ret, 'flickrphotos', 'farm', array('type' => 'text'));
@@ -305,5 +299,35 @@ function flickrrippr_update_60() {
   db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'owner_nsid', array('type' => 'text'));
 
+  //TODO migrate photos
+
+  //remove old columns
+  db_drop_field($ret, 'flickrphotos', 'page_url');
+  db_drop_field($ret, 'flickrphotos', 'photo_path');
+  db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
+  db_drop_field($ret, 'flickrphotos', 'image_nid');
+  return $ret;
+}
+
+function flickrrippr_update_6070(&$sandbox) {
+
+if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['photoid'] = 0;
+    // We'll -1 to disregard the uid 0...
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(flickrphoto_id) FROM {flickrphotos}'));
+    error_log("Max = ". $sandbox['max']);
+  }
+
+  error_log(print_r($sandbox, 1));
+  $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE farm IS NULL and failed = 0 LIMIT 2");
+  while($photo = db_fetch_object($result)) {
+    flickrrippr_makenode($photo->flickrphoto_id);
+    $sandbox['progress']++;
+    $sandbox['photoid'] = $photo->flickrphoto_id;
+    error_log("Photo number ". $photo->flickrphoto_id);
+    $sandbox['message'] = t('Queued %count photos for refetching', array('%count' => $sandbox['progress']));
+  }
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
   return $ret;
 }
