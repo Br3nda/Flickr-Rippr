@@ -1,4 +1,4 @@
-name = Flickr Tags Rippr
+name = Flickr Rippr - Tags
 description = Syncs tags on flickr photos to photos imported via Flickr Rippr module
 package = Flickr
 
