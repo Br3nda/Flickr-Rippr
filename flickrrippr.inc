@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.63 2010/09/22 00:44:18 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.64 2010/09/23 23:06:57 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -147,7 +147,7 @@ function flickrrippr_makenode($photo_id) {
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
 //   drupal_set_message(print_r($flickr_info, 1));
 
-  $fields = array('farm', 'server', 'secret', 'dateuploaded', 'license', 'originalformat', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
+  $fields = array('farm', 'server', 'secret', 'dateuploaded', 'license', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
   foreach ($fields as $f) {
     $values[$f] = $details[$f];
   }
