@@ -1,0 +1,6 @@
+name = Flickr Rippr - Sets
+description = Imports sets from flickr
+package = Flickr
+core = 6.x
+dependencies[] = flickrrippr
+dependencies[] = taxonomy
