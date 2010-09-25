@@ -13,3 +13,28 @@ function flickrsets_flickrrippr_node_alter($node, $details) {
 function flickrsets_photo_add_sets($nid, $details) {
   drupal_set_message('TODO');
 }
+
+function flickrsets_form_alter(&$form, &$form_state, $form_id) {
+  if('flickrrippr_admin_settings_form' != $form_id) {
+    return;
+  }
+
+  $options = array();
+  foreach(taxonomy_get_vocabularies() as $v) {
+    $options[$v->vid] = $v->name; 
+  }
+  $form['sets'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Sets'),
+    '#weight' => -1,
+    'import_sets' => array(
+      '#title' => t('Import sets?'),
+      '#type' => 'checkbox',
+    ),
+    'sets_vocab' => array(
+      '#title' => t('Vocab for sets'),
+      '#type' => 'select',
+      '#options' => $options,
+    ),
+  );
+}
