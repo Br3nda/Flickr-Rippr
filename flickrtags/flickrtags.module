@@ -42,11 +42,8 @@ function flickrtags_photo_add_tags($nid, $photo_info=null) {
       );
       taxonomy_save_term($term);
       //add to those we are gonna save
-      $node_terms[] = $term;
     }
-    else {
-      $node_terms[] = $term;
-    }
+    $node_terms[] = $term;
 
   }
 //   drupal_set_message("Tags = ". print_r($node_terms, 1));
