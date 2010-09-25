@@ -37,4 +37,12 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
       '#options' => $options,
     ),
   );
+  $form['#validate'][] = 'flickrsets_admin_validate'; //Be sure not to use 'form' for the 'functionName' part as it will confuse drupal.  Use a descriptive name.
+  $form['#submit'][] = 'flickrsets_admin_submit';  //Be sure not to use 'form' for the 'functionName' part as it will confuse drupal.  Use a descriptive name.
+}
+
+function flickrsets_admin_validate() {
+}
+
+function flickrsets_admin_submit() {
 }
