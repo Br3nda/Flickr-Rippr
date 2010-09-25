@@ -10,6 +10,6 @@ function flickrsets_flickrrippr_node_alter($node, $details) {
   }
 }
 
-function flickrsets_photo_add_sets($node->nid, $details) {
+function flickrsets_photo_add_sets($nid, $details) {
   drupal_set_message('TODO');
 }
