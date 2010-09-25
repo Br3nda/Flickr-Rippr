@@ -58,7 +58,11 @@ function flickrtags_matching_vid($terms, $vid) {
   }
 }
 
-function flickrtags_admin_form() {
+function flickrtags_form_alter(&$form, $form_state, $form_id) {
+  if('flickrrippr_admin_settings_form' != $form_id) {
+    return;
+  }
+
   $form['tags'] = array(
     '#type' => 'fieldset',
     '#title' => t('Tags'),
