@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.35 2010/09/26 04:10:02 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.36 2010/09/26 21:54:49 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -131,6 +131,22 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'radios',
     '#options' => _flickr_rippr_jpeg_sizes(),
     '#default_value' => variable_get('flickrrippr_page_size', 'm'),
+  );
+
+  $form['failed'] = array(
+    '#title' => 'Failed Imports',
+    '#type' => 'fieldset',
+    'failed_action' => array(
+      '#type' => 'radios',
+      '#title' => t('When photos cannot be refetched from flickr.com:'),
+      '#options' => array(
+        'delete' => t('Delete completely from this website.'),
+        'unpublish' => t('Unpublish the photo.'),
+        'nothiing' => t('Do nothing. Leave the content on this website'),
+      ),
+      '#required' => TRUE,
+      '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
+    ),
   );
 
 
