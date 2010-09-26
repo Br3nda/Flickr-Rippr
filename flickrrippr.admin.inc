@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.34 2010/09/13 08:02:11 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.35 2010/09/26 04:10:02 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -73,6 +73,7 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Flickr Rippr Settings'),
     '#collapsible' => TRUE,
+    '#weight' => -5,
   );
 
   $path_options = flickrrippr_path_options();
@@ -136,7 +137,7 @@ function flickrrippr_admin_settings_form() {
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
-
+    '#weight' => 9,
   );
   
   return $form;
