@@ -1,16 +1,16 @@
 <?php
 function flickrsets_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
-  if (variable_get('flickrsets_vocab', FALSE)) {
-    $vocab = variable_get('flickrrippr_sets_vocab', 0);
+  if (variable_get('flickrsets_import', FALSE)) {
+    $vocab = variable_get('flickrsets_vocab', 0);
     if (!$vocab) {
       return;
     }
-    flickrtags_photo_add_tags($node->nid, $details);
+    flickrsets_vocab($node->nid, $details);
   }
 }
 
-function flickrsets_photo_add_sets($nid, $details) {
+function flickrsets_vocab($nid, $details) {
   drupal_set_message('TODO');
 }
 
