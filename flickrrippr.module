@@ -103,17 +103,6 @@ function flickrrippr_menu() {
     'weight' => 0,
     'file' => 'flickrrippr.admin.inc',
   );
-
-  if (module_exists('flickrtags')) {
-    $items['admin/settings/flickrrippr/tags'] = array(
-      'title' => 'Tag Rippr',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('flickrtags_admin_form'),
-      'access arguments' => array('Administer global flickr api settings'),
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 1,
-    );
-  }
   return $items;
 }
 
