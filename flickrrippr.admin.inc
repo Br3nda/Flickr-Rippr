@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.38 2010/09/26 21:57:26 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.39 2010/09/26 21:58:01 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -124,6 +124,7 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'radios',
     '#options' => _flickr_rippr_jpeg_sizes(),
     '#default_value' => variable_get('flickrrippr_teaser_size', 't'),
+    '#required' => TRUE,
   );
   $form['image_sizes']['page_size'] = array(
     '#title' => t('Page image size'),
@@ -131,6 +132,7 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'radios',
     '#options' => _flickr_rippr_jpeg_sizes(),
     '#default_value' => variable_get('flickrrippr_page_size', 'm'),
+    '#required' => TRUE,
   );
 
   $form['failed'] = array(
