@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.37 2010/09/26 21:56:08 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.38 2010/09/26 21:57:26 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -138,7 +138,7 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'fieldset',
     'failed_action' => array(
       '#type' => 'radios',
-      '#title' => t('When photos cannot be refetched from flickr.com:'),
+      '#title' => t('When photos cannot be refetched from flickr.com'),
       '#options' => array(
         'delete' => t('Delete completely from this website.'),
         'unpublish' => t('Unpublish the photo.'),
