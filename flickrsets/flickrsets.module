@@ -30,12 +30,14 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
     'flickrsets_import' => array(
       '#title' => t('Import sets?'),
       '#type' => 'checkbox',
+      '#default_value' => variable_get('flickrsets_import', FALSE),
     ),
     'flickrsets_vocab' => array(
       '#title' => t('Vocab for sets'),
       '#type' => 'select',
       '#description' => t('You may need to create a new vocab at !link', array('!link' => l('Taxonomy Admin', 'admin/content/taxonomy'))),
       '#options' => $options,
+      '#default_value' => variable_get('flickrsets_vocab', 0),
     ),
   );
 
