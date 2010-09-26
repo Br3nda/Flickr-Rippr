@@ -1,7 +1,7 @@
 <?php
 function flickrsets_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
-  if (variable_get('flickrrippr_import_sets', FALSE)) {
+  if (variable_get('flickrsets_vocab', FALSE)) {
     $vocab = variable_get('flickrrippr_sets_vocab', 0);
     if (!$vocab) {
       return;
@@ -27,22 +27,30 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
     '#type' => 'fieldset',
     '#title' => t('Sets'),
     '#weight' => -1,
-    'import_sets' => array(
+    'flickrsets_import' => array(
       '#title' => t('Import sets?'),
       '#type' => 'checkbox',
     ),
-    'sets_vocab' => array(
+    'flickrsets_vocab' => array(
       '#title' => t('Vocab for sets'),
       '#type' => 'select',
+      '#description' => t('You may need to create a new vocab at !link', array('!link' => l('Taxonomy Admin', 'admin/content/taxonomy'))),
       '#options' => $options,
     ),
   );
-  $form['#validate'][] = 'flickrsets_admin_validate'; //Be sure not to use 'form' for the 'functionName' part as it will confuse drupal.  Use a descriptive name.
-  $form['#submit'][] = 'flickrsets_admin_submit';  //Be sure not to use 'form' for the 'functionName' part as it will confuse drupal.  Use a descriptive name.
+
+  $form['#validate'][] = 'flickrsets_admin_validate'; 
+  $form['#submit'][] = 'flickrsets_admin_submit';  
 }
 
-function flickrsets_admin_validate() {
+function flickrsets_admin_validate($form, &$form_state) {
+//   drupal_set_message(__FUNCTION__);
 }
 
-function flickrsets_admin_submit() {
+function flickrsets_admin_submit($form, &$form_state) {
+  $import = $form_state['values']['flickrsets_import'];
+  variable_set('flickrsets_import', $import);
+
+  $vocab = $form_state['values']['flickrsets_vocab'];
+  variable_set('flickrsets_vocab', $vocab);
 }
