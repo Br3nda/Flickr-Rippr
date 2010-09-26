@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.36 2010/09/26 21:54:49 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.37 2010/09/26 21:56:08 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -142,7 +142,7 @@ function flickrrippr_admin_settings_form() {
       '#options' => array(
         'delete' => t('Delete completely from this website.'),
         'unpublish' => t('Unpublish the photo.'),
-        'nothiing' => t('Do nothing. Leave the content on this website'),
+        'nothing' => t('Do nothing. Leave the content on this website'),
       ),
       '#required' => TRUE,
       '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
