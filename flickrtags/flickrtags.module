@@ -3,8 +3,8 @@
 
 function flickrtags_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
-  if (variable_get('flickrrippr_import_tags', FALSE)) {
-    $vocab = variable_get('flickrrippr_tags_vocab', 0);
+  if (variable_get('flickrtags_import', FALSE)) {
+    $vocab = variable_get('flickrtags_vocab', 0);
     if (!$vocab) {
       return;
     }
