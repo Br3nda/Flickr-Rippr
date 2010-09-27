@@ -515,9 +515,7 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   }
   switch ($op) {
     case 'delete':
-      //delete where there is no node.. THIS WON'T SCALE
-      //how to get around drupal's lack of referential integrity?
-      db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
+      db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
       drupal_set_message("Flickr Rippr photo deleted.");
     break;
     case 'view':
