@@ -202,7 +202,7 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   //update their user info
-  job_queue('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser));
+  job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser));
 
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
