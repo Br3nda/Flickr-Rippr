@@ -202,10 +202,9 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   //update their user info
-  job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser));
+  job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
 
-
-  $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
+  $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
 
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
@@ -230,22 +229,29 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
       $local_cached_details = flickrrippr_get_photo_details_by_photoid($p['id']);
-      $age = strtotime('now') - $local_cached_details->lastfetched;
-      watchdog('flickrrippr', t('Photo was fetched %age seconds ago', array('%age' => $age)));
-      //only queue if it hasn't been fetched in last hour.
-      if ($age > 60*60) {
-        job_queue_add('flickrrippr_makenode', t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => print_r($flickruser, 1))), array($p['id']));
+      if($local_cached_details) {
+        $age = strtotime('now') - $local_cached_details->lastfetched;
       }
-      //$num_photos++;
+      else $age = -1;
+//       watchdog('flickrrippr', t('Photo was fetched %age seconds ago', array('%age' => $age)));
+      //only queue if it hasn't been fetched in last hour.
+
+      //hack to get around job_queue restricting descriptions to 255 chars
+      $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => print_r($flickruser, 1)));
+      if(strlen($description) >= 255) {
+        $description = substr($description, 0, 254);
+      }
+
+      if ($age > 60*60 || $age = -1) {
+        job_queue_add('flickrrippr_makenode', $description, array($p['id']));
+      }
+      $num_photos++;
     }
   }
 
-  //drupal_set_message(t('!count Photos saved or updated', array('!count' => $num_photos)));
+  drupal_set_message(t('!count Photos queued for import', array('!count' => $num_photos)));
 
 }
-
-include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
-
 
 /**
  * Helper function, returns the flickr_id for a flickr username.
