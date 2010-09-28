@@ -1,21 +1,72 @@
 <?php
-function flickrsets_flickrrippr_node_alter($node, $details) {
+
+
+/*function flickrsets_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
   if (variable_get('flickrsets_import', FALSE)) {
     $vocab = variable_get('flickrsets_vocab', 0);
     if (!$vocab) {
       return;
     }
-    flickrsets_vocab($node->nid, $details);
+    flickrsets_add_sets($node->nid, $details);
   }
 }
+*/
+// function flickrsets_add_sets($nid, $details) {
+//   
+//   if (!$nid) {
+//     drupal_set_message(t('Refusing to add tags to a null nid'), 'error');
+//     return;
+//   }
+//   $node = node_load(array('nid' => $nid));
+//   $vid = variable_get('flickrrippr_sets_vocab', 0);
+// //   $node_terms = $node->taxonomy;
+// 
+//   drupal_set_message(print_r($details, 1));
+//   return;
+// 
+//   $node_terms = array();
+//   foreach($photo_info['tags']['tag'] as $tag) {
+//     $raw = $tag['raw'];
+//     $terms = taxonomy_get_term_by_name($raw);
+// 
+//     //if we got some terms back, check if they're in our vocab or not
+//     if (sizeof($terms)) {
+//       $term = flickrtags_matching_vid($terms, $vid);
+//     }
+//     
+//     //if we still don't have a term, create it.
+//     if (!isset($term) or !sizeof($terms)) {
+//       drupal_set_message("Creating new term $raw");
+//       $term = array(
+//         'vid' => $vid, // Voacabulary ID
+//         'name' => $raw, // Term Name 
+//         'relations' => array(15), // (Optional) Related Term IDs 
+//       );
+//       taxonomy_save_term($term);
+//       //add to those we are gonna save
+//     }
+//     $node_terms[] = $term;
+// 
+//   }
+// //   drupal_set_message("Tags = ". print_r($node_terms, 1));
+//   taxonomy_node_save($node, $node_terms); 
+// }
 
-function flickrsets_vocab($nid, $details) {
-  drupal_set_message('TODO');
+function flickrsets_node_info() {
+  return array(
+    'flickrrippr_photoset' => array(
+      'name' => t('Flickr Photoset'),
+      'module' => 'flickrsets',
+      'description' => t("Photo sets imported from flickr.com"),
+      'has_body' => FALSE,
+    )
+  );
 }
 
 function flickrsets_form_alter(&$form, &$form_state, $form_id) {
-  if('flickrrippr_admin_settings_form' != $form_id) {
+  
+  if('flickrrippr_user_settings_form' != $form_id) {
     return;
   }
 
@@ -25,19 +76,12 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
   }
   $form['sets'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Sets'),
-    '#weight' => -1,
+    '#title' => t('Flickr Sets'),
+    '#weight' => 1,
     'flickrsets_import' => array(
       '#title' => t('Import sets?'),
       '#type' => 'checkbox',
       '#default_value' => variable_get('flickrsets_import', FALSE),
-    ),
-    'flickrsets_vocab' => array(
-      '#title' => t('Vocab for sets'),
-      '#type' => 'select',
-      '#description' => t('You may need to create a new vocab at !link', array('!link' => l('Taxonomy Admin', 'admin/content/taxonomy'))),
-      '#options' => $options,
-      '#default_value' => variable_get('flickrsets_vocab', 0),
     ),
   );
 
@@ -45,6 +89,7 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
   $form['#submit'][] = 'flickrsets_admin_submit';  
 }
 
+/*
 function flickrsets_admin_validate($form, &$form_state) {
 //   drupal_set_message(__FUNCTION__);
 }
@@ -55,4 +100,4 @@ function flickrsets_admin_submit($form, &$form_state) {
 
   $vocab = $form_state['values']['flickrsets_vocab'];
   variable_set('flickrsets_vocab', $vocab);
-}
+}*/
