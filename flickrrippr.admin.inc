@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.39 2010/09/26 21:58:01 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.40 2010/09/28 02:16:50 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -33,13 +33,14 @@ function flickrrippr_admin() {
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
     array('data' => t('Tag'), 'field' => 'tag'),
   );
-  $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u 
+  $result = pager_query("SELECT u.uid, u.name, f.* FROM {users} u 
       LEFT OUTER JOIN {flickrusers} f  
       ON u.uid = f.uid AND u.uid > 0 WHERE u.name <> '' ". tablesort_sql($headers), 50);
 
 
   while ($u = db_fetch_object($result)) {
     $rows[] = array(
+      flickrrippr_user_avatar($u), 
       theme('username', $u),
       check_plain($u->flickrusername),
       check_plain($u->flickrid),
