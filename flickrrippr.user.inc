@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.7 2010/09/13 01:20:07 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.8 2010/09/28 02:24:07 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -97,12 +97,14 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
+    '#weight' => 9,
     );
 
   $form['delete'] = array(
     '#type' => 'submit',
     '#value' => t('Delete'),
-    );
+    '#weight' => 9,
+  );
   return $form;
 }
 
