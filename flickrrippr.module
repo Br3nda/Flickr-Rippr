@@ -257,7 +257,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 //     }
   }
 
-  drupal_set_message(t('!count photos queued for import.', array('!count' => $num_photos)));
+  drupal_set_message(t('%count photos queued for import.', array('%count' => $num_photos)));
 
 }
 
