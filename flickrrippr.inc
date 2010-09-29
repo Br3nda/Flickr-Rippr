@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67 2010/09/28 02:17:49 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.1 2010/09/29 23:37:08 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -27,7 +27,7 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
     return;
   }
   
-  return user_load(array('uid' => $flickruser->uid));
+  return user_load($flickruser->uid);
 }
 
 /**
@@ -48,7 +48,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
     return;
   }
  
-  return  user_load(array('uid' => $flickruser->uid));
+  return  user_load($flickruser->uid);
 }
 
 
