@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.9 2010/09/29 02:11:16 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.10 2010/09/29 02:15:39 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -114,9 +114,12 @@ function flickrrippr_user_settings_form($a, $flickruser) {
 
 
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
-  //TODO, check the submitted username exists on flickr?
-  //query api
-  //and store the 3432@N00 uid then
+  if(!isset($form_state['values']['flickrid'])) {
+    $existing = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername='%s'", $form_state['values']['flickr_username']));
+    if($existing) {
+      form_set_error('flickr_username', t('Cannot add this flickr account, it is already configured on this website.'));
+    }
+  }
 }
 /**
  * Save submission of a user editting their own settings
