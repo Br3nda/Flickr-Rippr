@@ -2,7 +2,7 @@
 /**
  * Implementation of hook_perm().
  */
-function flickrrippr_perm() {
+function flickrrippr_permission() {
   return array('Configure own blogged flickr stream', 'Administer global flickr api settings', /* 'Cache own Flickr Photos on this server'*/);
 }
 
