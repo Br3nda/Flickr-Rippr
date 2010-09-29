@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.8 2010/09/28 02:24:07 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.9 2010/09/29 02:11:16 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -75,7 +75,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   if (isset($flickruser->flickrid)) {
     $form['flickr_username'] = array(
       '#type' => 'markup', 
-      '#value' => '<p><strong>'. t('Flickr Username: ') .'</strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
+      '#value' => flickrrippr_user_avatar($flickruser) .'<p><strong>'. t('Flickr Username: ') . ' </strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
     );
   }
   else {
@@ -100,11 +100,13 @@ function flickrrippr_user_settings_form($a, $flickruser) {
     '#weight' => 9,
     );
 
-  $form['delete'] = array(
-    '#type' => 'submit',
-    '#value' => t('Delete'),
-    '#weight' => 9,
-  );
+  if(isset($flickruser->flickrid)) {
+    $form['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+      '#weight' => 9,
+    );
+  }
   return $form;
 }
 
