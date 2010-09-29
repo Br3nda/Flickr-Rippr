@@ -1,0 +1,35 @@
+<?php
+
+function flickrsets_install() {
+  drupal_install_schema('flickrsets');
+}
+
+function flickrsets_uninstall() {
+  drupal_uninstall_schema('flickrsets');
+}
+
+function flickrsets_schema() {
+  $schema['flickrsets_users'] = array(
+    'fields' => array(
+      'flickrid' => array('type' => 'text'),
+      'import' => array('type' => 'int'),
+    ),
+    'primary key' => array('flickrid'),
+  );
+  $schema['flickrsets'] = array(
+    'fields' => array(
+      'nid' => array('type' => 'int'),
+      'flickrid' => array('type' => 'text'),
+    ),
+    'primary key' => array('nid'),
+  );
+  $schema['flickrsets_photos'] = array(
+    'fields' => array(
+      'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
+      'nid' => array('type' => 'int'),
+    ),
+    'primary key' => array('nid'),
+  );
+  return $schema;
+}
+

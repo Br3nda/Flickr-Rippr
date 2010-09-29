@@ -1,5 +1,25 @@
 <?php
+/**
+ * Implementation of hook_cron().
+ */
+function flickrsets_cron() {
+  
 
+  $result = db_query("SELECT * FROM {flickrsets_users} s INNER JOIN {flickrusers} u ON s.flickrid = u.flickrid AND import=TRUE") {
+  while ($flickruser = db_fetch_object($result)) {
+    
+  }
+}
+
+function flickrsets_get_latest($flickruser) {
+  $flickr = flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
+    return FALSE;
+  }
+
+  $flickr->photosets_getList('user_id' => check_plain($flickruser->flickruser_id);
+}
 
 /*function flickrsets_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
@@ -81,23 +101,23 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
     'flickrsets_import' => array(
       '#title' => t('Import sets?'),
       '#type' => 'checkbox',
-      '#default_value' => variable_get('flickrsets_import', FALSE),
+//       '#default_value' => variable_get('flickrsets_import', FALSE),
     ),
   );
 
-  $form['#validate'][] = 'flickrsets_admin_validate'; 
-  $form['#submit'][] = 'flickrsets_admin_submit';  
+  $form['#validate'][] = 'flickrsets_validate'; 
+  $form['#submit'][] = 'flickrsets_submit';  
+  
 }
 
-/*
-function flickrsets_admin_validate($form, &$form_state) {
-//   drupal_set_message(__FUNCTION__);
+
+function flickrsets_validate($form, &$form_state) {
+
 }
 
-function flickrsets_admin_submit($form, &$form_state) {
-  $import = $form_state['values']['flickrsets_import'];
-  variable_set('flickrsets_import', $import);
-
-  $vocab = $form_state['values']['flickrsets_vocab'];
-  variable_set('flickrsets_vocab', $vocab);
-}*/
+function flickrsets_submit($form, &$form_state) {
+   drupal_set_message(__FUNCTION__);
+  $flickrsets_user->uid = $form_state['values']['uid'];
+  $flickrsets_user->import = $form_state['values']['flickrsets_import'];
+  drupal_write_record('flickrsets_users', $flickrsets_user);
+}
