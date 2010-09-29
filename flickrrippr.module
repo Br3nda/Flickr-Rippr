@@ -358,8 +358,8 @@ function flickrrippr_user_settings($uid = NULL) {
       check_plain($a->flickrusername),
       $tag_links,
       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
-      l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
-      l('View Photos', 'user/'. $user->uid .'/flickrrippr/view/'. $a->flickrid),
+      l(t('Edit'), 'user/' . $user->uid . '/flickrrippr/edit/' . $a->flickrid),
+      l('View Photos', 'user/' . $user->uid . '/flickrrippr/view/' . $a->flickrid),
     );
     
   }
@@ -401,7 +401,7 @@ function flickrrippr_user_fetch_now_submit($form_id, $fv) {
   $dest = $_POST['dest'];
 
   if (!$dest) {
-    $dest = 'user/'. $uid .'/flickrrippr';
+    $dest = 'user/' . $uid . '/flickrrippr';
   }
   //get user
   $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
@@ -485,7 +485,7 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   if (!$photo || $photo['failed'] == 1) {
     if (node_access('delete', $node)) {
-      drupal_set_message(t("Failed to find flickr photo info for !link", array('!link' => l($node->title, 'node/'. $node->nid))), 'error');
+      drupal_set_message(t("Failed to find flickr photo info for !link", array('!link' => l($node->title, 'node/' . $node->nid))), 'error');
       $node->content['delete'] = array(
         '#value' => drupal_get_form('flickrrippr_failed_form', $node),
         '#weight' => -10,
@@ -500,7 +500,7 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   }
   else {
     $size = variable_get('flickrrippr_teaser_size', 't');
-    $link = 'node/'. $node->nid;
+    $link = 'node/' . $node->nid;
   }
 
 //   drupal_set_message(print_r($photo, 1));
@@ -511,14 +511,14 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 
   $node->content['flickr_photo'] = array(
     '#weight' => 0,
-   '#value' => '<div class="flickrrippr_photo">'. $image .'</div>',
+   '#value' => '<div class="flickrrippr_photo">' . $image . '</div>',
   );
 
 
   $markup_trust = variable_get('flickrrippr_markup_trust', FALSE);
 
   $node->content['body'] = array(
-    '#value' => '<div class="flickrrippr_description">'. nl2br($markup_trust ? $photo['description'] : check_plain($photo['description']))  .'</div>', //decode then encode
+    '#value' => '<div class="flickrrippr_description">' . nl2br($markup_trust ? $photo['description'] : check_plain($photo['description']))  . '</div>', //decode then encode
     '#weight' => 5
   );
   
@@ -546,7 +546,7 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'delete':
       db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
-      drupal_set_message("Flickr Rippr photo deleted.");
+      drupal_set_message(t("Flickr Rippr photo deleted."));
     break;
     case 'view':
       flickrrippr_view($node, $teaser, $page);
