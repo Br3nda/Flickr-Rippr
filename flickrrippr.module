@@ -14,7 +14,7 @@ function flickrrippr_menu() {
   $items = array();
   $items['admin/content/flickrrippr'] = array(
     'title' => 'Flickr Rippr',
-    'description' => t('View users, and force re-read from flickr.com'),
+    'description' => 'View users, and force re-read from flickr.com',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrrippr_admin',
     'access arguments' => array('Administer global flickr api settings'),
