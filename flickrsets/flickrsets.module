@@ -17,7 +17,7 @@ function flickrsets_get_latest($flickruser) {
     return FALSE;
   }
 
-  $flickr->photosets_getList('user_id' => check_plain($flickruser->flickruser_id);
+  $flickr->photosets_getList($flickruser->flickruser_id);
 }
 
 /*function flickrsets_flickrrippr_node_alter($node, $details) {
