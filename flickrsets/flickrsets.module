@@ -16,9 +16,9 @@ function flickrsets_get_latest($flickruser) {
     drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
     return FALSE;
   }
-
   $flickr->photosets_getList($flickruser->flickruser_id);
 }
+
 
 /*function flickrsets_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
@@ -85,33 +85,40 @@ function flickrsets_node_info() {
 
 function flickrsets_form_alter(&$form, &$form_state, $form_id) {
   
-  if('flickrrippr_user_settings_form' != $form_id) {
-    return;
-  }
+  switch($form_id) {
+    case 'flickrrippr_user_settings_form':
 
-  $options = array();
-  foreach(taxonomy_get_vocabularies() as $v) {
-    $options[$v->vid] = $v->name; 
-  }
-  $form['sets'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Flickr Sets'),
-    '#weight' => 1,
-    'flickrsets_import' => array(
-      '#title' => t('Import sets?'),
-      '#type' => 'checkbox',
-//       '#default_value' => variable_get('flickrsets_import', FALSE),
-    ),
-  );
+      $options = array();
+      foreach(taxonomy_get_vocabularies() as $v) {
+        $options[$v->vid] = $v->name; 
+      }
+      $form['sets'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Flickr Sets'),
+        '#weight' => 1,
+        'flickrsets_import' => array(
+          '#title' => t('Import sets?'),
+          '#type' => 'checkbox',
+    //       '#default_value' => variable_get('flickrsets_import', FALSE),
+        ),
+      );
 
-  $form['#validate'][] = 'flickrsets_validate'; 
-  $form['#submit'][] = 'flickrsets_submit';  
-  
+      $form['#validate'][] = 'flickrsets_validate'; 
+      $form['#submit'][] = 'flickrsets_submit';  
+    break;
+    case 'flickrrippr_user_fetch_now':
+      drupal_set_message(__FUNCTION__ . '::'. $form_id);
+      $form['#submit'][] = 'flickrsets_fetch_now_submit';
+    break;
+  }
 }
 
+function flickrsets_fetch_now_submit($form, &$form_state) {
+  drupal_set_message(__FUNCTION__);
+}
 
 function flickrsets_validate($form, &$form_state) {
-
+  drupal_set_message(__FUNCTION__);
 }
 
 function flickrsets_submit($form, &$form_state) {
