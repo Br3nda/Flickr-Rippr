@@ -121,7 +121,7 @@ function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   
   $form['message'] = array(
     '#type' => 'markup',
-    '#value' => '<p>'. t('Are you sure you want to delete this account?') .'</p>'
+    '#value' => '<p>' . t('Are you sure you want to delete this account?') . '</p>'
   );
 
   $form['confirm'] = array(
@@ -136,7 +136,7 @@ function flickrrippr_user_delete_account_submit($form_id, $form_state) {
   $uid = $form_state['values']['uid'];
   $flickrid = $form_state['values']['flickrid'];
   db_query("DELETE FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid);
-  drupal_goto('user/'. $uid .'/flickrrippr');
+  drupal_goto('user/' . $uid . '/flickrrippr');
 }
 
 function flickrrippr_node_refresh_perm($nid) {
@@ -210,7 +210,12 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   //update their user info
-  job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+  job_queue_add(
+    'flickrrippr_fetch_user_info_and_save', 
+    t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), 
+    array($flickruser), 
+    drupal_get_path('module', 'flickrrippr') . '/flickrrippr.user.inc'
+  );
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
 
@@ -243,7 +248,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
         //hack to get around job_queue restricting descriptions to 255 chars
         $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => print_r($flickruser, 1)));
-        if(strlen($description) >= 255) {
+        if (strlen($description) >= 255) {
           $description = substr($description, 0, 254);
         }
         job_queue_add('flickrrippr_makenode', $description, array($p['id']));
@@ -318,7 +323,7 @@ function flickrrippr_user_settings($uid = NULL) {
   else {
     GLOBAL $user;
   }
-  $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
+  $output .= l(t('Add new account'), 'user/' . $user->uid . '/flickrrippr/add');
 
   $accounts = flickrrippr_get_flickr_accounts($user->uid);
 
@@ -337,7 +342,7 @@ function flickrrippr_user_settings($uid = NULL) {
       $tags = explode(',', $a->tag);
       foreach ($tags as $t) {
         if (!empty($a->flickrphotosurl)) {
-          $tag_links .= l($t, $a->flickrphotosurl .'tags/'. check_plain($t));
+          $tag_links .= l($t, $a->flickrphotosurl . 'tags/' . check_plain($t));
         }
         else {
           $tag_links .= check_plain($t);
