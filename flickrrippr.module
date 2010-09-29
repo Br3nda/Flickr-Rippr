@@ -273,7 +273,7 @@ function flickrrippr_flickruser($username) {
   $fuser = $flickr->people_findByUsername($username);
 
   if (!$fuser['id']) {
-    drupal_set_message(t('!username is not known by flickr.com', array('!username' => $username)), 'error');
+    drupal_set_message(t('%username is not known by flickr.com', array('%username' => $username)), 'error');
     return;
   }
   db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE flickrusername='%s'", $fuser['id'], $username);
