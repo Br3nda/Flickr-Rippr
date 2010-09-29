@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.1 2010/09/29 23:37:08 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.2 2010/09/29 23:37:29 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -58,7 +58,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
 */
 function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
   if (!$flickr_photo['farm'] ||  !$flickr_photo['secret']) {
-    drupal_set_message("Cannot calculate path without farm and secret.", 'error');
+    drupal_set_message(t("Cannot calculate path without farm and secret."), 'error');
     return '';
   }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
