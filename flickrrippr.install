@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.34 2010/09/26 21:49:34 taniwha Exp $
+// $Id: flickrrippr.install,v 1.35 2010/09/29 03:03:53 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -67,6 +67,10 @@ function flickrrippr_schema() {
       'owner_nsid' => array('type' => 'text'),
       ),
       'primary key' => array('flickrphoto_id'),
+      'indexes' => array(
+        'flickrphotos_nid' => array('nid'),
+        'flickrphotos_owner' => array('owner_nsid'),
+      ),
     );
 
 /*
@@ -339,4 +343,10 @@ if (!isset($sandbox['progress'])) {
 function flickrrippr_update_6080() {
   variable_set('flickrtags_import', variable_get('flickrrippr_import_tags', FALSE));
   variable_set('flickrtags_vocab',variable_get('flickrrippr_tags_vocab', 0));
+}
+
+function flickrrippr_update_6090() {
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
+  return $ret;
 }
