@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.40 2010/09/28 02:16:50 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.41 2010/09/29 02:09:11 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -34,7 +34,7 @@ function flickrrippr_admin() {
     array('data' => t('Tag'), 'field' => 'tag'),
   );
   $result = pager_query("SELECT u.uid, u.name, f.* FROM {users} u 
-      LEFT OUTER JOIN {flickrusers} f  
+      INNER JOIN {flickrusers} f  
       ON u.uid = f.uid AND u.uid > 0 WHERE u.name <> '' ". tablesort_sql($headers), 50);
 
 
