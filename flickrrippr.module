@@ -13,7 +13,7 @@ function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
   $items['admin/content/flickrrippr'] = array(
-    'title' => t('Flickr Rippr'),
+    'title' => 'Flickr Rippr',
     'description' => t('View users, and force re-read from flickr.com'),
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrrippr_admin',
@@ -22,7 +22,7 @@ function flickrrippr_menu() {
   );
 
   $items['admin/content/flickrrippr/fetch'] = array(
-    'title' => t('Fetch'),
+    'title' => 'Fetch',
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_admin_fetch',
     'page arguments' => array(4),
@@ -31,7 +31,7 @@ function flickrrippr_menu() {
   );
 
   $items['admin/content/flickrrippr/edit'] = array(
-    'title' => t('Edit'),
+    'title' => 'Edit',
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_admin_edit',
     'page argument' => array(4, 5),
@@ -41,7 +41,7 @@ function flickrrippr_menu() {
 
   //configure a user's account with their flickr username
   $items['user/%/flickrrippr'] = array(
-    'title' => t('Flickr Rippr'),
+    'title' => 'Flickr Rippr',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'flickrrippr_user_settings',
     'page arguments' => array(1),
@@ -49,7 +49,7 @@ function flickrrippr_menu() {
     'file' => 'flickrrippr.user.inc',
   );
   $items['user/%/flickrrippr/add'] = array(
-    'title' => t('add'),
+    'title' => 'add',
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_add_account',
     'page arguments' => array(1),
@@ -57,7 +57,7 @@ function flickrrippr_menu() {
     'file' => 'flickrrippr.user.inc',
   );
   $items['user/%/flickrrippr/edit/%'] = array(
-    'title' => t('edit'),
+    'title' => 'edit',
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_edit_account',
     'page arguments' => array(1, 4),
@@ -66,7 +66,7 @@ function flickrrippr_menu() {
   );
 
   $items['user/%/flickrrippr/view/%'] = array(
-    'title' => t('View Photos'),
+    'title' => 'View Photos',
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_view_photos',
     'page arguments' => array(1, 4),
@@ -75,7 +75,7 @@ function flickrrippr_menu() {
   );
 
   $items['user/%/flickrrippr/delete/%'] = array(
-    'title' => t('edit'),
+    'title' => 'edit',
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrrippr_user_delete_account', 1, 4),
