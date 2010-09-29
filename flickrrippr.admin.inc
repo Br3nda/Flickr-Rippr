@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.18.2.13 2010/09/23 23:11:40 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.18.2.14 2010/09/29 21:44:50 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -33,13 +33,14 @@ function flickrrippr_admin() {
     array('data' => t('Flickr NSID'), 'field' => 'flickrid'),
     array('data' => t('Tag'), 'field' => 'tag'),
   );
-  $result = pager_query("SELECT u.uid, u.name, f.tag, f.flickrusername, f.flickrid FROM {users} u 
-      LEFT OUTER JOIN {flickrusers} f  
+  $result = pager_query("SELECT u.uid, u.name, f.* FROM {users} u 
+      INNER JOIN {flickrusers} f  
       ON u.uid = f.uid AND u.uid > 0 WHERE u.name <> '' ". tablesort_sql($headers), 50);
 
 
   while ($u = db_fetch_object($result)) {
     $rows[] = array(
+      flickrrippr_user_avatar($u), 
       theme('username', $u),
       check_plain($u->flickrusername),
       check_plain($u->flickrid),
@@ -73,6 +74,7 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Flickr Rippr Settings'),
     '#collapsible' => TRUE,
+    '#weight' => -5,
   );
 
   $path_options = flickrrippr_path_options();
@@ -123,6 +125,7 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'radios',
     '#options' => _flickr_rippr_jpeg_sizes(),
     '#default_value' => variable_get('flickrrippr_teaser_size', 't'),
+    '#required' => TRUE,
   );
   $form['image_sizes']['page_size'] = array(
     '#title' => t('Page image size'),
@@ -130,13 +133,30 @@ function flickrrippr_admin_settings_form() {
     '#type' => 'radios',
     '#options' => _flickr_rippr_jpeg_sizes(),
     '#default_value' => variable_get('flickrrippr_page_size', 'm'),
+    '#required' => TRUE,
+  );
+
+  $form['failed'] = array(
+    '#title' => 'Failed Imports',
+    '#type' => 'fieldset',
+    'failed_action' => array(
+      '#type' => 'radios',
+      '#title' => t('When photos cannot be refetched from flickr.com'),
+      '#options' => array(
+        'delete' => t('Delete completely from this website.'),
+        'unpublish' => t('Unpublish the photo.'),
+        'nothing' => t('Do nothing. Leave the content on this website'),
+      ),
+      '#required' => TRUE,
+      '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
+    ),
   );
 
 
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
-
+    '#weight' => 9,
   );
   
   return $form;

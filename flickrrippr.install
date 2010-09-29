@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.5 2010/09/23 23:11:40 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.6 2010/09/29 21:44:50 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -67,6 +67,10 @@ function flickrrippr_schema() {
       'owner_nsid' => array('type' => 'text'),
       ),
       'primary key' => array('flickrphoto_id'),
+      'indexes' => array(
+        'flickrphotos_nid' => array('nid'),
+        'flickrphotos_owner' => array('owner_nsid'),
+      ),
     );
 
 /*
@@ -329,5 +333,20 @@ if (!isset($sandbox['progress'])) {
     $sandbox['message'] = t('Queued %count photos for refetching', array('%count' => $sandbox['progress']));
   }
   $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  return $ret;
+}
+
+/**
+ * Hook update_N
+ * variables moved to own function - migrate them
+ */
+function flickrrippr_update_6080() {
+  variable_set('flickrtags_import', variable_get('flickrrippr_import_tags', FALSE));
+  variable_set('flickrtags_vocab',variable_get('flickrrippr_tags_vocab', 0));
+}
+
+function flickrrippr_update_6090() {
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
   return $ret;
 }

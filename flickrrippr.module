@@ -67,6 +67,15 @@ function flickrrippr_menu() {
     'file' => 'flickrrippr.user.inc',
   );
 
+  $items['user/%/flickrrippr/view/%'] = array(
+    'title' => t('View Photos'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrrippr_user_view_photos',
+    'page arguments' => array(1, 4),
+    'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrrippr.user.inc',
+  );
+
   $items['user/%/flickrrippr/delete/%'] = array(
     'title' => t('edit'),
     'type' => MENU_CALLBACK,
@@ -103,19 +112,9 @@ function flickrrippr_menu() {
     'weight' => 0,
     'file' => 'flickrrippr.admin.inc',
   );
-
-  if (module_exists('flickrtags')) {
-    $items['admin/settings/flickrrippr/tags'] = array(
-      'title' => 'Tag Rippr',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('flickrtags_admin_form'),
-      'access arguments' => array('Administer global flickr api settings'),
-      'type' => MENU_LOCAL_TASK,
-      'weight' => 1,
-    );
-  }
   return $items;
 }
+
 
 function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   $form = array();
@@ -213,10 +212,9 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
   //update their user info
-  flickrrippr_fetch_user_info_and_save($flickruser);
+  job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
 
-
-  $num_photos = variable_get('flickrrippr_num_per_fetch', 10);
+  $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
 
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
@@ -240,17 +238,25 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   $num_photos = 0;
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
-      job_queue_add('flickrrippr_makenode', t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => $flickruser->flickrusername)), array($p['id']));
-      //$num_photos++;
-    }
+      //only fetch if there's new stuff
+//       $local_cached_details = flickrrippr_get_photo_details_by_photoid($p['id']);
+//       if (!$local_cached_details) {
+        //only queue if it hasn't been fetched in last hour.
+
+        //hack to get around job_queue restricting descriptions to 255 chars
+        $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => print_r($flickruser, 1)));
+        if(strlen($description) >= 255) {
+          $description = substr($description, 0, 254);
+        }
+        job_queue_add('flickrrippr_makenode', $description, array($p['id']));
+        $num_photos++;
+      }
+//     }
   }
 
-  //drupal_set_message(t('!count Photos saved or updated', array('!count' => $num_photos)));
+  drupal_set_message(t('!count photos queued for import.', array('!count' => $num_photos)));
 
 }
-
-include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
-
 
 /**
  * Helper function, returns the flickr_id for a flickr username.
@@ -319,28 +325,30 @@ function flickrrippr_user_settings($uid = NULL) {
   $accounts = flickrrippr_get_flickr_accounts($user->uid);
 
 
-  $headers = array('', t('Flickr ID'), t('Flickr username'), t('Tag'));
+  $headers = array('', 
+    t('Flickr ID'), 
+    t('Flickr username'), 
+    t('Tag')
+  );
   $rows = array();
   foreach ($accounts as $a) {
 
     $tag_links = '';
 
-    if (!empty($a->tag)) {
+    if (!empty($a->tag) ) {
       $tags = explode(',', $a->tag);
       foreach ($tags as $t) {
-        $tag_links .= l($t, $a->flickrphotosurl .'tags/'. check_plain($t));
+        if (!empty($a->flickrphotosurl)) {
+          $tag_links .= l($t, $a->flickrphotosurl .'tags/'. check_plain($t));
+        }
+        else {
+          $tag_links .= check_plain($t);
+        }
       }
     }
   
-    if (!preg_match('!farm0!', $a->flickravatar)) {
-      //make image
-      $avatar = theme('image', check_plain($a->flickravatar), check_plain($a->flickrusername), check_plain($a->flickrusername), array(), FALSE);
-      //and put link around it
-      $avatar = l($avatar, $a->flickrprofileurl, array('html' => TRUE));
-    }
-    else {
-      $avatar = '';
-    }
+    $avatar = flickrrippr_user_avatar($a);
+
     $rows[] = array(
       $avatar,
       $a->flickrid,
@@ -348,12 +356,26 @@ function flickrrippr_user_settings($uid = NULL) {
       $tag_links,
       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
+      l('View Photos', 'user/'. $user->uid .'/flickrrippr/view/'. $a->flickrid),
     );
     
   }
   $output .= theme('table', $headers, $rows);
   return $output;
 
+}
+
+function flickrrippr_user_avatar($a) {
+  if (isset($a->flickravatar) && !empty($a->flickravatar) && !preg_match('!farm0!', $a->flickravatar)) {
+    //make image
+    $avatar = theme('image', check_plain($a->flickravatar), check_plain($a->flickrusername), check_plain($a->flickrusername), array(), FALSE);
+    //and put link around it
+    $avatar = l($avatar, $a->flickrphotosurl, array('html' => TRUE));
+  }
+  else {
+    $avatar = '';
+  }
+  return $avatar;
 }
 
 function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
@@ -520,9 +542,7 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   }
   switch ($op) {
     case 'delete':
-      //delete where there is no node.. THIS WON'T SCALE
-      //how to get around drupal's lack of referential integrity?
-      db_query('DELETE FROM {flickrphotos} WHERE nid NOT IN (SELECT nid FROM {node});');
+      db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
       drupal_set_message("Flickr Rippr photo deleted.");
     break;
     case 'view':
