@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.11 2010/09/29 02:24:54 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.12 2010/09/29 02:51:45 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -163,7 +163,6 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
       $user->uid,
       $form_state['values']['flickrid']);
 
-    flickrrippr_fetch_user_info_and_save($flickr_account);
     drupal_set_message(t("Flickr account updated"));
   }
   else {
@@ -175,9 +174,12 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
       $form_state['values']['flickr_tag'],
       $user->uid);
     drupal_set_message(t("Flickr username set"));
+    $flickr_account->flickrid = $flickrid;
+    $flickr_account->uid = $user->uid;
   }
-  
-  
+    
+  flickrrippr_fetch_user_info_and_save($flickr_account);
+
 
   drupal_goto('user/'. $user->uid .'/flickrrippr');
 }
