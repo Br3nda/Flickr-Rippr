@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.3 2010/09/29 23:40:58 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.4 2010/09/29 23:41:37 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -220,7 +220,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
 
   if (!empty($nid) && $nid) {
     //already exists
-    $node = node_load(array('nid' => $nid));
+    $node = node_load($nid);
   }
   $node->type = 'flickrrippr_photo';
 
