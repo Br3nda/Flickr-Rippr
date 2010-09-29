@@ -4,4 +4,4 @@ package = Flickr
 
 core = 7.x
 dependencies[] = flickrapi
-dependencies[] = taxonomy
+dependencies[] = job_queue

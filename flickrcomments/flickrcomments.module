@@ -1,0 +1,89 @@
+<?php
+
+
+function flickrcomments_flickrrippr_node_alter($node, $details) {
+  if ($details['comments'] == 0) {
+    //no comments
+    return;
+  }
+
+  $photo_id = $details['photo_id'];
+  drupal_set_message("Going to get comments for $photo_id");
+
+  $flickr = @flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
+    return FALSE;
+  }
+  $comments = $flickr->photos_comments_getList($photo_id);
+//       drupal_set_message('all = '. nl2br(print_r($comments['comment'], 1)));
+
+  //no comments? get out of here
+  if (!isset($comments['comment']) or !is_array($comments['comment'])) {
+    return;
+  }
+  foreach($comments['comment'] as $c) {
+//     drupal_set_message('comment  = '. print_r($c, 1));
+    $existing_comment = _flickrcomments_get_comment($c['id']);
+    if (!$existing_comment) {
+      _flickrcomments_save_new_comment($node, $c);
+    }
+    else {
+      _flickrcomments_update_comment($node, $c, $existing_comment);
+    }
+
+  }
+}
+
+
+function _flickrcomments_get_comment($comment_id) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrcomments} where flickrcommentid='%s'", $comment_id));
+}
+
+function _flickrcomments_update_comment($node, $details, $existing_comment) {
+    $comment = array(
+    'subject' => t('Flickr comment'),
+    'homepage' => check_plain($details['permalink']),
+    'name' => check_plain($details['authorname']),
+    'cid' => FALSE, //needed to be set, so core doesn't E_STRICT splatter
+    'pid' => 0,
+    'nid' => $node->nid,
+    'uid' => 0,
+    'comment' => check_plain($details['_content']),
+    'format' => 0, //THIS IS BAD.. fix before any release.
+    'timestamp' => $details['datecreate'],
+    'cid' => $existing_comment->cid
+  );
+  $cid = comment_save($comment);
+
+}
+
+function _flickrcomments_save_new_comment($node, $details) {
+  $comment = array(
+    'subject' => t('Flickr comment'),
+    'homepage' => check_plain($details['permalink']),
+    'name' => check_plain($details['authorname']),
+    'cid' => FALSE, //needed to be set, so core doesn't E_STRICT splatter
+    'pid' => 0,
+    'nid' => $node->nid,
+    'uid' => 0,
+    'comment' => check_plain($details['_content']),
+    'format' => 0, //THIS IS BAD.. fix before any release.
+    'timestamp' => $details['datecreate'],
+  );
+  
+  
+  $cid = comment_save($comment);
+  if (!$cid) {
+    drupal_set_message(t("Failed to save comment"), 'error');
+    return false;
+  }
+  drupal_set_message(t("Saved comment by %name", array('%name' => $details['authorname'])));
+  db_query("INSERT INTO {flickrcomments} (flickrcommentid, authorname, permalink, cid) VALUES ('%s', '%s', '%s', %d)",
+    $details['id'],
+    $details['authorname'],
+    $details['permalink'],
+    $cid);
+}
+
+

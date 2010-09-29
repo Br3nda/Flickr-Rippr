@@ -11,7 +11,14 @@ function flickrjpegcache_flickrrippr_path_options() {
  * implementatin of hook_flickrrippr_path
  * Save the file on the file system - not as a deep linking src to flickr.com
  */
-function flickrjpegcache_get_path($flickr_photo, $size=FALSE) {
+function flickrjpegcache_get_path($flickr_photo, $size=FALSE, $refetch=FALSE) {
+  $filename = $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
+
+//   drupal_set_message(file_directory_path() .DIRECTORY_SEPARATOR . $filename);
+  if(!$refetch && file_exists(file_directory_path() . DIRECTORY_SEPARATOR. $filename)) {
+    return file_directory_path() . DIRECTORY_SEPARATOR. $filename;
+  }
+
   $src = flickrrippr_path_remote($flickr_photo, $size);
   $response = drupal_http_request($src);
   if ($response->code != 200) {
@@ -19,9 +26,9 @@ function flickrjpegcache_get_path($flickr_photo, $size=FALSE) {
     return $src;
   }
 
-  $filename = $flickr_photo['id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
+  
   //jpeg is now in $response->data
   $file = file_save_data($response->data, $filename, FILE_EXISTS_REPLACE);
-//   drupal_set_mes#sage(t("Jpeg saved as %file", array('%file' => $file)));
+//   drupal_set_message(t("Jpeg saved locally as %file", array('%file' => $file)));
   return $file;
 }

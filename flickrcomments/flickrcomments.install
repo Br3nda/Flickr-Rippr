@@ -1,0 +1,37 @@
+<?php
+// $Id: flickrcomments.install,v 1.4.2.2 2010/09/29 21:46:13 taniwha Exp $
+/**
+ * @file DB stuff for flickr comments
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function flickrcomments_install() {
+  drupal_install_schema('flickrcomments');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+
+function flickrcomments_uninstall() {
+  drupal_uninstall_schema('flickrcomments');
+}
+
+
+/**
+ * Implementation of hook_schema().
+ */
+function flickrcomments_schema() {
+  $schema['flickrcomments'] = array(
+    'fields' => array(
+      'flickrcommentid' => array('type' => 'text', 'not null' => TRUE),
+      'authorname' => array('type' => 'text', 'not null' => TRUE), 
+      'permalink' => array('type' => 'text', 'not null' => TRUE),
+      'cid' => array('type' => 'int', 'not null' => TRUE, 'unique' => TRUE), //references comment.cid
+      ),
+    'primary key' => array('flickrcommentid')
+  );
+  return $schema;
+}

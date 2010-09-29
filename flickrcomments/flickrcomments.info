@@ -1,0 +1,7 @@
+name = Flickr Rippr - Comments
+description = Syncs comments on flickr to photos imported via Flickr Rippr module
+package = Flickr
+
+core = 6.x
+dependencies[] = flickrrippr
+dependencies[] = comment
