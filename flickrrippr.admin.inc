@@ -1,12 +1,12 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.41 2010/09/29 02:09:11 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.41.2.1 2010/09/29 23:13:52 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
 
 function flickrrippr_admin_edit($uid, $flickrid) {
 
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $fuser = flickrrippr_get_flickruser($uid, $flickrid);
   include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
   return drupal_get_form('flickrrippr_user_settings_form', $fuser);
 }
@@ -15,7 +15,7 @@ function flickrrippr_admin_edit($uid, $flickrid) {
 
 //TODO CHANGE TO FORM!
 function flickrrippr_admin_fetch($uid, $flickrid) {
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $fuser = flickrrippr_get_flickruser($uid, $flickrid);
   $new = flickrrippr_fetch_latest($fuser);
   drupal_goto('admin/content/flickrrippr');
 }

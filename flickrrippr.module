@@ -193,7 +193,7 @@ function flickrrippr_node_refresh($nid) {
  * This function will recurse, reading futher back into the flickr stream
  * until it finds a photo it already has saved as a node
  */
-function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
+function flickrrippr_check_latest_for_flickruser($user_id, $pagenum = 1) {
  //fetches defails from our database
   $flickrusers =  flickrrippr_get_flickr_accounts($user_id);
 
@@ -290,7 +290,7 @@ function flickrrippr_cron() {
   $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
 
   while ($fuser = db_fetch_object($result)) {
-    flickrrippr_check_latest_for_user($fuser->uid);
+    flickrrippr_check_latest_for_flickruser($fuser->uid);
   }
 }
 /*
