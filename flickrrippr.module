@@ -531,26 +531,12 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 function flickrrippr_node_form(&$form_state, $node) {
 }
 
-/**
- * Implementaion of hook_nodeapi().
- */
-function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
-  if (!isset($node->nid)) {
-    return;
-  }
-  $photo_id = flickrrippr_node_get_photoid($node->nid);
-  if (!$photo_id) {
-    //not a flickr photo
-    return;
-  }
-  switch ($op) {
-    case 'delete':
-      db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
-      drupal_set_message(t("Flickr Rippr photo deleted."));
-    break;
-    case 'view':
-      flickrrippr_view($node, $teaser, $page);
-    break;
-  }
+function flickrrippr_node_delete(&$node, $op, $teaser, $page) {
+  db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
+  drupal_set_message(t("Flickr Rippr photo deleted."));
+}
+
+function flickrrippr_node_view(&$node, $op, $teaser, $page) {
+  flickrrippr_view($node, $teaser, $page);
 }
 
