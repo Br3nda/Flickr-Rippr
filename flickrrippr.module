@@ -115,6 +115,7 @@ function flickrrippr_menu() {
   return $items;
 }
 
+
 function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   $form = array();
   $form['uid'] = array('#type' => 'hidden', '#value' => $uid);

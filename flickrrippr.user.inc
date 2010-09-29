@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.13 2010/09/29 03:20:15 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14 2010/09/29 20:52:30 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -189,7 +189,7 @@ function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
     return  $flickr->people_findByUsername($flickrusername);
 }
 
-
+//TODO Move this all the themes
 function flickrrippr_user_view_photos($uid, $flickruserid) {
   $output = '';
 
