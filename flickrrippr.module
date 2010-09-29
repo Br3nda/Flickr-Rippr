@@ -532,7 +532,7 @@ function flickrrippr_node_form(&$form_state, $node) {
 }
 
 /**
- * 
+ * Implementaion of hook_nodeapi().
  */
 function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   if (!isset($node->nid)) {
