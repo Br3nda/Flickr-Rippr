@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.12 2010/09/29 02:51:45 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.13 2010/09/29 03:20:15 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -187,4 +187,25 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
     $flickr = flickrapi_phpFlickr();
     return  $flickr->people_findByUsername($flickrusername);
+}
+
+
+function flickrrippr_user_view_photos($uid, $flickruserid) {
+  $output = '';
+
+  $result = pager_query("SELECT * FROM {flickrphotos} WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
+  
+  $rows = array();
+  while($photo = db_fetch_object($result)) {
+    //   drupal_set_message(print_r($photo, 1));
+    $jpeg_path = flickrrippr_path((array)$photo, 't');
+    $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo->nid, array('html' => TRUE));
+    if(count($col) > 6) {
+      $rows[] = $col;
+      $col = array();
+    }
+  }
+  $output .= theme('pager');
+  $output .= theme('table', array(), $rows);
+  return $output;
 }

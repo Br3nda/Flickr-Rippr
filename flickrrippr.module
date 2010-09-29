@@ -67,6 +67,15 @@ function flickrrippr_menu() {
     'file' => 'flickrrippr.user.inc',
   );
 
+  $items['user/%/flickrrippr/view/%'] = array(
+    'title' => t('View Photos'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrrippr_user_view_photos',
+    'page arguments' => array(1, 4),
+    'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrrippr.user.inc',
+  );
+
   $items['user/%/flickrrippr/delete/%'] = array(
     'title' => t('edit'),
     'type' => MENU_CALLBACK,
@@ -346,6 +355,7 @@ function flickrrippr_user_settings($uid = NULL) {
       $tag_links,
       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
+      l('View Photos', 'user/'. $user->uid .'/flickrrippr/view/'. $a->flickrid),
     );
     
   }
