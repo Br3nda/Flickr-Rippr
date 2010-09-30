@@ -1,7 +1,8 @@
 <?php
+//$Id: flickrrippr.views.inc,v 1.1.6.2 2010/09/30 00:31:55 taniwha Exp $
+
 /**
  * @file Views stuff
- * $Id: flickrrippr.views.inc,v 1.1.6.1 2010/09/30 00:31:11 taniwha Exp $
  */
 
 function flickrrippr_views_data() {
