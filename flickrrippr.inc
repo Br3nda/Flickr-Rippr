@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.4 2010/09/29 23:41:37 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.5 2010/09/30 00:40:36 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -21,7 +21,7 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
     return;
   }
   
-  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE LOWER(flickrusername) = '%s'", strtolower($fuser)));
+  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE LOWER(flickrusername) = !fuser", array('!fuser' => strtolower($fuser))));
   if (!$flickruser) {
     drupal_set_message(t("Flickruser %flickrusername is not a registered user of this site", array('%flickrusername' => $fuser)));
     return;
@@ -256,18 +256,12 @@ function flickrrippr_photo_get_nid($photo_id) {
  * get the photo id for a nid
  */
 function flickrrippr_get_photo_details_by_photoid($pid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = %d", $pid));
+  return db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = :pid", array(':pid' => $pid)));
 }
 
 /**
  * Get a user's flickr settings from our database
  */
 function flickrrippr_get_flickr_accounts($uid) {
-  $result = db_query("SELECT * FROM {flickrusers} WHERE uid = %d ORDER BY lower(flickrusername)", $uid);
-  $flickr_users = array();
-  while ($fuser = db_fetch_object($result)) {
-    $flickr_users[] = $fuser;
-  }
-  return $flickr_users;
-  
+  return db_query("SELECT * FROM {flickrusers} WHERE uid = :uid ORDER BY lower(flickrusername)", array(':uid' => $uid));
 }
