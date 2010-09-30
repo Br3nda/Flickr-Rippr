@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.41.2.1 2010/09/29 23:13:52 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.41.2.2 2010/09/30 00:24:10 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -7,7 +7,7 @@
 function flickrrippr_admin_edit($uid, $flickrid) {
 
   $fuser = flickrrippr_get_flickruser($uid, $flickrid);
-  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+  include_once(drupal_get_path('module', 'flickrrippr') . '/flickrrippr.user.inc');
   return drupal_get_form('flickrrippr_user_settings_form', $fuser);
 }
 
@@ -202,5 +202,5 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
   variable_set('flickrrippr_page_size', $page_size);
   variable_set('flickrrippr_teaser_size', $teaser_size);
 
-  drupal_set_message('Flickr Rippr settings saved');  
+  drupal_set_message(t('Flickr Rippr settings saved'));  
 }
