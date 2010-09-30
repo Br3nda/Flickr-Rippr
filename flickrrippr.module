@@ -285,7 +285,11 @@ function flickrrippr_flickruser($username) {
     drupal_set_message(t('%username is not known by flickr.com', array('%username' => $username)), 'error');
     return;
   }
-  db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE flickrusername='%s'", $fuser['id'], $username);
+
+  db_update('flickrusers')
+    ->fields(array('flickrid' => $fuser['id']))
+    ->condition('flickrusername', $username) 
+    ->execute();
   return $fuser['id'];
 }
 
@@ -296,9 +300,9 @@ function flickrrippr_cron() {
   //get missing flickrids
 //   flickrrippr_add_missing_flickrids();
 
-  $accounts = db_select('flickrusers', 'f')
-    ->addField('f', 'uid')
-    ->execute();
+  $accounts = db_select('flickrusers')
+    ->addField('flickrusers', '*');
+   $accounts->execute();
   foreach($accounts as $fuser) {
     flickrrippr_check_latest_for_flickruser($fuser->uid);
   }
