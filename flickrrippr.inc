@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.5 2010/09/30 00:40:36 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.6 2010/09/30 00:41:31 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -116,7 +116,6 @@ function flickrrippr_makenode($photo_id) {
   
 
   $flickr_context = $flickr->photos_getContext($photo_id);
-  
 
   //flickr username
   $flickrusername = $flickr_info['owner']['username'];
@@ -129,14 +128,6 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
     return FALSE;
   }
-
-  //Full (normal) sized image
-//   $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
-//   $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_teaser_size', 'm'));
-
-  $page_url = $flickr_info['urls']['url'][0]['_content'];
-
-  
 
   //assemble everything to pass to hook
   $details = array(
