@@ -227,6 +227,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 //     drupal_get_path('module', 'flickrrippr') . '/flickrrippr.user.inc'
 //   );
   //TODO use D7 queues
+  require_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
   flickrrippr_fetch_user_info_and_save(array($flickruser));
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
@@ -345,7 +346,7 @@ function flickrrippr_user_settings($uid = NULL) {
   $accounts = flickrrippr_get_flickr_accounts($user->uid);
 
 
-  $headers = array('', 
+  $header = array('', 
     t('Flickr ID'), 
     t('Flickr username'), 
     t('Tag'),
@@ -381,7 +382,7 @@ function flickrrippr_user_settings($uid = NULL) {
     );
     
   }
-  $output .= theme('table', array('header' => $headers, 'rows' => $rows));
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
   return $output;
 
 }
