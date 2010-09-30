@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.6 2010/09/30 01:01:23 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.7 2010/09/30 01:06:31 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -21,17 +21,25 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   //e.g. Array ( [id] => 95198959@N00 [nsid] => 95198959@N00 [ispro] => 1 [iconserver] => 5 [iconfarm] => 1 [path_alias] => alan50 [username] => Alan50 [realname] => Alan [location] => Hamilton, New Zealand [photosurl] => http://www.flickr.com/photos/alan50/ [profileurl] => http://www.flickr.com/people/alan50/ [mobileurl] => http://m.flickr.com/photostream.gne?id=274055 [photos] => Array ( [firstdatetaken] => 2002-11-23 12:11:53 [firstdate] => 1111902587 [count] => 941 ) )
   
   $avatar = flickrrippr_get_avatar($user_info);
+  db_update('flickrusers')
+    ->fields(
+      array(
+        'username' => $user_info['username'],
+        'flickrispro' => $user_info['ispro'],
+        'flickrphotosurl' => $user_info['photosurl'],
+        'flickrprofileurl' => $user_info['profileurl'],
+        'flickravatar' => $avatar,
+      )
+    )
+    ->condition('uid', $flickruser->uid)
+    ->condition('flickrid', $flickuser->flickrid)
+    ->execute();
+
 //   drupal_set_message(print_r($user_info, 1));
   $result = db_query("UPDATE {flickrusers} SET flickrusername=:username, flickrispro=:ispro, flickrphotosurl=:photosurl, flickrprofileurl=:profileurl, flickravatar=:avatar
     WHERE uid=:uid AND flickrid=:id",
     array(
-      ':username' => $user_info['username'],
-      ':ispro' => $user_info['ispro'],
-      ':photosurl' => $user_info['photosurl'],
-      ':profileurl' => $user_info['profileurl'],
-      ':avatar' => $avatar,
-      ':uid' => $flickruser->uid,
-      ':id' => $flickruser->flickrid
+
     )
   );
 }
@@ -119,7 +127,7 @@ function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
 
   if (!isset($form_state['values']['flickrid'])) {
-    $query = db_select('flickrusers')   
+    $existing = db_select('flickrusers')   
       ->fields('flickrusers', array('uid'))
       ->condition('flickrusername', $form_state['values']['flickr_username'])
       ->execute()
