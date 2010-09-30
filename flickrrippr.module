@@ -137,7 +137,7 @@ function flickrrippr_user_delete_account($form, $uid, $flickrid) {
 function flickrrippr_user_delete_account_submit($form_id, $form_state) {
   $uid = $form_state['values']['uid'];
   $flickrid = $form_state['values']['flickrid'];
-  db_query("DELETE FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid);
+  db_query("DELETE FROM {flickrusers} WHERE uid=:uid AND flickrid=:flickrid", array(':uid' => $uid, ':flickrid' => $flickrid));
   drupal_goto('user/' . $uid . '/flickrrippr');
 }
 
@@ -160,14 +160,21 @@ function flickrrippr_node_refresh_permission($nid) {
  * Get the details of a flickr user from the database
  */
 function flickrrippr_get_flickruser($uid, $flickrid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
+  return db_select('flickrusers')
+    ->condition('uid', $uid)
+    ->condition('flickrid', $flickrid)
+    ->execute();
+    
+//   return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
 }
 
 /**
  * Loading of the node
  */
 function flickrrippr_load(&$node) {
-  $node->flickr_photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
+  $node->flickr_photo = db_select('flickrphotos')
+    ->condition('nid', $node->nid)
+    ->execute();
 }
 
 /**
@@ -289,9 +296,9 @@ function flickrrippr_cron() {
   //get missing flickrids
 //   flickrrippr_add_missing_flickrids();
 
-  $result = db_query("SELECT * FROM {flickrusers} ORDER BY uid");
-
-  while ($fuser = db_fetch_object($result)) {
+  $accounts = db_select('flickrusers')
+    ->execute();
+  foreach($accounts as $fuser) {
     flickrrippr_check_latest_for_flickruser($fuser->uid);
   }
 }
@@ -534,7 +541,7 @@ function flickrrippr_node_form(&$form_state, $node) {
 }
 
 function flickrrippr_node_delete(&$node, $op, $teaser, $page) {
-  db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
+  db_query('DELETE FROM {flickrphotos} WHERE nid=?', array($node->nid)); 
   drupal_set_message(t("Flickr Rippr photo deleted."));
 }
 
