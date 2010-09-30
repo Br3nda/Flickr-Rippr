@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.4 2010/09/30 00:51:54 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.5 2010/09/30 00:54:29 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -63,8 +63,8 @@ function flickrrippr_user_add_account($uid) {
 /**
  * Form for a user editing their own settings
  */
-function flickrrippr_user_settings_form($a, $flickruser) {
-  
+function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
+ 
   $form = array();
   if (isset($flickruser->flickrusername)) {
     drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $flickruser->flickrusername)));
