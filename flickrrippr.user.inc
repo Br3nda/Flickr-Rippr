@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.2 2010/09/30 00:27:21 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.3 2010/09/30 00:29:40 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -75,7 +75,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   if (isset($flickruser->flickrid)) {
     $form['flickr_username'] = array(
       '#type' => 'markup', 
-      '#value' => flickrrippr_user_avatar($flickruser) .'<p><strong>'. t('Flickr Username: ') . ' </strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
+      '#value' => flickrrippr_user_avatar($flickruser) . '<p><strong>' . t('Flickr Username:') . ' </strong><br/>' . check_plain($flickruser->flickrusername) . '</p>',
     );
   }
   else {
@@ -100,7 +100,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
     '#weight' => 9,
     );
 
-  if(isset($flickruser->flickrid)) {
+  if (isset($flickruser->flickrid)) {
     $form['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
@@ -115,16 +115,16 @@ function flickrrippr_user_settings_form($a, $flickruser) {
 
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
 
-  if(!isset($form_state['values']['flickrid'])) {
+  if (!isset($form_state['values']['flickrid'])) {
     $existing = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername='%s'", $form_state['values']['flickr_username']));
-    if($existing) {
+    if ($existing) {
       form_set_error('flickr_username', t('Cannot add this flickr account, it is already configured on this website.'));
     }
   }
   
-  if(isset($form_state['values']['flickr_username'])) {
+  if (isset($form_state['values']['flickr_username'])) {
     $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
-    if(!$flickr_details) {
+    if (!$flickr_details) {
       form_set_error('flickr_username', t('Account not found on flickr.com'));
     }
   }
@@ -143,7 +143,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 
   //delete button 
   if ($form_state['values']['op'] == 'Delete') {
-    drupal_goto('user/'. $user->uid .'/flickrrippr/delete/'. $form_state['values']['flickrid']);
+    drupal_goto('user/' . $user->uid . '/flickrrippr/delete/' . check_plain($form_state['values']['flickrid']));
   }
 
 
@@ -181,7 +181,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   flickrrippr_fetch_user_info_and_save($flickr_account);
 
 
-  drupal_goto('user/'. $user->uid .'/flickrrippr');
+  drupal_goto('user/' . $user->uid . '/flickrrippr');
 }
 
 function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
@@ -193,14 +193,14 @@ function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
 function flickrrippr_user_view_photos($uid, $flickruserid) {
   $output = '';
 
-  $result = pager_query("SELECT * FROM {flickrphotos} WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
+  $result = pager_query("SELECT * FROM {flickrphotos} WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, NULL, $flickruserid);
   
   $rows = array();
-  while($photo = db_fetch_object($result)) {
+  while ($photo = db_fetch_object($result)) {
     //   drupal_set_message(print_r($photo, 1));
     $jpeg_path = flickrrippr_path((array)$photo, 't');
-    $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo->nid, array('html' => TRUE));
-    if(count($col) > 6) {
+    $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/' . $photo->nid, array('html' => TRUE));
+    if (count($col) > 6) {
       $rows[] = $col;
       $col = array();
     }
