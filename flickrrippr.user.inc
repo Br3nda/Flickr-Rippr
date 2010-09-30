@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.9 2010/09/30 01:08:59 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.10 2010/09/30 01:10:34 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -34,14 +34,6 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
     ->condition('uid', $flickruser->uid)
     ->condition('flickrid', $flickuser->flickrid)
     ->execute();
-
-//   drupal_set_message(print_r($user_info, 1));
-  $result = db_query("UPDATE {flickrusers} SET flickrusername=:username, flickrispro=:ispro, flickrphotosurl=:photosurl, flickrprofileurl=:profileurl, flickravatar=:avatar
-    WHERE uid=:uid AND flickrid=:id",
-    array(
-
-    )
-  );
 }
 
 
