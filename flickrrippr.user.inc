@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.1 2010/09/29 23:13:52 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.2 2010/09/30 00:27:21 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -135,7 +135,7 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
 
   if (!empty($form_state['values']['uid'])) {
-    $user = user_load(array('uid' => intval($form_state['values']['uid'])));
+    $user = user_load(intval($form_state['values']['uid']));
   }
   else {
     GLOBAL $user;
