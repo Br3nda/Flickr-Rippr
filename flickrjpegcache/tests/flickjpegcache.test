@@ -1,5 +1,13 @@
+<<<<<<< flickjpegcache.test
 <?php
-// $Id: flickjpegcache.test,v 1.3 2010/09/13 01:20:07 taniwha Exp $
+// $Id: flickjpegcache.test,v 1.4 2010/09/30 03:16:31 taniwha Exp $
 /**
  * @file Unit tests for Flickr Rippr's jpeg cache
  */
+=======
+<?php
+// $Id: flickjpegcache.test,v 1.4 2010/09/30 03:16:31 taniwha Exp $
+/**
+ * @file Unit tests for Flickr Rippr's jpeg cache
+ */
+>>>>>>> 1.2.2.3

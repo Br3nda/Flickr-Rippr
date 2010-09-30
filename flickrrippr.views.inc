@@ -1,5 +1,9 @@
 <?php
+// $Id: flickrrippr.views.inc,v 1.2 2010/09/30 03:16:31 taniwha Exp $
 
+/**
+ * @file Views stuff
+ */
 
 function flickrrippr_views_data() {
   $data['flickrphotos']['table']['group'] = t('Flickr Rippr');

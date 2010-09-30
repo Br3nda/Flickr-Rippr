@@ -4,3 +4,5 @@ package = Flickr
 
 core = 7.x
 dependencies[] = flickrapi
+files[] = phpFlickr/phpFlickr.php
+

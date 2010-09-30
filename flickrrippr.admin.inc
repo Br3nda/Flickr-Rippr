@@ -1,13 +1,13 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.41 2010/09/29 02:09:11 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.42 2010/09/30 03:16:31 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
 
 function flickrrippr_admin_edit($uid, $flickrid) {
 
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
-  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+  $fuser = flickrrippr_get_flickruser($uid, $flickrid);
+  include_once(drupal_get_path('module', 'flickrrippr') . '/flickrrippr.user.inc');
   return drupal_get_form('flickrrippr_user_settings_form', $fuser);
 }
 
@@ -15,7 +15,7 @@ function flickrrippr_admin_edit($uid, $flickrid) {
 
 //TODO CHANGE TO FORM!
 function flickrrippr_admin_fetch($uid, $flickrid) {
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $fuser = flickrrippr_get_flickruser($uid, $flickrid);
   $new = flickrrippr_fetch_latest($fuser);
   drupal_goto('admin/content/flickrrippr');
 }
@@ -46,7 +46,7 @@ function flickrrippr_admin() {
       check_plain($u->flickrid),
       check_plain($u->tag),
       drupal_get_form('flickrrippr_user_fetch_now', $u->uid, $u->flickrid, 'admin/content/flickrrippr'),
-      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. check_plain($u->flickrid)),
+      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/' . $u->uid . '/' . check_plain($u->flickrid)),
     );
   }
   $output .= theme('table', $headers, $rows);
@@ -202,5 +202,5 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
   variable_set('flickrrippr_page_size', $page_size);
   variable_set('flickrrippr_teaser_size', $teaser_size);
 
-  drupal_set_message('Flickr Rippr settings saved');  
+  drupal_set_message(t('Flickr Rippr settings saved'));  
 }

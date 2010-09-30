@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14 2010/09/29 20:52:30 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.15 2010/09/30 03:16:31 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -60,11 +60,10 @@ function flickrrippr_user_add_account($uid) {
 /**
  * Form for a user editing their own settings
  */
-function flickrrippr_user_settings_form($a, $flickruser) {
-  
+function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
   $form = array();
   if (isset($flickruser->flickrusername)) {
-    drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $flickruser->flickrusername)));
+    drupal_set_title(t('Flickr Rippr settings for @username', array('@username' => $flickruser->flickrusername)));
   }
 
   if (isset($flickruser->flickrid)) {
@@ -129,11 +128,16 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
     }
   }
 }
+
+function dp($thing) {
+  drupal_set_message(print_r($thing, 1));
+}
+
 /**
  * Save submission of a user editting their own settings
  */
 function flickrrippr_user_settings_form_submit($form, &$form_state) {
-
+  db(print_r($form_state, 1));
   if (!empty($form_state['values']['uid'])) {
     $user = user_load(array('uid' => intval($form_state['values']['uid'])));
   }
