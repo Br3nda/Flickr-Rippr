@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.3 2010/09/30 00:29:40 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.4 2010/09/30 00:51:54 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -22,15 +22,17 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   
   $avatar = flickrrippr_get_avatar($user_info);
 //   drupal_set_message(print_r($user_info, 1));
-  $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrispro=%d, flickrphotosurl='%s', flickrprofileurl='%s', flickravatar='%s'
-    WHERE uid=%d AND flickrid='%s'",
-    $user_info['username'],
-    $user_info['ispro'],
-    $user_info['photosurl'],
-    $user_info['profileurl'],
-    $avatar,
-    $flickruser->uid,
-    $flickruser->flickrid
+  $result = db_query("UPDATE {flickrusers} SET flickrusername=:username, flickrispro=:ispro, flickrphotosurl=:photosurl, flickrprofileurl=:profileurl, flickravatar=:avatar
+    WHERE uid=:uid AND flickrid=:id",
+    array(
+      ':username' => $user_info['username'],
+      ':ispro' => $user_info['ispro'],
+      ':photosurl' => $user_info['photosurl'],
+      ':profileurl' => $user_info['profileurl'],
+      ':avatar' => $avatar,
+      ':uid' => $flickruser->uid,
+      ':id' => $flickruser->flickrid
+    )
   );
 }
 
@@ -40,6 +42,7 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
  */
 function flickrrippr_user_edit_account($uid, $flickrid) {
   $fuser = flickrrippr_get_flickruser($uid, $flickrid);
+  error_log(print_r($fuser, 1));
   $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
   return $output;
 }
@@ -116,7 +119,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
 
   if (!isset($form_state['values']['flickrid'])) {
-    $existing = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername='%s'", $form_state['values']['flickr_username']));
+    $existing = db_query("SELECT * FROM {flickrusers} WHERE flickrusername=:fuser", array(':fuser' => $form_state['values']['flickr_username']));
     if ($existing) {
       form_set_error('flickr_username', t('Cannot add this flickr account, it is already configured on this website.'));
     }
@@ -157,23 +160,27 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 
 
   if (isset($flickr_account->flickrusername)) {
-    
-    $result = db_query("UPDATE {flickrusers} SET tag='%s' WHERE uid = %d AND flickrid='%s'",
-      $form_state['values']['flickr_tag'],
-      $user->uid,
-      $form_state['values']['flickrid']);
-
+    unset($record);
+    $record = (object)array(
+      'tag' => $$form_state['values']['flickr_tag'],
+      'uid' => $user->uid,
+      'flickrid' => $form_state['values']['flickrid']
+    );
+    drupal_write_record('flickrusers', $record, array('uid', 'flickrid')); //
     drupal_set_message(t("Flickr account updated"));
   }
   else {
     $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
     $flickrid = $flickr_details['id'];
-    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s', %d)",
-      $form_state['values']['flickr_username'],
-      $flickrid,
-      $form_state['values']['flickr_tag'],
-      $user->uid);
+
+    unset($record);
+    $record->flickrusername = $form_state['values']['flickr_username'];
+    $record->flickrid = $flickrid;
+    $record->tag = $form_state['values']['flickr_tag'];
+    $record->uid = $user->uid;
+    drupal_write_record('flickrusers', $record);
     drupal_set_message(t("Flickr username set"));
+
     $flickr_account->flickrid = $flickrid;
     $flickr_account->uid = $user->uid;
   }
