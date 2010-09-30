@@ -211,6 +211,11 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
  */
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
+  $num_queue = db_fetch_object(db_query("SELECT count(*) as c FROM {job_queue} WHERE function='flickrrippr_makenode'"))->c;
+  if ($num_queue > 1000) {
+    watchdog('flickrrippr', 'More than 1,000 flickr rippr jobs queued. Not queueing anymore');
+    return;
+  }
   //update their user info
   job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
 
