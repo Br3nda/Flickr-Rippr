@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.6 2010/09/30 00:41:31 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.7 2010/09/30 01:32:24 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -21,7 +21,12 @@ function flickrrippr_get_user_by_flickrusername($fuser) {
     return;
   }
   
-  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE LOWER(flickrusername) = !fuser", array('!fuser' => strtolower($fuser))));
+  $flickruser = db_select('flickrusers', 'f')
+    ->addField('f', 'uid')
+    ->condition('LOWER(flickrusername)', strtolower($fuser))
+    ->execute()
+    ->fetch();
+
   if (!$flickruser) {
     drupal_set_message(t("Flickruser %flickrusername is not a registered user of this site", array('%flickrusername' => $fuser)));
     return;
@@ -42,7 +47,11 @@ function flickrrippr_get_user_by_nsid($nsid) {
     return;
   }
   
-  $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid = '%s'", $nsid));
+  $flickruser = db_select('flickrusers', 'f')
+    ->addField('d', 'uid')
+    ->condition('flickrid', $nsid)
+    ->execute()
+    ->fetch();
   if (!$flickruser) {
     drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
     return;
@@ -108,9 +117,11 @@ function flickrrippr_makenode($photo_id) {
   //we can't get info from flickr -- mark this node as bad
   if (!$flickr_info) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
-    db_query("UPDATE {flickrphotos} SET failed = 1 WHERE flickrphoto_id = %d", $photo_id);
-    //TODO unpublish the node?
-    
+    db_update('flickrphotos')
+      ->fields(array('failed' => 1))
+      ->condition('flickrphoto_id', $photo_id)
+      ->execute();
+   
     return FALSE;
   }
   
@@ -169,13 +180,14 @@ function flickrrippr_makenode($photo_id) {
   if (isset($node->is_new) && $node->is_new) {
 //     drupal_set_message("New node, nid = $node->nid");
   
-    $values[] = $details['id'];
-    $values[] = $node->nid;
-    $values[] = strtotime('now');
+    $fields['flickrphoto_id'] = $details['id'];
+    $fields['nid'] = $node->nid;
+    $fields['lastfetched'] = strtotime('now');
+  
 
-    $result = db_query("INSERT INTO {flickrphotos} (" . implode($fields, ', ') . ", flickrphoto_id, nid, lastfetched)
-      VALUES (" . str_repeat("'%s', ",  count($fields) ) . " %d, %d, %d )",
-      $values);
+    $result = db_insert('flickrphotos')
+      ->fields($fields)
+      ->execute();
       drupal_set_message(t("Saved new photo %photo_id, " . l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
   else {
@@ -247,12 +259,21 @@ function flickrrippr_photo_get_nid($photo_id) {
  * get the photo id for a nid
  */
 function flickrrippr_get_photo_details_by_photoid($pid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE flickrphoto_id = :pid", array(':pid' => $pid)));
+  return db_select('flickrphotos', 'p')
+      ->addField('p', '*')
+      ->condition('flickrphoto_id', $pid)
+      ->execute()
+      ->fetch();
 }
 
 /**
  * Get a user's flickr settings from our database
  */
 function flickrrippr_get_flickr_accounts($uid) {
-  return db_query("SELECT * FROM {flickrusers} WHERE uid = :uid ORDER BY lower(flickrusername)", array(':uid' => $uid));
+  return db_select('flickrusers')
+    ->addField('flickrusers', '*')
+    ->condition('uid', $uid)
+    ->orderBy('lower(flickrusername)')
+    ->execute();
 }
+
