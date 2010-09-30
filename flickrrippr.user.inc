@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.8 2010/09/30 01:06:46 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.9 2010/09/30 01:08:59 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -185,14 +185,17 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
     $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
     $flickrid = $flickr_details['id'];
 
-    unset($record);
-    $record->flickrusername = $form_state['values']['flickr_username'];
-    $record->flickrid = $flickrid;
-    $record->tag = $form_state['values']['flickr_tag'];
-    $record->uid = $user->uid;
-    drupal_write_record('flickrusers', $record);
+    db_insert('flickruser')
+    ->fields(
+      array(
+        'flickrusername' => $form_state['values']['flickr_username'],
+        'flickrid' => $flickrid,
+        'tag' => $form_state['values']['flickr_tag'],
+        'uid' => $user->uid,
+      )
+    )
+    ->execute();
     drupal_set_message(t("Flickr username set"));
-
     $flickr_account->flickrid = $flickrid;
     $flickr_account->uid = $user->uid;
   }
