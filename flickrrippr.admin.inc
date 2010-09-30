@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.41.2.2 2010/09/30 00:24:10 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.41.2.3 2010/09/30 00:24:33 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -46,7 +46,7 @@ function flickrrippr_admin() {
       check_plain($u->flickrid),
       check_plain($u->tag),
       drupal_get_form('flickrrippr_user_fetch_now', $u->uid, $u->flickrid, 'admin/content/flickrrippr'),
-      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/'. $u->uid .'/'. check_plain($u->flickrid)),
+      l(t('Edit Settings'), 'admin/content/flickrrippr/edit/' . $u->uid . '/' . check_plain($u->flickrid)),
     );
   }
   $output .= theme('table', $headers, $rows);
