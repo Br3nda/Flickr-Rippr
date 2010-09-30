@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.14.4.5 2010/09/30 00:54:29 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.14.4.6 2010/09/30 01:01:23 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -119,9 +119,14 @@ function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
 
   if (!isset($form_state['values']['flickrid'])) {
-    $existing = db_query("SELECT * FROM {flickrusers} WHERE flickrusername=:fuser", array(':fuser' => $form_state['values']['flickr_username']));
+    $query = db_select('flickrusers')   
+      ->fields('flickrusers', array('uid'))
+      ->condition('flickrusername', $form_state['values']['flickr_username'])
+      ->execute()
+      ->fetchField();
     if ($existing) {
-      form_set_error('flickr_username', t('Cannot add this flickr account, it is already configured on this website.'));
+      form_set_error('flickr_username', t('Cannot add this flickr account, it is already configured on this website.' . print_r($existing, 1)));
+      return;
     }
   }
   
