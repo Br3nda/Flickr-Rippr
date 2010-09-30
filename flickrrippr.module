@@ -164,7 +164,8 @@ function flickrrippr_get_flickruser($uid, $flickrid) {
     ->fields('flickrusers')
     ->condition('uid', $uid)
     ->condition('flickrid', $flickrid)
-    ->execute();
+    ->execute()
+    ->fetch();
     
 //   return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
 }
