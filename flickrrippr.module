@@ -1,4 +1,6 @@
 <?php
+require_once(drupal_get_path('module', 'flickrrippr') . '/flickrrippr.inc');
+
 /**
  * Implementation of hook_perm().
  */
