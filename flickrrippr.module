@@ -296,8 +296,8 @@ function flickrrippr_cron() {
   //get missing flickrids
 //   flickrrippr_add_missing_flickrids();
 
-  $accounts = db_select('flickrusers')
-    ->fields( array('uid'))
+  $accounts = db_select('flickrusers', 'f')
+    ->addField('f', 'uid')
     ->execute();
   foreach($accounts as $fuser) {
     flickrrippr_check_latest_for_flickruser($fuser->uid);
