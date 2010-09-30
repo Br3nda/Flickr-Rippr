@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.8 2010/09/30 01:34:32 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.9 2010/09/30 01:39:28 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -279,7 +279,7 @@ function flickrrippr_get_photo_details_by_photoid($pid) {
  */
 function flickrrippr_get_flickr_accounts($uid) {
   return db_select('flickrusers')
-    ->addField('flickrusers', '*')
+    ->fields('flickrusers')
     ->condition('uid', $uid)
     ->orderBy('lower(flickrusername)')
     ->execute();
