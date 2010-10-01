@@ -13,23 +13,30 @@ function flickrjpegcache_flickrrippr_path_options() {
  */
 function flickrjpegcache_get_path(&$node, $flickr_photo, $size=FALSE, $refetch=FALSE) {
 
-//   drupal_set_message(print_r($flickr_photo, 1));
-//   return;
-
-
-
   //make a file object which we'll save eventually
   $file = new stdClass();
   $file->filename = $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
-
   
   if(!$refetch && file_exists(file_directory_path() . DIRECTORY_SEPARATOR. $file->filename)) {
     return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
   }
 
+//   drupal_set_message("Looking for $file->filename");
+  foreach ($node->files as $fid => $f) {
+//     drupal_set_message("checking $f->filename");
+    if ($file->filename == $f->filename) {
+      $our_file = $f;
+      $file->fid = $fid;
+    }
+  }
+//   drupal_set_message("File id = $file->fid");
+
+  if (!$refetch) {
+    return $file->filename;
+  }
   
   $src = flickrrippr_path_remote($flickr_photo, $size);
-  drupal_set_message("Will download from $src");
+//   drupal_set_message("Will download from $src");
   $response = drupal_http_request($src);
   if ($response->code != 200) {
     drupal_set_message(t('Failed to fetch jpeg from flickr'), 'error');
@@ -50,19 +57,24 @@ function flickrjpegcache_get_path(&$node, $flickr_photo, $size=FALSE, $refetch=F
   $file->timestamp = time();
   $file->weight = 0;
   $file->list = TRUE;
-  $file->new = TRUE;
-  $file->title .= ' ' . $sizes[$size];
-
-  drupal_write_record('files', $file);
-  drupal_set_message(print_r($file, 1));
-  drupal_set_message(print_r($flickr_photo, 1));
+  $file->new = !isset($file->fid);
 
   $sizes = _flickr_rippr_jpeg_sizes();
-  
+
+  $file->description .= ' ' . $sizes[$size];
+// 
+//   drupal_set_message(print_r($file, 1));
+  if($file->fid) {
+    drupal_write_record('files', $file, array('fid'));
+  }
+  else {
+    drupal_write_record('files', $file);
+  }
+//   drupal_set_message(print_r($file, 1));
+//   drupal_set_message(print_r($flickr_photo, 1));
 
   $node->files[$file->fid] = $file;
   
-
   upload_save($node);
 
   return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
@@ -72,5 +84,5 @@ function flickrjpegcache_get_path(&$node, $flickr_photo, $size=FALSE, $refetch=F
 
 function flickrjpegcache_flickrrippr_node_alter($node, $details) {
   //force a refresh
-  flickrjpegcache_get_path($node, $details, NULL, TRUE);
+  flickrjpegcache_get_path($node, $details, 'b', TRUE);
 }
