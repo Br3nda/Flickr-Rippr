@@ -498,7 +498,7 @@ function flickrrippr_failed_form_submit($form, $fv) {
 
 function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   
-  $photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
+  $photo = (array)$node->flickr_photo;
 
 
   if (!$photo['farm'] || !$photo['server'] || !$photo['secret']) {
