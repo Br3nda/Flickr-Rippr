@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.18.2.14 2010/09/29 21:44:50 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.18.2.15 2010/10/01 02:49:59 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -136,21 +136,21 @@ function flickrrippr_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  $form['failed'] = array(
-    '#title' => 'Failed Imports',
-    '#type' => 'fieldset',
-    'failed_action' => array(
-      '#type' => 'radios',
-      '#title' => t('When photos cannot be refetched from flickr.com'),
-      '#options' => array(
-        'delete' => t('Delete completely from this website.'),
-        'unpublish' => t('Unpublish the photo.'),
-        'nothing' => t('Do nothing. Leave the content on this website'),
-      ),
-      '#required' => TRUE,
-      '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
-    ),
-  );
+//   $form['failed'] = array(
+//     '#title' => 'Failed Imports',
+//     '#type' => 'fieldset',
+//     'failed_action' => array(
+//       '#type' => 'radios',
+//       '#title' => t('When photos cannot be refetched from flickr.com'),
+//       '#options' => array(
+//         'delete' => t('Delete completely from this website.'),
+//         'unpublish' => t('Unpublish the photo.'),
+//         'nothing' => t('Do nothing. Leave the content on this website'),
+//       ),
+//       '#required' => TRUE,
+//       '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
+//     ),
+//   );
 
 
   $form['save'] = array(
