@@ -13,16 +13,21 @@ function flickrjpegcache_flickrrippr_path_options() {
  */
 function flickrjpegcache_get_path(&$node, $flickr_photo, $size=FALSE, $refetch=FALSE) {
 
+ 
   //make a file object which we'll save eventually
   $file = new stdClass();
   $file->filename = $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
   
-  if(!$refetch && file_exists(file_directory_path() . DIRECTORY_SEPARATOR. $file->filename)) {
-    return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
+  if(!file_exists(file_directory_path() . DIRECTORY_SEPARATOR. $file->filename)) {
+    $refetch = TRUE;
   }
 
-//   drupal_set_message("Looking for $file->filename");
-  foreach ($node->files as $fid => $f) {
+  if(!$refetch) {
+    return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
+  }
+//   drupal_set_message("Fetching!");
+  
+  if(is_array($node->files)) foreach ($node->files as $fid => $f) {
 //     drupal_set_message("checking $f->filename");
     if ($file->filename == $f->filename) {
       $our_file = $f;
@@ -48,7 +53,7 @@ function flickrjpegcache_get_path(&$node, $flickr_photo, $size=FALSE, $refetch=F
   // Move uploaded files from PHP's upload_tmp_dir to Drupal's temporary directory.
   // This overcomes open_basedir restrictions for future file operations.
   $file->filepath = file_save_data($response->data, $file->filename, FILE_EXISTS_REPLACE);
-  drupal_set_message(t("Jpeg saved locally as %file", array('%file' => $file->filepath)));
+//   drupal_set_message(t("Jpeg saved locally as %file", array('%file' => $file->filepath)));
 
   $file->description = $flickr_photo['title'];
   $file->filesize = filesize($file->filepath);
