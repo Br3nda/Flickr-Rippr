@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.15 2010/09/29 21:44:50 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.16 2010/10/01 04:18:14 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -66,7 +66,7 @@ function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
     //none chosen, use default
     return flickrrippr_path_remote($flickr_photo, $size);
   }
-  return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
+  return module_invoke($path_handler, 'get_path', $node, $flickr_photo, $size);
 }
 
 /**
@@ -156,6 +156,7 @@ function flickrrippr_makenode($photo_id) {
   foreach($flickr_info['owner'] as $key => $o) {
     $details['owner_'. $key] = $o;
   }
+  $details['flickrphoto_id'] = $details['id'];
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
 //   drupal_set_message(print_r($flickr_info, 1));
 
@@ -203,7 +204,7 @@ function flickrrippr_makenode($photo_id) {
 
     drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
-  //the extra hookes
+  //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
   return $node;
