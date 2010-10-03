@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.6 2010/09/29 21:44:50 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.7 2010/10/03 20:38:55 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -72,6 +72,7 @@ function flickrrippr_schema() {
         'flickrphotos_owner' => array('owner_nsid'),
       ),
     );
+  variable_set("upload_flickrrippr_photo", 1);
 
 /*
 Array
@@ -349,4 +350,8 @@ function flickrrippr_update_6090() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
   db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
   return $ret;
+}
+
+function flicrrippr_update_6100() {
+  variable_set("upload_flickrrippr_photo", 1);
 }
