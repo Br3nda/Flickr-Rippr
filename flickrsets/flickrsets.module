@@ -4,7 +4,7 @@
  */
 function flickrsets_cron() {
   
-  $result = db_query("SELECT * FROM {flickrsets_users} s INNER JOIN {flickrusers} u ON s.flickrid = u.flickrid AND import=TRUE");
+  $result = db_query("SELECT * FROM {flickrsets_users} s INNER JOIN {flickrusers} u ON s.flickrid = u.flickrid AND import=1");
   while ($flickruser = db_fetch_object($result)) {
     
   }
