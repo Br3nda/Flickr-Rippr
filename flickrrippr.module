@@ -120,7 +120,7 @@ function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   $form = array();
   $form['uid'] = array('#type' => 'hidden', '#value' => $uid);
   $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickrid);
-  
+
   $form['message'] = array(
     '#type' => 'markup',
     '#value' => '<p>'. t('Are you sure you want to delete this account?') . '</p>'
@@ -144,7 +144,7 @@ function flickrrippr_user_delete_account_submit($form_id, $form_state) {
 function flickrrippr_node_refresh_perm($nid) {
   //check if this has a photo id
   $photo_id = flickrrippr_node_get_photoid($nid);
-  
+
   if (!$photo_id) {
     return FALSE;
   }
@@ -309,66 +309,11 @@ function flickrrippr_add_missing_flickrids() {
     $result = $flickr->people_findByUsername($fu->flickrusername);
     $id = $result['id'];
     drupal_set_message($id);
-    db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE uid=%d AND flickrusername='%s'", $id, $fu->uid, $fu->flickrusername); 
+    db_query("UPDATE {flickrusers} SET flickrid='%s' WHERE uid=%d AND flickrusername='%s'", $id, $fu->uid, $fu->flickrusername);
   }
 }*/
 
 
-/**
- * Where a user defines their username
- */
-function flickrrippr_user_settings($uid = NULL) {
-  $output = '';
-  if (!empty($uid) && user_access('Administer global flickr api settings')) {
-    $user = user_load(array('uid' => $uid));
-  }
-  else {
-    GLOBAL $user;
-  }
-  $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
-
-  $accounts = flickrrippr_get_flickr_accounts($user->uid);
-
-
-  $headers = array('', 
-    t('Flickr ID'), 
-    t('Flickr username'), 
-    t('Tag')
-  );
-  $rows = array();
-  foreach ($accounts as $a) {
-
-    $tag_links = '';
-
-    if (!empty($a->tag) ) {
-      $tags = explode(',', $a->tag);
-      foreach ($tags as $t) {
-        if (!empty($a->flickrphotosurl)) {
-          $tag_links .= l($t, $a->flickrphotosurl .'tags/'. check_plain($t));
-        }
-        else {
-          $tag_links .= check_plain($t);
-        }
-      }
-    }
-  
-    $avatar = flickrrippr_user_avatar($a);
-
-    $rows[] = array(
-      $avatar,
-      $a->flickrid,
-      check_plain($a->flickrusername),
-      $tag_links,
-      drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
-      l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
-      l('View Photos', 'user/'. $user->uid .'/flickrrippr/view/'. $a->flickrid),
-    );
-    
-  }
-  $output .= theme('table', $headers, $rows);
-  return $output;
-
-}
 
 function flickrrippr_user_avatar($a) {
   if (isset($a->flickravatar) && !empty($a->flickravatar) && !preg_match('!farm0!', $a->flickravatar)) {
@@ -467,18 +412,18 @@ function flickrrippr_failed_form_submit($form, $fv) {
   node_delete($nid);
 //   drupal_set_message(t('Flickr photo delete from this website'));
   drupal_goto('<front>');
-  
+
 }
 
 function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
-  
+
   $photo = (array)$node->flickr_photo;
   if (empty($photo)) {
     drupal_set_message('No photo info attached', 'error');
     watchdog('flickrrippr', 'Node has no photo info. !link', array('!link' => l($node->title, 'node/'. $node->nid)), WATCHDOG_ERROR);
     return $node;
   }
-  
+
   if (!$photo['farm'] || !$photo['server'] || !$photo['secret']) {
       GLOBAL $_FR_refresh_count;
 
@@ -510,7 +455,7 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   }
 
   //get the image, using theme()
-  
+
   $jpeg_path = flickrrippr_path($node, $size);
   $image = l(theme('image', $jpeg_path, $teaser, $teaser, NULL, FALSE), $link, array('html' => TRUE));
 
@@ -526,9 +471,9 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
     '#value' => '<div class="flickrrippr_description">'. nl2br($markup_trust ? $photo['description'] : check_plain($photo['description']))  .'</div>', //decode then encode
     '#weight' => 5
   );
-  
+
 //   $node->content['body'] = array();
-  
+
   return $node;
 }
 
@@ -537,7 +482,7 @@ function flickrrippr_node_form(&$form_state, $node) {
 }
 
 /**
- * 
+ *
  */
 function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   if (!isset($node->nid)) {
@@ -550,7 +495,7 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   }
   switch ($op) {
     case 'delete':
-      db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid); 
+      db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid);
       drupal_set_message("Flickr Rippr photo deleted.");
     break;
     case 'view':
@@ -563,10 +508,10 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
  */
 function _flickr_rippr_jpeg_sizes() {
   return array(
-//     'sq' => t('Square (75 x 75)'), 
-    't'  => t('Thumbnail (100 x 75)'),      
+//     'sq' => t('Square (75 x 75)'),
+    't'  => t('Thumbnail (100 x 75)'),
     's'  => t('Small (240 x 180)'),
-    'm'  => t('Medium 500 (500 x 375)'), 
+    'm'  => t('Medium 500 (500 x 375)'),
     'z'  => t('Medium 640 (640 x 480)'),
     'l'  => t('Large (1024 x 768)'),
     'o'  => t('Original (2592 x 1944)')
