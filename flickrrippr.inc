@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.16 2010/10/01 04:18:14 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.17 2010/10/03 20:55:14 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -48,7 +48,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
     return;
   }
  
-  return  user_load(array('uid' => $flickruser->uid));
+  return user_load(array('uid' => $flickruser->uid));
 }
 
 
@@ -56,23 +56,28 @@ function flickrrippr_get_user_by_nsid($nsid) {
 /**
 * Work out the path to a photo - also handles the cache on the local filesystem
 */
-function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
-  if (!$flickr_photo['farm'] ||  !$flickr_photo['secret']) {
-    drupal_set_message("Cannot calculate path without farm and secret.", 'error');
+function flickrrippr_path($node, $size = FALSE) {
+  
+  $flickr_photo = $node->flickr_photo;
+
+  if (empty($flickr_photo['secret'])) {
+    drupal_set_message("Cannot calculate path without the 'secret'. This should never happen ;-).", 'error');
     return '';
   }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
     //none chosen, use default
-    return flickrrippr_path_remote($flickr_photo, $size);
+    return flickrrippr_path_remote($node, $size);
   }
-  return module_invoke($path_handler, 'get_path', $node, $flickr_photo, $size);
+
+  return module_invoke($path_handler, 'get_path', $node, $size);
 }
 
 /**
  * Calculates path to photo on flickr
  */
-function flickrrippr_path_remote($flickr_photo, $size) {
+function flickrrippr_path_remote($node, $size) {
+  $flickr_photo = $node->flickr_photo;
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
 }
@@ -129,10 +134,6 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
     return FALSE;
   }
-
-  //Full (normal) sized image
-//   $photo_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_page_size', 'm'));
-//   $thumbnail_path =  flickrrippr_path($flickr_info, variable_get('flickrrippr_teaser_size', 'm'));
 
   $page_url = $flickr_info['urls']['url'][0]['_content'];
 
