@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.2.8.1 2010/10/03 21:57:20 taniwha Exp $
+// $Id: flickrrippr.test,v 1.2.8.2 2010/10/03 22:22:01 taniwha Exp $
 
 /**
  * @file
@@ -31,7 +31,7 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
    */
   public function setUp() {
     // Enable any modules required for the test.
-    parent::setUp('flickrrippr', 'flickrapi');
+    parent::setUp('flickrrippr', 'flickrapi', 'job_queue');
 
     $this->admin_user = $this->drupalCreateUser( array('Administer global flickr api settings', 'administer site configuration'));
     $this->normal_user = $this->drupalCreateUser( array('Configure own blogged flickr stream'));
@@ -42,6 +42,7 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
 
     //log in as admin
     $this->drupalLogin($this->admin_user);
+    $this->verbose(print_r($this->admin_user, 1));
 
     //configure the flickr api module
 
@@ -87,11 +88,30 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     $this->assertText('Filter by Tag');
 
     $edit['flickr_username'] = 'br3nda';
-    $this->drupalPost('user/'. $this->normal_user->uid .'/flickrrippr/add', $edit, 'Save');
-    $this->show($this->getAbsoluteUrl());
+    $this->drupalPost($this->getUrl(), $edit, 'Save');
 
+
+    //check it all saved
+    $this->assertText('Br3nda'); //it'll have been capitalised via the API
+    $this->assertText('36251685@N00');
+    //check the image appeared
+    $this->assertRaw('http://farm1.static.flickr.com/2/buddyicons/36251685@N00.jpg');
 
     //do a fetch of this account
+    $this->drupalPost($this->getUrl(), array(), 'Fetch now');
+
+    //TODO edit, and check the details appear
+    $this->clickLink('Edit', 1); //the 2nd Edit link, not the edit in the tabs
+    $this->assertNoText('add');
+    $this->assertText('Flickr Username');
+    $this->assertText('Filter by Tag');
+    $form = array('flickr_tag' => 'shadowcat');
+    $this->drupalPost($this->geturl(), $form, 'Save');
+
+    //add a kitty
+    $this->assertText('shadowcat');
+    $this->clickLink('Edit', 1);
+    $this->assertText('shadowcat');
 
     //try adding the same account again, must fail
 
@@ -112,8 +132,11 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
 
     $this->drupalLogout();
 
+    //run cron
+    //$this->cronRun();
+    $this->drupalGet('cron.php');
 
-    // $this->cronRun();
+    //TODO Check that some photos got imported
   }
 
 
