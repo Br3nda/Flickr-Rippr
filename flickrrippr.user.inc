@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.9 2010/10/03 22:04:06 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.10 2010/10/05 01:44:15 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -46,7 +46,7 @@ function flickrrippr_user_settings($uid = NULL) {
 
     $rows[] = array(
       $avatar,
-      $a->flickrid,
+      check_plain($a->flickrid),
       check_plain($a->flickrusername),
       $tag_links,
       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
@@ -55,7 +55,9 @@ function flickrrippr_user_settings($uid = NULL) {
     );
 
   }
-  $output .= theme('table', $headers, $rows);
+  if (count($rows)) {
+    $output .= theme('table', $headers, $rows);
+  }
   return $output;
 
 }
