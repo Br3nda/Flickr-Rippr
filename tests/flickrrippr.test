@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.2.8.2 2010/10/03 22:22:01 taniwha Exp $
+// $Id: flickrrippr.test,v 1.2.8.3 2010/10/05 08:03:22 taniwha Exp $
 
 /**
  * @file
@@ -14,6 +14,8 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
    */
   protected $privileged_user;
   protected $apikey = '1611f2ad417e2276c05fa279654cc0e8';
+  protected $flickrusername = 'Flickr Rippr';
+  protected $nsid = '54551252@N03';
 
   /**
    * getInfo() returns properties that are displayed in the test selection form.
@@ -87,15 +89,17 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     $this->assertText('Flickr Username');
     $this->assertText('Filter by Tag');
 
-    $edit['flickr_username'] = 'br3nda';
+    $edit['flickr_username'] = strtolower($this->flickrusername);
+    $edit['flickr_tag'] = 'fruit';
     $this->drupalPost($this->getUrl(), $edit, 'Save');
 
-
     //check it all saved
-    $this->assertText('Br3nda'); //it'll have been capitalised via the API
-    $this->assertText('36251685@N00');
+    $this->assertText($this->flickrusername); //it'll have been capitalised via the API
+    $this->assertText($this->nsid);
+    $this->assertText('fruit');
+
     //check the image appeared
-    $this->assertRaw('http://farm1.static.flickr.com/2/buddyicons/36251685@N00.jpg');
+    $this->assertRaw('http://farm5.static.flickr.com/4105/buddyicons/54551252@N03.jpg');
 
     //do a fetch of this account
     $this->drupalPost($this->getUrl(), array(), 'Fetch now');
@@ -105,11 +109,11 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     $this->assertNoText('add');
     $this->assertText('Flickr Username');
     $this->assertText('Filter by Tag');
-    $form = array('flickr_tag' => 'shadowcat');
+    $form = array('flickr_tag' => '');
     $this->drupalPost($this->geturl(), $form, 'Save');
 
     //add a kitty
-    $this->assertText('shadowcat');
+    $this->assertNoText('fruit');
     $this->clickLink('Edit', 1);
     $this->assertText('shadowcat');
 
