@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.18.2.16 2010/10/01 04:18:14 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.18.2.17 2010/10/06 01:58:18 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -61,12 +61,7 @@ function flickrrippr_path_options() {
 
   return $options;
 }
-function flickrrippr_node_handler_options() {
-  $options = array('flickrrippr' => t('Flickr Rippr'));  
-  $options += module_invoke_all(__FUNCTION__);
 
-  return $options;
-}
 
 function flickrrippr_admin_settings_form() {
 
@@ -87,15 +82,6 @@ function flickrrippr_admin_settings_form() {
     '#description' => t('Note: Changing the path handler does not modify existing photos previously fetch from flickr.com.'),
   );
 
-  $node_handlers = flickrrippr_node_handler_options();
-  $form['general']['node_handler'] = array(
-    '#type' => 'radios', 
-    '#title' => t('Flickr Node Handler'), 
-    '#options' => $node_handlers,
-    '#default_value' => variable_get('flickrrippr_node_handler', 'flickrrippr'),
-    '#required' => TRUE,
-    '#description' => t('Note: Changing the Node handler does not modify existing nodes.'),
-  );
 
   $form['general']['markup_trust'] = array(
     '#type' => 'checkbox',
@@ -176,9 +162,6 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
 
   $path_handler = $form_values['values']['path_handler'];
   variable_set('flickrrippr_path_handler', $path_handler);
-
-  $node_handler = $form_values['values']['node_handler'];
-  variable_set('flickrrippr_node_handler', $node_handler);
 
   $num_per_fetch = $form_values['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
