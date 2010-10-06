@@ -12,10 +12,8 @@ function flickrjpegcache_flickrrippr_path_options() {
  * Save the file on the file system - not as a deep linking src to flickr.com
  */
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
-//   drupal_set_message(__FUNCTION__. ' node = '. print_r($node, 1));
- 
 
-  $flickr_photo = (array)$node->flickr_photo;
+  $flickr_photo = $node->flickr_photo;
   //make a file object which we'll save eventually
   $file = new stdClass();
   $file->filename = $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
@@ -46,7 +44,7 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 //   drupal_set_message("Will download from $src");
   $response = drupal_http_request($src);
   if ($response->code != 200) {
-    drupal_set_message(t('Failed to fetch jpeg from flickr'), 'error');
+    drupal_set_message(t('Failed to fetch jpeg from flickr. %flickrmessage. Src = %src', array('%flickrmessage' => print_r($response, 1), '%src' => $src)), 'error');
     return $src;
   }
 
@@ -91,5 +89,5 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
 function flickrjpegcache_flickrrippr_node_alter($node, $details) {
   //force a refresh
-  flickrjpegcache_get_path($node, $details, 'l', TRUE);
+  flickrjpegcache_get_path($node, 'l', TRUE);
 }

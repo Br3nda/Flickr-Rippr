@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.10 2010/10/05 01:44:15 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.11 2010/10/06 04:21:46 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -257,7 +257,8 @@ function flickrrippr_user_view_photos($uid, $flickruserid) {
   $rows = array();
   while($photo = db_fetch_object($result)) {
     //   drupal_set_message(print_r($photo, 1));
-    $jpeg_path = flickrrippr_path((array)$photo, 't');
+    $node->flickr_photo = (array)$photo;
+    $jpeg_path = flickrrippr_path($node, 't');
     $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo->nid, array('html' => TRUE));
     if(count($col) > 6) {
       $rows[] = $col;
