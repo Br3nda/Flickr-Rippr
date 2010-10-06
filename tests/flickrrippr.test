@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.2.8.3 2010/10/05 08:03:22 taniwha Exp $
+// $Id: flickrrippr.test,v 1.2.8.4 2010/10/06 01:40:34 taniwha Exp $
 
 /**
  * @file
@@ -44,7 +44,7 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
 
     //log in as admin
     $this->drupalLogin($this->admin_user);
-    $this->verbose(print_r($this->admin_user, 1));
+//    $this->verbose(print_r($this->admin_user, 1));
 
     //configure the flickr api module
 
