@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.2.8.4 2010/10/06 01:40:34 taniwha Exp $
+// $Id: flickrrippr.test,v 1.2.8.5 2010/10/06 21:11:09 taniwha Exp $
 
 /**
  * @file
@@ -61,7 +61,6 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     $this->drupalGet('admin/settings/flickrrippr');
     $form = array();
     $form['path_handler'] = 0;
-    $form['node_handler'] = 'flickrrippr';
     $form['markup_trust'] = FALSE;
     $form['num_per_fetch'] = 5;
     $form['teaser_size'] = 's';
