@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.17 2010/10/03 20:55:14 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.18 2010/10/06 04:22:26 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -61,7 +61,8 @@ function flickrrippr_path($node, $size = FALSE) {
   $flickr_photo = $node->flickr_photo;
 
   if (empty($flickr_photo['secret'])) {
-    drupal_set_message("Cannot calculate path without the 'secret'. This should never happen ;-).", 'error');
+    drupal_set_message(t("Cannot calculate path without the 'secret'. Something is wrong with node %nid.", array('%nid' => $node->nid)), 'error');
+    
     return '';
   }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
