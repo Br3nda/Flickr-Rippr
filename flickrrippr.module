@@ -243,13 +243,8 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   $num_photos = 0;
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
-      //only fetch if there's new stuff
-//       $local_cached_details = flickrrippr_get_photo_details_by_photoid($p['id']);
-//       if (!$local_cached_details) {
-        //only queue if it hasn't been fetched in last hour.
-
         //hack to get around job_queue restricting descriptions to 255 chars
-        $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => check_plain($flickruser)));
+        $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => check_plain($flickruser->flickrusername)));
         if(strlen($description) >= 255) {
           $description = substr($description, 0, 254);
         }
