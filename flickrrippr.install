@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.36 2010/09/30 03:16:31 taniwha Exp $
+// $Id: flickrrippr.install,v 1.37 2010/10/06 22:32:44 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -72,6 +72,7 @@ function flickrrippr_schema() {
         'flickrphotos_owner' => array('owner_nsid'),
       ),
     );
+  variable_set("upload_flickrrippr_photo", 1);
 
 /*
 Array
@@ -282,6 +283,14 @@ function flickrrippr_update_50() {
   return $ret;
 }
 
+function flickrrippr_update_50() {
+  db_add_field($ret, 'flickrusers', 'flickrispro', array('type' => 'int'));
+  db_add_field($ret, 'flickrusers', 'flickrphotosurl', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrprofileurl', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickravatar', array('type' => 'text'));
+  return $ret;
+}
+
 function flickrrippr_update_60() {
 
   //add new ones
@@ -348,4 +357,77 @@ function flickrrippr_update_6090() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
   db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
   return $ret;
+}=======
+
+function flickrrippr_update_60() {
+
+  //add new ones
+  db_add_field($ret, 'flickrphotos', 'farm', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'server', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'secret', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'dateuploaded', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'license', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'originalsecret', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'originalformat', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'rotation', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'title', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'date_posted', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'date_taken', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'date_lastupdate', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'views', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'photopage', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'media', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
+  db_add_field($ret, 'flickrphotos', 'owner_nsid', array('type' => 'text'));
+
+  //TODO migrate photos
+
+  //remove old columns
+  db_drop_field($ret, 'flickrphotos', 'page_url');
+  db_drop_field($ret, 'flickrphotos', 'photo_path');
+  db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
+  db_drop_field($ret, 'flickrphotos', 'image_nid');
+  return $ret;
 }
+
+function flickrrippr_update_6070(&$sandbox) {
+
+if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['photoid'] = 0;
+    
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(flickrphoto_id) FROM {flickrphotos} WHERE farm IS NULL and failed = 0 '));
+    error_log("Max = ".  $sandbox['max']);
+  }
+  $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE flickrphoto_id > %d AND farm IS NULL and failed = 0 ORDER BY flickrphoto_id LIMIT 50", $sandbox['photoid']);
+  
+  while($photo = db_fetch_object($result)) {
+    error_log("Photo number ". $photo->flickrphoto_id);
+    job_queue_add('flickrrippr_makenode', t('Updating photo %id', array('%id' => $photo->flickrphoto_id)), array($photo->flickrphoto_id));
+    $sandbox['progress']++;
+    $sandbox['photoid'] = $photo->flickrphoto_id;
+    
+    $sandbox['message'] = t('Queued %count photos for refetching', array('%count' => $sandbox['progress']));
+  }
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  return $ret;
+}
+
+/**
+ * Hook update_N
+ * variables moved to own function - migrate them
+ */
+function flickrrippr_update_6080() {
+  variable_set('flickrtags_import', variable_get('flickrrippr_import_tags', FALSE));
+  variable_set('flickrtags_vocab',variable_get('flickrrippr_tags_vocab', 0));
+}
+
+function flickrrippr_update_6090() {
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
+  return $ret;
+}
+
+function flicrrippr_update_6100() {
+  variable_set("upload_flickrrippr_photo", 1);
+}>>>>>>> 1.21.2.7

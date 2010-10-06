@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.15 2010/09/30 03:16:31 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.16 2010/10/06 22:29:05 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -65,6 +65,7 @@ function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
   if (isset($flickruser->flickrusername)) {
     drupal_set_title(t('Flickr Rippr settings for @username', array('@username' => $flickruser->flickrusername)));
   }
+  $form['debug'] = array('#type' => 'markup', '#value' => nl2br(check_plain(print_r($flickruser, 1))));
 
   if (isset($flickruser->flickrid)) {
     $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
