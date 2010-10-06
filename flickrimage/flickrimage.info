@@ -1,6 +1,6 @@
 name = Flickr Rippr - Image Module Integration
 description = Saves flickr photos as nodes of type image.
 package = Flickr
-core = 6.x
+core = 7.x
 dependencies[] = flickrrippr
 dependencies[] = image

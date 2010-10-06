@@ -1,5 +1,6 @@
 name = Flickr Rippr - Local Jpeg Cache
 description = Saves jpegs locally, instead of using embedded on flickr.com
 package = Flickr
-core = 6.x
+core = 7.x
 dependencies[] = flickrrippr
+dependencies[] = upload

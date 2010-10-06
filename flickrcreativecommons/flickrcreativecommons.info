@@ -2,6 +2,6 @@ name = Flickr Rippr - Creative Commons
 description = Adds creative commons license info to photos from flickr.
 package = Flickr
 
-core = 6.x
+core = 7.x
 dependencies[] = flickrrippr
 dependencies[] = creativecommons

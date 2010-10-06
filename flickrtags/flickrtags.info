@@ -2,6 +2,6 @@ name = Flickr Rippr - Tags
 description = Syncs tags on flickr photos to photos imported via Flickr Rippr module
 package = Flickr
 
-core = 6.x
+core = 7.x
 dependencies[] = flickrrippr
 dependencies[] = taxonomy
