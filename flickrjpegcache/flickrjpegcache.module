@@ -42,7 +42,7 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
     return $file->filename;
   }
   
-  $src = flickrrippr_path_remote($flickr_photo, $size);
+  $src = flickrrippr_path_remote($node, $size);
 //   drupal_set_message("Will download from $src");
   $response = drupal_http_request($src);
   if ($response->code != 200) {
