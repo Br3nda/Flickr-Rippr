@@ -446,7 +446,7 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   }
 
   if ($page) {
-    $size = variable_get('flickrrippr_page_size', 'm');
+    $size = variable_get('flickrrippr_page_size', 'z');
     $link = $photo['photopage'];
   }
   else {
