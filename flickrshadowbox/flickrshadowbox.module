@@ -1,46 +1,17 @@
 <?php
-/**
- * Make visible to the Flickr Rippr module
- */
-// function flickrshadowbox_flickrrippr_node_handler_options() {
-//   return array('flickrshadowbox' => 'Shadow Box');
-// }
-// 
-// function flickrshadowbox_flickrrippr_make_node($details) {
-//   $node->type = 'flickrrippr_shadowbox';
-//   $node->title = $details['title'];
-//   node_save($node);
-// }
-// 
-// function flickrshadowbox_node_info() {
-//   return array('flickrrippr_shadowbox' => array(
-//       'module' => 'flickrshadowbox',
-//       'has_title' => TRUE,
-//       'has_body' => FALSE,
-//     )
-//   );
-// }
-/*
-function flickrshadowbox_nodeapi($node, $op) {
-  var_dump($node);
-  if(!'flickrrippr_photo' == $node->type) {
+
+function flickrshadowbox_nodeapi(&$node, $op, $teaser, $page) {
+  if ('view' != $op) {
     return;
   }
-  switch($op) {
-    case 'view': 
-
-    drupal_set_message($path);
-//     $node->files[] = 
-//     $node->files[] = 
-515]=> object(stdClass)#22 (13) { ["fid"]=> string(3) "515" ["uid"]=> string(1) "1" ["filename"]=> string(9) "taggy.jpg" ["filepath"]=> string(29) "sites/default/files/taggy.jpg" ["filemime"]=> string(10) "image/jpeg" ["filesize"]=> string(5) "81100" ["status"]=> string(1) "1" ["timestamp"]=> string(10) "1285901425" ["nid"]=> string(5) "36627" ["vid"]=> string(5) "36627" ["description"]=> string(9) "taggy.jpg" ["list"]=> string(1) "1" ["weight"]=> string(1) "0" } [516]=> object(stdClass)#25 (13) { ["fid"]=> string(3) "516" ["uid"]=> string(1) "1" ["filename"]=> string(27) "4210294339_63da855ba8_b.jpg" ["filepath"]=> string(47) "sites/default/files/4210294339_63da855ba8_b.jpg" ["filemime"]=> string(10) "image/jpeg" ["filesize"]=> string(6) "358415" ["status"]=> string(1) "1" ["timestamp"]=> string(10) "1285901462" ["nid"]=> string(5) "36627" ["vid"]=> string(5) "36627" ["description"]=> string(27) "4210294339
-    break;
-  }
-}*/
-
-function flickrshadowbox_flickrrippr_node_alter(&$node, $details) {
-  module_load_include('inc', 'flickrrippr', 'flickrrippr');
-  $path = flickrrippr_path((array)$node->flickr_photo, 'm');
-
-//   $node->files[] = array('description' => $details['description'], '
-//   upload_save($node);
+  
+  $thumb_path = flickrrippr_path($node, variable_get('flickrrippr_teaser_size', 't'));
+  $big_path =  flickrrippr_path($node, variable_get('flickrrippr_page_size', 'z'));
+  $image = theme('image', $thumb_path, $teaser, $teaser, NULL, FALSE);
+  $node->content['flickr_photo'] = array(
+    '#value' => l($image, $big_path, array('html' => TRUE)),
+  );
+  $node->content['flickr_page'] = array(
+    '#value' => '<p>'. l(check_plain($node->title), $node->flickr_photo['photopage']) .'</p>',
+  );
 }
