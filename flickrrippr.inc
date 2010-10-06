@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.19 2010/10/06 20:23:49 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.20 2010/10/06 21:13:42 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -229,7 +229,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
 
   $node->title = htmlentities($details['title']);
   $node->created = strtotime($details['date_taken']);
-  $node->changed = strtotime($details['date_uploaded']);
+  $node->changed = strtotime($details['date_posted']);
 
   //if owner not set, then set it.
   if (!isset($node->uid)) {
