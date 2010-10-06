@@ -4,6 +4,9 @@ function flickrshadowbox_nodeapi(&$node, $op, $teaser, $page) {
   if ('view' != $op) {
     return;
   }
+  if(empty($node->flickr_photo)) {
+    return;
+  }
   
   $thumb_path = flickrrippr_path($node, variable_get('flickrrippr_teaser_size', 't'));
   $big_path =  flickrrippr_path($node, variable_get('flickrrippr_page_size', 'z'));
