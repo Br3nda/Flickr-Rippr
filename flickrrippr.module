@@ -167,7 +167,7 @@ function flickrrippr_get_flickr_user($uid, $flickrid) {
  * Loading of the node
  */
 function flickrrippr_load(&$node) {
-  $node->flickr_photo = db_fetch_object(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
+  $node->flickr_photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
 }
 
 /**
