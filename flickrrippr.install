@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.38 2010/10/07 04:26:34 taniwha Exp $
+// $Id: flickrrippr.install,v 1.39 2010/10/07 04:27:09 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -246,38 +246,8 @@ function flickrrippr_update_6090() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
   db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
   return $ret;
-}=======
-
-function flickrrippr_update_60() {
-
-  //add new ones
-  db_add_field($ret, 'flickrphotos', 'farm', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'server', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'secret', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'dateuploaded', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'license', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'originalsecret', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'originalformat', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'rotation', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'title', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'date_posted', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'date_taken', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'date_lastupdate', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'views', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'photopage', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'media', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'owner_nsid', array('type' => 'text'));
-
-  //TODO migrate photos
-
-  //remove old columns
-  db_drop_field($ret, 'flickrphotos', 'page_url');
-  db_drop_field($ret, 'flickrphotos', 'photo_path');
-  db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
-  db_drop_field($ret, 'flickrphotos', 'image_nid');
-  return $ret;
 }
+
 
 function flickrrippr_update_6070(&$sandbox) {
 
