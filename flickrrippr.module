@@ -387,26 +387,6 @@ function flickrrippr_user_avatar($a) {
 
 }
 
-function flickrrippr_user_avatar($a) {
-  if (isset($a->flickravatar) && !empty($a->flickravatar) && !preg_match('!farm0!', $a->flickravatar)) {
-    //make image
-    $avatar = theme('image', 
-      array(
-        'src' => check_plain($a->flickravatar),
-        'alt' => check_plain($a->flickrusername), 
-        'title' => check_plain($a->flickrusername), 
-        'getsize' => FALSE
-      )
-    );
-
-    //and put link around it
-    $avatar = l($avatar, $a->flickrphotosurl, array('html' => TRUE));
-  }
-  else {
-    $avatar = '';
-  }
-  return $avatar;
-}
 
 function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
   $form = array();
