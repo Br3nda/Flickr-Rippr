@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.2.8.5 2010/10/06 21:11:09 taniwha Exp $
+// $Id: flickrrippr.test,v 1.2.8.6 2010/10/07 00:14:22 taniwha Exp $
 
 /**
  * @file
@@ -114,8 +114,6 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     //add a kitty
     $this->assertNoText('fruit');
     $this->clickLink('Edit', 1);
-    $this->assertText('shadowcat');
-
     //try adding the same account again, must fail
 
     //TODO try to configure module, they shouldn't be able to.
