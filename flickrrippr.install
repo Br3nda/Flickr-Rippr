@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.37 2010/10/06 22:32:44 taniwha Exp $
+// $Id: flickrrippr.install,v 1.38 2010/10/07 04:26:34 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -210,117 +210,6 @@ Array
   return $schema;
 }
 
-
-
-function flickrrippr_update_5() {
-  $ret[] = update_sql("CREATE TABLE {flickrcomments} (
-  cid integer REFERENCES {comments} (cid),
-  flickrcomment_id text UNIQUE,
-  author text NOT NULL,
-  authorname text NOT NULL,
-  datecreate integer NOT NULL,
-  permalink text,
-  content text,
- PRIMARY KEY (cid)
-)");
-return $ret;
-}
-
-/**
- Flickr's id > an integer hold
-*/
-function flickrrippr_update_6() {
-  $ret[] = update_sql("BEGIN");
-  $ret[] = update_sql("ALTER TABLE {flickrphotos} RENAME flickrphoto_id TO oldflickrphoto_id");
-  $ret[] = update_sql("ALTER TABLE {flickrphotos} ADD COLUMN flickrphoto_id text");
-  $ret[] = update_sql("UPDATE {flickrphotos} SET flickrphoto_id = oldflickrphoto_id::text");
-  $ret[] = update_sql("ALTER TABLE {flickrphotos} DROP COLUMN oldflickrphoto_id");
-  $ret[] = update_sql("COMMIT");
-  return $ret;
-}
-
-function flickrrippr_update_7() {
-  $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid text");
-  db_add_field($ret, 'flickrphotos', 'photo_path', 'text');
-  db_add_field($ret, 'flickrphotos', 'thumbnail_path', array('type' => 'text'));
-  
-  
-  return $ret;
-}
-function flickrrippr_update_8() {
-  db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'page_url', array('type' => 'text'));
-  return $ret;
-}
-
-function flickrrippr_update_9() {
-  db_add_field($ret, 'flickrusers', 'tag', array('type' => 'text'));
-  return $ret;
-}
-
-function flickrrippr_update_20() {
-  db_add_field($ret, 'flickrphotos', 'failed', array('type' => 'int'));
-  $ret[] = update_sql("UPDATE {flickrphotos} SET failed=0");
-  return $ret;
-}
-
-function flickrrippr_update_30() {
-  db_add_field($ret, 'flickrphotos', 'image_nid', array('type' => 'int'));
-  return $ret;
-}
-
-function flickrrippr_update_40() {
-  db_drop_primary_key($ret, 'flickrusers');
-  db_add_primary_key($ret, 'flickrusers', array('uid', 'flickrid'));
-  return $ret;
-}
-
-function flickrrippr_update_50() {
-  db_add_field($ret, 'flickrusers', 'flickrispro', array('type' => 'int'));
-  db_add_field($ret, 'flickrusers', 'flickrphotosurl', array('type' => 'text'));
-  db_add_field($ret, 'flickrusers', 'flickrprofileurl', array('type' => 'text'));
-  db_add_field($ret, 'flickrusers', 'flickravatar', array('type' => 'text'));
-  return $ret;
-}
-
-function flickrrippr_update_50() {
-  db_add_field($ret, 'flickrusers', 'flickrispro', array('type' => 'int'));
-  db_add_field($ret, 'flickrusers', 'flickrphotosurl', array('type' => 'text'));
-  db_add_field($ret, 'flickrusers', 'flickrprofileurl', array('type' => 'text'));
-  db_add_field($ret, 'flickrusers', 'flickravatar', array('type' => 'text'));
-  return $ret;
-}
-
-function flickrrippr_update_60() {
-
-  //add new ones
-  db_add_field($ret, 'flickrphotos', 'farm', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'server', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'secret', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'dateuploaded', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'license', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'originalsecret', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'originalformat', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'rotation', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'title', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'date_posted', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'date_taken', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'date_lastupdate', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'views', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'photopage', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'media', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
-  db_add_field($ret, 'flickrphotos', 'owner_nsid', array('type' => 'text'));
-
-  //TODO migrate photos
-
-  //remove old columns
-  db_drop_field($ret, 'flickrphotos', 'page_url');
-  db_drop_field($ret, 'flickrphotos', 'photo_path');
-  db_drop_field($ret, 'flickrphotos', 'thumbnail_path');
-  db_drop_field($ret, 'flickrphotos', 'image_nid');
-  return $ret;
-}
 
 function flickrrippr_update_6070(&$sandbox) {
 
