@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.18.2.17 2010/10/06 01:58:18 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.18.2.18 2010/10/07 00:53:04 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -79,7 +79,7 @@ function flickrrippr_admin_settings_form() {
     '#options' => $path_options,
     '#default_value' => variable_get('flickrrippr_path_handler', 0),
     '#required' => TRUE,
-    '#description' => t('Note: Changing the path handler does not modify existing photos previously fetch from flickr.com.'),
+    '#description' => t('Modifies where and how images are stored.'),
   );
 
 
