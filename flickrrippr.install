@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.7 2010/10/03 20:38:55 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.8 2010/10/09 21:22:44 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -15,7 +15,6 @@ function flickrrippr_install() {
 /**
  * Implementation of hook_uninstall().
  */
-
 function flickrrippr_uninstall() {
   drupal_uninstall_schema('flickrrippr');
 }
@@ -210,71 +209,62 @@ Array
   return $schema;
 }
 
-
-
-function flickrrippr_update_5() {
-  $ret[] = update_sql("CREATE TABLE {flickrcomments} (
-  cid integer REFERENCES {comments} (cid),
-  flickrcomment_id text UNIQUE,
-  author text NOT NULL,
-  authorname text NOT NULL,
-  datecreate integer NOT NULL,
-  permalink text,
-  content text,
- PRIMARY KEY (cid)
-)");
-return $ret;
-}
-
 /**
- Flickr's id > an integer hold
-*/
-function flickrrippr_update_6() {
-  $ret[] = update_sql("BEGIN");
-  $ret[] = update_sql("ALTER TABLE {flickrphotos} RENAME flickrphoto_id TO oldflickrphoto_id");
-  $ret[] = update_sql("ALTER TABLE {flickrphotos} ADD COLUMN flickrphoto_id text");
-  $ret[] = update_sql("UPDATE {flickrphotos} SET flickrphoto_id = oldflickrphoto_id::text");
-  $ret[] = update_sql("ALTER TABLE {flickrphotos} DROP COLUMN oldflickrphoto_id");
-  $ret[] = update_sql("COMMIT");
-  return $ret;
-}
-
+ * added flickrid to flickruser, and  photo_path and thumbnail_path to flickrphotos
+ */
 function flickrrippr_update_7() {
   $ret[] = update_sql("ALTER TABLE {flickrusers} ADD COLUMN flickrid text");
   db_add_field($ret, 'flickrphotos', 'photo_path', 'text');
   db_add_field($ret, 'flickrphotos', 'thumbnail_path', array('type' => 'text'));
-  
-  
   return $ret;
 }
+
+/**
+ * Added description and page_url to flickrphotos table
+ */
 function flickrrippr_update_8() {
   db_add_field($ret, 'flickrphotos', 'description', array('type' => 'text'));
   db_add_field($ret, 'flickrphotos', 'page_url', array('type' => 'text'));
   return $ret;
 }
 
+/**
+ * add tag column to flickr users
+ */
 function flickrrippr_update_9() {
   db_add_field($ret, 'flickrusers', 'tag', array('type' => 'text'));
   return $ret;
 }
 
+/**
+ * Added failed column to flickr photos
+ */
 function flickrrippr_update_20() {
   db_add_field($ret, 'flickrphotos', 'failed', array('type' => 'int'));
   $ret[] = update_sql("UPDATE {flickrphotos} SET failed=0");
   return $ret;
 }
 
+/**
+ * added image_nid to flickrphotos table
+ */
 function flickrrippr_update_30() {
   db_add_field($ret, 'flickrphotos', 'image_nid', array('type' => 'int'));
   return $ret;
 }
 
+/**
+ * changed the primary key on flickrusers, to allow same acocunt by multiple users
+ */
 function flickrrippr_update_40() {
   db_drop_primary_key($ret, 'flickrusers');
   db_add_primary_key($ret, 'flickrusers', array('uid', 'flickrid'));
   return $ret;
 }
 
+/**
+ * more columns on the flickrusers table
+ */
 function flickrrippr_update_50() {
   db_add_field($ret, 'flickrusers', 'flickrispro', array('type' => 'int'));
   db_add_field($ret, 'flickrusers', 'flickrphotosurl', array('type' => 'text'));
@@ -283,6 +273,9 @@ function flickrrippr_update_50() {
   return $ret;
 }
 
+/** 
+ * Added all fields from flickr api onto the flickrphotos table
+ */
 function flickrrippr_update_60() {
 
   //add new ones
@@ -314,6 +307,9 @@ function flickrrippr_update_60() {
   return $ret;
 }
 
+/**
+ * Use batch processing to migrate all photos to the new schema
+ */
 function flickrrippr_update_6070(&$sandbox) {
 
 if (!isset($sandbox['progress'])) {
@@ -338,20 +334,24 @@ if (!isset($sandbox['progress'])) {
 }
 
 /**
- * Hook update_N
- * variables moved to own function - migrate them
+ * variables names changes - migrate them in the database
  */
 function flickrrippr_update_6080() {
   variable_set('flickrtags_import', variable_get('flickrrippr_import_tags', FALSE));
   variable_set('flickrtags_vocab',variable_get('flickrrippr_tags_vocab', 0));
 }
 
+/**
+ * add some indexes
+ */
 function flickrrippr_update_6090() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
   db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
   return $ret;
 }
-
+/**
+ * mark flickr rippr photos as having uploads (attached files)
+ */
 function flicrrippr_update_6100() {
   variable_set("upload_flickrrippr_photo", 1);
 }
