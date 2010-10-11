@@ -1,0 +1,157 @@
+<?php
+// $Id: flickjpegcache.test,v 1.1.2.2 2010/10/11 04:06:04 taniwha Exp $
+
+/**
+ * @file
+ * Unit Tests for flickrrippr module
+ * http://drupal.org/node/265762
+ */
+
+class FlickrJpegCacheTests extends DrupalWebTestCase {
+
+  /**
+   * User with rights to post SimpleTest Example content.
+   */
+  protected $privileged_user;
+  protected $apikey = '1611f2ad417e2276c05fa279654cc0e8';
+  protected $flickrusername = 'Flickr Rippr';
+  protected $nsid = '54551252@N03';
+
+  /**
+   * getInfo() returns properties that are displayed in the test selection form.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Flickr Jpeg Cache',
+      'description' => 'Flickr rippr with jpegs caching locally.',
+      'group' => 'Flickr Rippr',
+    );
+  }
+
+  /**
+   * setUp() performs any pre-requisite tasks that need to happen.
+   */
+  public function setUp() {
+    // Enable any modules required for the test.
+    parent::setUp('flickrrippr', 'flickrapi', 'job_queue', 'upload', 'flickrjpegcache');
+
+    $this->admin_user = $this->drupalCreateUser( array('Administer global flickr api settings', 'administer site configuration'));
+    $this->normal_user = $this->drupalCreateUser( array('Configure own blogged flickr stream'));
+    // Create and log in our privileged user.
+  }
+
+  function setupFlickApi() {
+    $this->drupalGet('admin/settings/flickrapi');
+    $this->assertResponse(200);
+    $this->assertText('API Key');
+    $form['flickrapi_api_key'] = $this->apikey;
+    $form['flickrapi_cache_duration'] = 900;
+    $this->drupalPost('admin/settings/flickrapi', $form, 'Save configuration');
+    $this->assertResponse(200);
+  }
+  function setupFlickrRippr() {
+    //configure flickrrippr
+
+    $this->drupalGet('admin/settings/flickrrippr');
+
+    $this->assertText('Flickr Path Handler');
+    $this->assertText('None');
+    $this->assertText('Local Jpeg Cache');
+
+    $form = array();
+    $form['path_handler'] = 'flickrjpegcache';
+    $form['markup_trust'] = FALSE;
+    $form['num_per_fetch'] = 5;
+    $form['teaser_size'] = 's';
+    $form['page_size'] = 'b';
+    $this->drupalPost('admin/settings/flickrrippr', $form, 'Save');
+
+    //re-read the variables that just got saved;
+    $this->refreshVariables();
+  }
+
+  function testConfiguringModule() {
+
+    //log in as admin
+    $this->drupalLogin($this->admin_user);
+    //configure the flickr api module
+    $this->setupFlickApi();
+    $this->setupFlickrRippr();
+    $this->drupalLogout();
+
+
+    //log in as a normal user
+    $this->drupalLogin($this->normal_user);
+
+    //set their account details
+    $this->clickLink('My account');
+    $this->assertLink('Flickr Rippr');
+    $this->clickLink('Flickr Rippr');
+    $this->assertNoText('Flickr ID', 'Table should not display when there are no accounts set up yet');
+
+    $this->clickLink('Add new account');
+    $this->assertText('add');
+    $this->assertText('Flickr Username');
+    $this->assertText('Filter by Tag');
+
+    $edit = array(
+      'flickr_username' => strtolower($this->flickrusername),
+      'flickr_tag' => ''
+    );
+
+    $this->drupalPost($this->getUrl(), $edit, 'Save');
+    $user_page = $this->getUrl();
+
+    //check it all saved
+    $this->assertText($this->flickrusername); //it'll have been capitalised via the API
+    $this->assertText($this->nsid);
+
+    //do a fetch of this account
+    $this->drupalPost($this->getUrl(), array(), 'Fetch now');
+    $this->assertRaw('http://www.flickr.com/photos/54551252@N03/');
+    $this->assertText('Fetching latest for 54551252@N03');
+    $this->assertText('1 photos queued for import.');
+    
+    //run cron twice.
+    $this->drupalGet('cron.php');
+    $this->drupalGet('cron.php');
+
+    $this->drupalGet($user_page);
+
+    $this->assertText('Saved new photo 5053642940');
+    
+    $this->assertNoText('Failed to fetch jpeg from flickr');
+    $this->assertNoText('stdClass Object');
+
+    $this->clickLink("from the farmer's market");
+    $this->assertNoRaw("from the farmer's market"); // check there's no instance of this unescaped.
+    $this->assertNoRaw('node/2'); // check it wasn't saved twice
+
+    $this->drupalGet($user_page);
+    $this->clickLink('View Photos');
+
+    $this->drupalLogout();
+
+    //find a node called "from the farmer's market"
+    $node = $this->drupalGetNodeByTitle("from the farmer's market");
+    $this->drupalGet('node/'. $node->nid);
+
+    //log in as admin again
+    $this->drupalLogin($this->admin_user);
+    //set go to admin/content/flickrrippr
+    $this->drupalGet('admin/content/flickrrippr');
+    //TODO check the account created above are there
+    //TODO  fetch photos for some accounts
+
+    $this->drupalLogout();
+
+    //run cron
+    //$this->cronRun();
+
+
+    //TODO Check that some photos got imported
+
+  }
+
+
+}
