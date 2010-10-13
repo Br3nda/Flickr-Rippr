@@ -7,6 +7,9 @@ function flickrjpegcache_flickrrippr_path_options() {
   return array('flickrjpegcache' => 'Local Jpeg Cache');
 }
 
+function flickrjpegcache_get_file($filename) {
+}
+
 /**
  * implementatin of hook_flickrrippr_path
  * Save the file on the file system - not as a deep linking src to flickr.com
@@ -14,6 +17,11 @@ function flickrjpegcache_flickrrippr_path_options() {
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
   $flickr_photo = $node->flickr_photo;
+  if(!$flickr_photo) {
+    drupal_set_message(t('No flickr photo info attached to node!'), 'error');
+    drupal_set_message(print_r($node, 1), 'error');
+    return;
+  }
   //make a file object which we'll save eventually
   $file = new stdClass();
   $file->filename = $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
@@ -39,6 +47,8 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   if (!$refetch) {
     return $file->filename;
   }
+
+  $sizes = _flickr_rippr_jpeg_sizes();
   
   $src = flickrrippr_path_remote($node, $size);
 //   drupal_set_message("Will download from $src");
@@ -64,7 +74,6 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   $file->list = FALSE;
   $file->new = !isset($file->fid);
 
-  $sizes = _flickr_rippr_jpeg_sizes();
 
   $file->description .= ' ' . $sizes[$size];
 // 
@@ -88,6 +97,8 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 }
 
 function flickrjpegcache_flickrrippr_node_alter($node, $details) {
+  //copy the details, to be read in get_path().
+  $node->flickr_photo = $details;
   //force a refresh
-  flickrjpegcache_get_path($node, 'l', TRUE);
+  flickrjpegcache_get_path($node, 'b', TRUE);
 }
