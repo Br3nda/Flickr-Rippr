@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.26 2010/10/13 22:54:54 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.27 2010/10/13 22:55:08 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -190,7 +190,7 @@ function flickrrippr_makenode($photo_id) {
   else {
 
     $sql = "UPDATE {flickrphotos} SET ";
-    foreach($fields as $v) {
+    foreach ($fields as $v) {
       $sql .= "$v = '%s', ";
     }
     $sql .= " lastfetched=%d, failed=0 WHERE flickrphoto_id=%d AND nid=%d ";
