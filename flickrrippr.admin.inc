@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.46 2010/10/13 22:45:52 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.47 2010/10/13 22:47:13 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -145,18 +145,6 @@ function flickrrippr_admin_settings_form() {
   );
   
   return $form;
-}
-
-function _flickr_rippr_jpeg_sizes() {
-  return array(
-//     'sq' => t('Square (75 x 75)'), 
-    't'  => t('Thumbnail (100 x 75)'),      
-    's'  => t('Small (240 x 180)'),
-    0  => t('Medium 500 (500 x 375)'), 
-    'z'  => t('Medium 640 (640 x 480)'),
-    'b'  => t('Large (1024 x 768)'),
-    'o'  => t('Original (2592 x 1944)')
-  );
 }
 
 function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
