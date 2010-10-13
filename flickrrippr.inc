@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.22 2010/10/13 22:51:51 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.23 2010/10/13 22:52:10 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -54,8 +54,8 @@ function flickrrippr_get_user_by_nsid($nsid) {
 
 
 /**
-* Work out the path to a photo - also handles the cache on the local filesystem
-*/
+ * Work out the path to a photo - also handles the cache on the local filesystem
+ */
 function flickrrippr_path($node, $size = FALSE) {
   
   $flickr_photo = $node->flickr_photo;
