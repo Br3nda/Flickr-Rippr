@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.69 2010/10/07 04:25:14 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.70 2010/10/13 22:49:22 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -68,16 +68,16 @@ function flickrrippr_get_user_by_nsid($nsid) {
 function flickrrippr_path($node, $size = FALSE) {
   
   $flickr_photo = $node->flickr_photo;
-  if (empty($flickr_photo['secret'])) {
-    drupal_set_message(print_r($flickrphoto, 1));
-    drupal_set_message("Cannot calculate path without the 'secret'. This should never happen ;-).", 'error');
 
+  if (empty($flickr_photo['secret'])) {
+    drupal_set_message(t("Cannot calculate path without the 'secret'. Something is wrong with node %nid.", array('%nid' => $node->nid)), 'error');
+    
     return '';
   }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
     //none chosen, use default
-    return flickrrippr_path_remote($flickr_photo, $size);
+    return flickrrippr_path_remote($node, $size);
   }
   return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
 }
