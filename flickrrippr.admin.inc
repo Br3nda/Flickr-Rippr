@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.43 2010/10/07 04:29:28 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.44 2010/10/13 22:45:09 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -61,12 +61,7 @@ function flickrrippr_path_options() {
 
   return $options;
 }
-function flickrrippr_node_handler_options() {
-  $options = array('flickrrippr' => t('Flickr Rippr'));  
-  $options += module_invoke_all(__FUNCTION__);
 
-  return $options;
-}
 
 function flickrrippr_admin_settings_form() {
 
