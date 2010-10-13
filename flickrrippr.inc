@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.71 2010/10/13 22:49:42 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.72 2010/10/13 22:56:13 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -104,7 +104,8 @@ function flickrrippr_makenode($photo_id) {
 
   //TODO, this code is in two place -- make a function
   $local_cached_details = flickrrippr_get_photo_details_by_photoid($photo_id);
-  $age = strtotime('now') - $local_cached_details->lastfetched;
+  $age = $local_cached_details ? strtotime('now') - $local_cached_details->lastfetched : 0;
+  //
   watchdog('flickrrippr', 'Photo was fetched %age seconds ago', array('%age' => $age));
   //if it's already been fetched in the last hour....
 //   if ($age < 60*60) {
@@ -164,6 +165,7 @@ function flickrrippr_makenode($photo_id) {
   foreach ($flickr_info['owner'] as $key => $o) {
     $details['owner_' . $key] = $o;
   }
+  $details['flickrphoto_id'] = $details['id'];
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
 //   drupal_set_message(print_r($flickr_info, 1));
 
@@ -212,7 +214,7 @@ function flickrrippr_makenode($photo_id) {
 
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
-  //the extra hookes
+  //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
   return $node;
@@ -235,6 +237,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
 
   $node->title = htmlentities($details['title']);
   $node->created = strtotime($details['date_taken']);
+  $node->changed = strtotime($details['date_posted']);
 
   //if owner not set, then set it.
   if (!isset($node->uid)) {
