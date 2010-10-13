@@ -220,6 +220,11 @@ function flickrrippr_check_latest_for_flickruser($user_id, $pagenum = 1) {
  */
 function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
 
+  $num_queue = db_fetch_object(db_query("SELECT count(*) as c FROM {job_queue} WHERE function='flickrrippr_makenode'"))->c;
+  if ($num_queue > 1000) {
+    watchdog('flickrrippr', 'More than 1,000 flickr rippr jobs queued. Not queueing anymore');
+    return;
+  }
   //update their user info
 //   job_queue_add(
 //     'flickrrippr_fetch_user_info_and_save', 
@@ -271,7 +276,7 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
     }
   }
 
-  drupal_set_message(t('%count photos queued for import.', array('%count' => $num_photos)));
+  drupal_set_message(t('!count photos queued for import.', array('!count' => $num_photos)));
 
 }
 
@@ -331,6 +336,7 @@ function flickrrippr_add_missing_flickrids() {
 }*/
 
 
+
 function flickrrippr_user_avatar($a) {
   if (isset($a->flickravatar) && !empty($a->flickravatar) && !preg_match('!farm0!', $a->flickravatar)) {
     //make image
@@ -339,54 +345,10 @@ function flickrrippr_user_avatar($a) {
     $avatar = l($avatar, $a->flickrphotosurl, array('html' => TRUE));
   }
   else {
-    GLOBAL $user;
+    $avatar = '';
   }
-  $output .= l(t('Add new account'), 'user/' . $user->uid . '/flickrrippr/add');
-
-  $accounts = flickrrippr_get_flickr_accounts($user->uid);
-
-
-  $header = array('', 
-    t('Flickr ID'), 
-    t('Flickr username'), 
-    t('Tag'),
-    '', '', ''
-  );
-  $rows = array();
-  foreach ($accounts as $a) {
-
-    $tag_links = '';
-
-    if (!empty($a->tag) ) {
-      $tags = explode(',', $a->tag);
-      foreach ($tags as $t) {
-        if (!empty($a->flickrphotosurl)) {
-          $tag_links .= l($t, $a->flickrphotosurl . 'tags/' . check_plain($t));
-        }
-        else {
-          $tag_links .= check_plain($t);
-        }
-      }
-    }
-  
-    $avatar = flickrrippr_user_avatar($a);
-
-    $rows[] = array(
-      $avatar,
-      $a->flickrid,
-      check_plain($a->flickrusername),
-      $tag_links,
-      drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
-      l(t('Edit'), 'user/' . $user->uid . '/flickrrippr/edit/' . $a->flickrid),
-      l('View Photos', 'user/' . $user->uid . '/flickrrippr/view/' . $a->flickrid),
-    );
-    
-  }
-  $output .= theme('table', array('header' => $header, 'rows' => $rows));
-  return $output;
-
+  return $avatar;
 }
-
 
 function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
   $form = array();
@@ -562,4 +524,18 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
       flickrrippr_view($node, $teaser, $page);
     break;
   }
+}
+/**
+ * All the different sizes flickr have
+ */
+function _flickr_rippr_jpeg_sizes() {
+  return array(
+//     'sq' => t('Square (75 x 75)'),
+    't'  => t('Thumbnail (100 x 75)'),
+    's'  => t('Small (240 x 180)'),
+    'm'  => t('Medium 500 (500 x 375)'),
+    'z'  => t('Medium 640 (640 x 480)'),
+    'b'  => t('Large (1024 x 768)'),
+    'o'  => t('Original (2592 x 1944)')
+  );
 }
