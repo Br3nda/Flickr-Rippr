@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.11 2010/10/06 04:21:46 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.12 2010/10/13 22:44:06 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -98,7 +98,7 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
  * For editing one account
  */
 function flickrrippr_user_edit_account($uid, $flickrid) {
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $fuser = flickrrippr_get_flickruser($uid, $flickrid);
   $output = drupal_get_form('flickrrippr_user_settings_form', $fuser);
   return $output;
 }
@@ -208,7 +208,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
 
   //is editing existing
   if (isset($form_state['values']['flickrid'])) {
-    $flickr_account = flickrrippr_get_flickr_user($form_state['values']['uid'], $form_state['values']['flickrid']);
+    $flickr_account = flickrrippr_get_flickruser($form_state['values']['uid'], $form_state['values']['flickrid']);
   }
 
   //this fetches from flickr.com

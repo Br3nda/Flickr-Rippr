@@ -159,7 +159,7 @@ function flickrrippr_node_refresh_perm($nid) {
 /**
  * Get the details of a flickr user from the database
  */
-function flickrrippr_get_flickr_user($uid, $flickrid) {
+function flickrrippr_get_flickruser($uid, $flickrid) {
   return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
 }
 
@@ -346,7 +346,7 @@ function flickrrippr_user_fetch_now_submit($form_id, $fv) {
     $dest = 'user/'. $uid .'/flickrrippr';
   }
   //get user
-  $fuser = flickrrippr_get_flickr_user($uid, $flickrid);
+  $fuser = flickrrippr_get_flickruser($uid, $flickrid);
   if (!$fuser) {
     drupal_set_message(t('Flickr user (uid=%uid, flickrid=%flickrid) not found in our database', array('%uid' => $uid, '%flickrid' => $flickrid)), 'error');
     return;
