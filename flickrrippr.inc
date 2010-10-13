@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.70 2010/10/13 22:49:22 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.71 2010/10/13 22:49:42 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -79,13 +79,15 @@ function flickrrippr_path($node, $size = FALSE) {
     //none chosen, use default
     return flickrrippr_path_remote($node, $size);
   }
-  return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
+
+  return module_invoke($path_handler, 'get_path', $node, $size);
 }
 
 /**
  * Calculates path to photo on flickr
  */
-function flickrrippr_path_remote($flickr_photo, $size) {
+function flickrrippr_path_remote($node, $size) {
+  $flickr_photo = $node->flickr_photo;
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   return 'http://farm' . $flickr_photo['farm'] . '.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['flickrphoto_id'] . '_' . $flickr_photo['secret'] . ($size ? '_' . $size : '') . '.jpg';
 }
