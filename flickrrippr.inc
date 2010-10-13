@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.24 2010/10/13 22:52:24 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.25 2010/10/13 22:52:50 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -136,10 +136,6 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
     return FALSE;
   }
-
-  $page_url = $flickr_info['urls']['url'][0]['_content'];
-
-  
 
   //assemble everything to pass to hook
   $details = array(
