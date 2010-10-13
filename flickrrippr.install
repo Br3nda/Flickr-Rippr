@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.8 2010/10/09 21:22:44 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.9 2010/10/13 22:56:00 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -15,6 +15,7 @@ function flickrrippr_install() {
 /**
  * Implementation of hook_uninstall().
  */
+
 function flickrrippr_uninstall() {
   drupal_uninstall_schema('flickrrippr');
 }
@@ -317,10 +318,9 @@ if (!isset($sandbox['progress'])) {
     $sandbox['photoid'] = 0;
     
     $sandbox['max'] = db_result(db_query('SELECT COUNT(flickrphoto_id) FROM {flickrphotos} WHERE farm IS NULL and failed = 0 '));
-    error_log("Max = ".  $sandbox['max']);
   }
   $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE flickrphoto_id > %d AND farm IS NULL and failed = 0 ORDER BY flickrphoto_id LIMIT 50", $sandbox['photoid']);
-  
+
   while($photo = db_fetch_object($result)) {
     error_log("Photo number ". $photo->flickrphoto_id);
     job_queue_add('flickrrippr_makenode', t('Updating photo %id', array('%id' => $photo->flickrphoto_id)), array($photo->flickrphoto_id));
