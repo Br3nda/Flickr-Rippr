@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.25 2010/10/13 22:52:50 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.26 2010/10/13 22:54:54 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -201,7 +201,7 @@ function flickrrippr_makenode($photo_id) {
 
     $result = db_query($sql, $values);
 
-    drupal_set_message(t("Updated photo '%photo_id', ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+    drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
   //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
