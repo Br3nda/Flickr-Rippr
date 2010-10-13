@@ -35,11 +35,12 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   }
 //   drupal_set_message("Fetching!");
   
-  if(is_array($node->files)) foreach ($node->files as $fid => $f) {
-//     drupal_set_message("checking $f->filename");
-    if ($file->filename == $f->filename) {
-      $our_file = $f;
-      $file->fid = $fid;
+  if(isset($node->files) && is_array($node->files)) {
+    foreach ($node->files as $fid => $f) {
+      if ($file->filename == $f->filename) {
+        $our_file = $f;
+        $file->fid = $fid;
+      }
     }
   }
 //   drupal_set_message("File id = $file->fid");
