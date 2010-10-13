@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.21 2010/10/13 22:44:06 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.22 2010/10/13 22:51:51 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -96,7 +96,7 @@ function flickrrippr_makenode($photo_id) {
   //TODO, this code is in two place -- make a function
   $local_cached_details = flickrrippr_get_photo_details_by_photoid($photo_id);
   $age = $local_cached_details ? strtotime('now') - $local_cached_details->lastfetched : 0;
-    
+  //
   watchdog('flickrrippr', t('Photo was fetched %age seconds ago', array('%age' => $age)));
   //if it's already been fetched in the last hour....
 //   if ($age < 60*60) {
