@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.9 2010/10/13 22:56:00 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.10 2010/10/18 22:14:04 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -40,31 +40,31 @@ function flickrrippr_schema() {
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
-      'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
-      'nid' => array('type' => 'int', 'not null' => TRUE),
+      'flickrphoto_id' => array('type' => 'int', 'size' => 'big', 'unique' => TRUE),
+      'nid' => array('type' => 'int', 'not null' => TRUE, 'unique' => TRUE),
       'lastfetched' => array('type' => 'int', 'not null' => TRUE), //can has timestamp? :-(
 /*      'photo_path' => array('type' => 'text'),
       'thumbnail_path' => array('type' => 'text'),*/
       'farm' => array('type' => 'text', 'not null' => TRUE),
       'server' => array('type' => 'text', 'not null' => TRUE),
       'secret' => array('type' => 'text', 'not null' => TRUE),
-      'dateuploaded' => array('type' => 'text'),
-      'license' => array('type' => 'text'),
-      'originalsecret' => array('type' => 'text'),
-      'originalformat' => array('type' => 'text'),
-      'rotation' => array('type' => 'text'),
-      'title' => array('type' => 'text'),
-      'date_posted' => array('type' => 'text'),
-      'date_taken' => array('type' => 'text'),
-      'date_lastupdate' => array('type' => 'text'),
-      'views' => array('type' => 'text'),
-      'photopage' => array('type' => 'text'),
-      'media' => array('type' => 'text'),
-      'description' => array('type' => 'text'),
+      'dateuploaded' => array('type' => 'text', 'not null' => TRUE),
+      'license' => array('type' => 'text', 'not null' => TRUE),
+      'originalsecret' => array('type' => 'text', 'not null' => TRUE),
+      'originalformat' => array('type' => 'text', 'not null' => TRUE),
+      'rotation' => array('type' => 'text', 'not null' => TRUE),
+      'title' => array('type' => 'text', 'not null' => TRUE),
+      'date_posted' => array('type' => 'text', 'not null' => TRUE),
+      'date_taken' => array('type' => 'text', 'not null' => TRUE),
+      'date_lastupdate' => array('type' => 'text', 'not null' => TRUE),
+      'views' => array('type' => 'text', 'not null' => TRUE),
+      'photopage' => array('type' => 'text', 'not null' => TRUE),
+      'media' => array('type' => 'text', 'not null' => TRUE),
+      'description' => array('type' => 'text', 'not null' => TRUE),
 //       'page_url' => array('type' => 'text'),
       'failed' => array('type' => 'int', 'default' => 0),
 //       'image_nid' => array('type' => 'int'),
-      'owner_nsid' => array('type' => 'text'),
+      'owner_nsid' => array('type' => 'text', 'not null' => TRUE),
       ),
       'primary key' => array('flickrphoto_id'),
       'indexes' => array(
