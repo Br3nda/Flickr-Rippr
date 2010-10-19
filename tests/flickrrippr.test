@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.2.8.6 2010/10/07 00:14:22 taniwha Exp $
+// $Id: flickrrippr.test,v 1.2.8.7 2010/10/19 00:04:11 taniwha Exp $
 
 /**
  * @file
@@ -64,7 +64,7 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     $form['markup_trust'] = FALSE;
     $form['num_per_fetch'] = 5;
     $form['teaser_size'] = 's';
-    $form['page_size'] = 'l';
+    $form['page_size'] = 'b';
     $this->drupalPost('admin/settings/flickrrippr', $form, 'Save');
 
     //re-read the variables that just got saved;
