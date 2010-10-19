@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.10 2010/10/18 22:14:04 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.11 2010/10/19 00:05:19 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -40,8 +40,8 @@ function flickrrippr_schema() {
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
-      'flickrphoto_id' => array('type' => 'int', 'size' => 'big', 'unique' => TRUE),
-      'nid' => array('type' => 'int', 'not null' => TRUE, 'unique' => TRUE),
+      'flickrphoto_id' => array('type' => 'int', 'size' => 'big'),
+      'nid' => array('type' => 'int', 'not null' => TRUE),
       'lastfetched' => array('type' => 'int', 'not null' => TRUE), //can has timestamp? :-(
 /*      'photo_path' => array('type' => 'text'),
       'thumbnail_path' => array('type' => 'text'),*/
@@ -50,8 +50,8 @@ function flickrrippr_schema() {
       'secret' => array('type' => 'text', 'not null' => TRUE),
       'dateuploaded' => array('type' => 'text', 'not null' => TRUE),
       'license' => array('type' => 'text', 'not null' => TRUE),
-      'originalsecret' => array('type' => 'text', 'not null' => TRUE),
-      'originalformat' => array('type' => 'text', 'not null' => TRUE),
+      'originalsecret' => array('type' => 'text', 'not null' => FALSE), //allow nulls
+      'originalformat' => array('type' => 'text', 'not null' => FALSE), //allow nulls
       'rotation' => array('type' => 'text', 'not null' => TRUE),
       'title' => array('type' => 'text', 'not null' => TRUE),
       'date_posted' => array('type' => 'text', 'not null' => TRUE),
@@ -70,6 +70,11 @@ function flickrrippr_schema() {
       'indexes' => array(
         'flickrphotos_nid' => array('nid'),
         'flickrphotos_owner' => array('owner_nsid'),
+        'flickrphotos_id_index' => array('flickrphoto_id'),
+      ),
+      'unique keys' => array(
+        'flickrphotos_id_unique' => array('flickrphoto_id'),
+        'flickrphotos_nid_unique' => array('nid'),
       ),
     );
   variable_set("upload_flickrrippr_photo", 1);
@@ -352,6 +357,16 @@ function flickrrippr_update_6090() {
 /**
  * mark flickr rippr photos as having uploads (attached files)
  */
-function flicrrippr_update_6100() {
+function flickrrippr_update_6100() {
   variable_set("upload_flickrrippr_photo", 1);
+}
+
+/**
+ * enforce uniqueness, and not null, on database columns
+ */
+function flickrrippr_update_6110() {
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_id_index', array('flickrphoto_id'));
+  db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_id_unique', array('flickrphoto_id'));
+  db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_nid_unique', array('nid'));
+
 }
