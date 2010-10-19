@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.27 2010/10/13 22:55:08 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.28 2010/10/19 00:11:10 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -169,7 +169,7 @@ function flickrrippr_makenode($photo_id) {
   $node_handler = variable_get('flickrrippr_node_handler', 'flickrrippr');
 //   drupal_set_message("Node handler = $node_handler");
   $node = module_invoke($node_handler, 'flickrrippr_node_save_handler', $details);
-
+  
   if (!$node) {
     drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
@@ -203,6 +203,7 @@ function flickrrippr_makenode($photo_id) {
 
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
+
   //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
@@ -233,6 +234,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
     $node->uid = $details['user']->uid;
     $node->name = $details['user']->name;
   }
+  $node->flickrphoto_id = $photo_id;
   node_save($node);
   return $node;
 }
