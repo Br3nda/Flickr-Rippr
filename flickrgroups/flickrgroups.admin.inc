@@ -1,10 +1,13 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.5 2010/10/25 23:12:43 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.6 2010/10/25 23:13:11 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
  */
 
+/**
+ * Menu callback - shows currently configured groups and lets you add more
+ */
 function flickrgroup_admin_page() {
   $output = '';
   

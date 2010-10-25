@@ -1,0 +1,6 @@
+<?php
+// $Id: flickrshadowbox.test,v 1.1.2.3 2010/10/25 23:19:39 taniwha Exp $
+
+/**
+ * @file tests of the shadowbox integration (TODO)
+ */

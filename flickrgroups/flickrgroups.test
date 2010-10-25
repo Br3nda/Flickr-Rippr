@@ -1,4 +1,9 @@
 <?php
+// $Id: flickrgroups.test,v 1.1.2.7 2010/10/25 23:14:51 taniwha Exp $
+
+/**
+ * @file Unit tests for Flickr Groups
+ */
 
 class FlickrGroupstests extends DrupalWebTestCase {
   /**
@@ -20,7 +25,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
   public function setUp() {
     // Enable any modules required for the test.
     parent::setUp('flickrrippr', 'flickrapi', 'job_queue', 'flickrgroups');
-    $this->admin_user = $this->drupalCreateUser( array('Administer global flickr api settings', 'administer site configuration', 'administer imported flickr groups'));
+    $this->admin_user = $this->drupalCreateUser( array('administer imported flickr groups', 'access administration pages', 'Administer global flickr api settings'));
     $this->normal_user = $this->drupalCreateUser( array('Configure own blogged flickr stream'));
   }
   
@@ -69,6 +74,10 @@ class FlickrGroupstests extends DrupalWebTestCase {
     
     $this->assertText("Kid's Eats");
     $this->assertLink('Add group');
+    
+    //get the photos
+    $this->drupalPost($this->getUrl(), array(), 'Fetch');
+    $this->assertResponse(200);
     
 /*    
     //log in as a normal user
