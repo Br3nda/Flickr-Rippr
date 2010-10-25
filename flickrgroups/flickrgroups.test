@@ -1,6 +1,14 @@
 <?php
 
 class FlickrGroupstests extends DrupalWebTestCase {
+  /**
+  * User with rights to post SimpleTest Example content.
+  */
+  protected $privileged_user;
+  protected $apikey = '1611f2ad417e2276c05fa279654cc0e8';
+  protected $flickrusername = 'Flickr Rippr';
+  protected $nsid = '54551252@N03';
+  
   function getInfo() {
     return array(
       'name' => 'Flickr Groups',
@@ -34,6 +42,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
     
     //configure flickrrippr
     $this->drupalGet('admin/flickr/flickrrippr');
+    $this->assertResponse(200);
     $form = array();
     $form['path_handler'] = 0;
     $form['markup_trust'] = FALSE;
