@@ -85,7 +85,7 @@ function flickrsets_node_info() {
 
 function flickrsets_form_alter(&$form, &$form_state, $form_id) {
   
-  switch($form_id) {
+  switch ($form_id) {
     case 'flickrrippr_user_settings_form':
 
       $options = array();

@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.18.2.19 2010/10/13 22:44:06 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.18.2.20 2010/10/25 23:41:18 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -150,28 +150,28 @@ function flickrrippr_admin_settings_form() {
 
 
 
-function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
-  $num_per_fetch = $form_values['values']['num_per_fetch'];
+function flickrrippr_admin_settings_form_validate($form, &$form_state) {
+  $num_per_fetch = $form_state['values']['num_per_fetch'];
   if (!is_numeric($num_per_fetch)) {
     form_set_error('num_per_fetch', t('Num to fetch must be number'));
   }
   
 }
 
-function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
+function flickrrippr_admin_settings_form_submit($form_id, $form_state) {
 
-  $path_handler = $form_values['values']['path_handler'];
+  $path_handler = $form_state['values']['path_handler'];
   variable_set('flickrrippr_path_handler', $path_handler);
 
-  $num_per_fetch = $form_values['values']['num_per_fetch'];
+  $num_per_fetch = $form_state['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
 
-  $markup_trust = $form_values['values']['markup_trust'];
+  $markup_trust = $form_state['values']['markup_trust'];
   variable_set('flickrrippr_markup_trust', $markup_trust);
 
 
-  $page_size = $form_values['values']['page_size'];
-  $teaser_size = $form_values['values']['teaser_size'];
+  $page_size = $form_state['values']['page_size'];
+  $teaser_size = $form_state['values']['teaser_size'];
   variable_set('flickrrippr_page_size', $page_size);
   variable_set('flickrrippr_teaser_size', $teaser_size);
 
