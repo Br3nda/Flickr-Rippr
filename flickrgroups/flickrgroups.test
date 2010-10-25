@@ -1,0 +1,6 @@
+<?php
+
+class FlickrGroupstests extends DrupalWebTestCase {
+    function getInfo() {
+    }
+}
