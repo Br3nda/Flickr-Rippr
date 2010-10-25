@@ -1,4 +1,9 @@
 <?php
+// $Id: flickrgroups.admin.inc,v 1.1.2.5 2010/10/25 23:12:43 taniwha Exp $ 
+
+/**
+ * @file administering the automatic import of flickr groups
+ */
 
 function flickrgroup_admin_page() {
   $output = '';
