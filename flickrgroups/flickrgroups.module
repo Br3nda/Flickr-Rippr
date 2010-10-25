@@ -2,7 +2,7 @@
 
 function flickrgroups_menu() {
   $items['admin/flickr/flickrgroups'] = array(
-    'title' => t('Flickr Groups'),
+    'title' => 'Flickr Groups',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrgroup_admin_page',
     'page arguments' => array(1),
