@@ -50,7 +50,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
     $form['num_per_fetch'] = 5;
     $form['teaser_size'] = 's';
     $form['page_size'] = 'b';
-    $this->drupalPost('admin/settings/flickrrippr', $form, 'Save');
+    $this->drupalPost($this->getUrl(), $form, 'Save');
     
     //re-read the variables that just got saved;
     $this->refreshVariables();
