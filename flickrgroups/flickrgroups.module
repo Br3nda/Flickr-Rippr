@@ -3,11 +3,16 @@
 function flickrgroups_menu() {
   $items['admin/flickr/flickrgroups'] = array(
     'title' => t('Flickr Groups'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrgroup_admin_page',
     'page arguments' => array(1),
-    'access arguments' => array('Configure own blogged flickr stream'),
+    'access arguments' => array('administer imported flickr groups'),
     'file' => 'flickrgroups.admin.inc',
+    
   );
   return $items;
+}
+
+function flickrgroups_perm() {
+  return array('administer imported flickr groups');
 }
