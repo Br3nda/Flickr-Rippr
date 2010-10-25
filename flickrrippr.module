@@ -16,7 +16,7 @@ function flickrrippr_menu() {
   $items = array();
   $items['admin/content/flickrrippr'] = array(
     'title' => 'Flickr Rippr',
-    'description' => t('View users, and force re-read from flickr.com'),
+    'description' => 'View users, and force re-read from flickr.com',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrrippr_admin',
     'access arguments' => array('Administer global flickr api settings'),
@@ -142,7 +142,7 @@ function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   return $form;
 }
 
-function flickrrippr_user_delete_account_submit($form_id, $form_state) {
+function flickrrippr_user_delete_account_submit($form, &$form_state) {
   $uid = $form_state['values']['uid'];
   $flickrid = $form_state['values']['flickrid'];
   db_query("DELETE FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid);
