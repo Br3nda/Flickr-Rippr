@@ -1,0 +1,4 @@
+name = Flickr Rippr - Groups
+package = Flickr
+dependencies[] = flickrrippr
+core = 6.x

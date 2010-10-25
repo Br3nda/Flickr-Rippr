@@ -16,6 +16,11 @@ function flickrjpegcache_get_file($filename) {
  */
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
+  if (!$node->nid || !$node->vid) {
+    drupal_set_message(t('Node not saved yet!'). print_r($node, 1), 'error');
+    foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
+  }
+
   $flickr_photo = $node->flickr_photo;
   if(!$flickr_photo) {
     drupal_set_message(t('No flickr photo info attached to node!'), 'error');
@@ -90,6 +95,7 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
   $node->files[$file->fid] = $file;
   
+  
   upload_save($node);
 
   return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
@@ -98,8 +104,13 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 }
 
 function flickrjpegcache_flickrrippr_node_alter($node, $details) {
+  if (!$node->nid || !$node->vid) {
+    drupal_set_message(t('Node not saved yet!') . print_r($node, 1), 'error');
+    return;
+  }
+
   //copy the details, to be read in get_path().
-  $node->flickr_photo = $details;
+  
   //force a refresh
   flickrjpegcache_get_path($node, 'b', TRUE);
 }

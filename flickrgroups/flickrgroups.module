@@ -1,7 +1,7 @@
 <?php
 
 function flickrgroups_menu() {
-  $items['admin/flickrrippr/flickrgroups'] = array(
+  $items['admin/flickr/flickrgroups'] = array(
     'title' => t('Flickr Groups'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'flickrgroup_admin_paeg',

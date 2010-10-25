@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.12 2010/10/13 22:44:06 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.13 2010/10/25 22:04:05 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -255,9 +255,9 @@ function flickrrippr_user_view_photos($uid, $flickruserid) {
   $result = pager_query("SELECT * FROM {flickrphotos} WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
 
   $rows = array();
-  while($photo = db_fetch_object($result)) {
+  while($photo = db_fetch_array($result)) {
     //   drupal_set_message(print_r($photo, 1));
-    $node->flickr_photo = (array)$photo;
+    $node->flickr_photo = $photo;
     $jpeg_path = flickrrippr_path($node, 't');
     $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo->nid, array('html' => TRUE));
     if(count($col) > 6) {

@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.11 2010/10/19 00:05:19 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.12 2010/10/25 22:04:05 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -368,5 +368,4 @@ function flickrrippr_update_6110() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_id_index', array('flickrphoto_id'));
   db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_id_unique', array('flickrphoto_id'));
   db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_nid_unique', array('nid'));
-
 }
