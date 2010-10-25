@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.13 2010/10/25 22:04:05 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14 2010/10/25 23:34:36 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -159,7 +159,7 @@ function flickrrippr_user_settings_form($a, $flickruser) {
     '#weight' => 9,
     );
 
-  if(isset($flickruser->flickrid)) {
+  if (isset($flickruser->flickrid)) {
     $form['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
@@ -174,16 +174,16 @@ function flickrrippr_user_settings_form($a, $flickruser) {
 
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
 
-  if(!isset($form_state['values']['flickrid'])) {
+  if (!isset($form_state['values']['flickrid'])) {
     $existing = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername='%s'", $form_state['values']['flickr_username']));
-    if($existing) {
+    if ($existing) {
       form_set_error('flickr_username', t('Cannot add this flickr account, it is already configured on this website.'));
     }
   }
 
-  if(isset($form_state['values']['flickr_username'])) {
+  if (isset($form_state['values']['flickr_username'])) {
     $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
-    if(!$flickr_details) {
+    if (!$flickr_details) {
       form_set_error('flickr_username', t('Account not found on flickr.com'));
     }
   }
@@ -260,7 +260,7 @@ function flickrrippr_user_view_photos($uid, $flickruserid) {
     $node->flickr_photo = $photo;
     $jpeg_path = flickrrippr_path($node, 't');
     $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo->nid, array('html' => TRUE));
-    if(count($col) > 6) {
+    if (count($col) > 6) {
       $rows[] = $col;
       $col = array();
     }
