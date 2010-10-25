@@ -22,4 +22,5 @@ function flickrgroups_schema() {
       'url_unique' => array('url'),
     ),
   );
+  return $schema;
 }
