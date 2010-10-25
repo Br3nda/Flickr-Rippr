@@ -17,8 +17,8 @@ function flickrjpegcache_get_file($filename) {
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
   if (!$node->nid || !$node->vid) {
-    drupal_set_message(t('Node not saved yet!'). print_r($node, 1), 'error');
-    foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
+    drupal_set_message(t('Node not saved yet!'), 'error');
+//     foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
   }
 
   $flickr_photo = $node->flickr_photo;
