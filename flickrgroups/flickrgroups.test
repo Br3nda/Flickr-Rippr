@@ -4,7 +4,8 @@ class FlickrGroupstests extends DrupalWebTestCase {
   /**
   * User with rights to post SimpleTest Example content.
   */
-  protected $privileged_user;
+  protected $admin_user;
+  protected $normal_user;
   protected $apikey = '1611f2ad417e2276c05fa279654cc0e8';
   protected $flickrusername = 'Flickr Rippr';
   protected $nsid = '54551252@N03';
@@ -59,7 +60,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
     $this->drupalGet('admin/flickr/flickrgroups');
     $this->assertResponse(200);
     
-    $this->clickrLink('Add group');
+    $this->clickLink('Add group');
     $this->assertResponse(200);
     
     $group = array('name' => 'Kid\'s Eats', 'url' => 'http://www.flickr.com/groups/kideats/pool/with/1471483911/');
