@@ -1,0 +1,25 @@
+<?php
+
+function flickrgroups_install() {
+  drupal_install_schema('flickrgroups');
+}
+function flickrgroups_uninstall() {
+  drupal_uninstall_schema('flickgroups');
+}
+
+function flickrgroups_schema() {
+  $schema['flickrgroups'] = array(
+    'fields' => array(
+      'group_id' => array('type' => 'serial'),
+      'flickrgroup_id' => array('type' => 'text', 'not null' => TRUE),
+      'name' => array('type' => 'text', 'not null' => TRUE),
+      'url' => array('type' => 'text', 'not null' => TRUE),
+    ),
+    'primary key' => ('group_id'),
+    'unique indexes' => array(
+      'flickrgroup_id_unique' => array('flickrgroup_id'),
+      'name_unique' => array('name'),
+      'url_unique' => array('url'),
+    ),
+  );
+}
