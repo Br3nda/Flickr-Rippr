@@ -1,0 +1,13 @@
+<?php
+
+function flickrgroups_menu() {
+  $items['admin/flickrrippr/flickrgroups'] = array(
+    'title' => t('Flickr Groups'),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'flickrgroup_admin_paeg',
+    'page arguments' => array(1),
+    'access arguments' => array('Configure own blogged flickr stream'),
+    'file' => 'flickrgroups.admin.inc',
+  );
+  return $items;
+}
