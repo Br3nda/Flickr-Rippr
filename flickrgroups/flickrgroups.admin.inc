@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.13 2010/10/26 02:14:38 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.14 2010/10/26 02:15:12 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -15,6 +15,7 @@ function flickrgroup_admin_page() {
   );
   $output .= '<p>'. l('Add group', 'admin/flickr/flickrgroups/add') .'</p>';
   $result = pager_query("SELECT * FROM {flickrgroups}". tablesort_sql($headers));
+  $rows = array();
   while ($g = db_fetch_object($result)) {
     $rows[] = array(
       check_plain($g->name),
@@ -24,8 +25,10 @@ function flickrgroup_admin_page() {
   if (!count($rows)) {
     $output .= '<p>'. t('No groups') .'</p>';
   }
-  $output .= theme('table', $headers, $rows);
-  $output .= theme('pager');
+  else {
+    $output .= theme('table', $headers, $rows);
+    $output .= theme('pager');
+  }
   return $output;
 }
 
