@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.9 2010/10/26 00:56:20 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.10 2010/10/26 00:56:49 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -43,7 +43,7 @@ function flickrgroups_fetch_form($a, $group_id) {
 
 function flickrgroups_fetch_form_submit($a, $form_state) {
   $group_id = intval($_POST['group_id']);
-  drupal_set_message($group_id);
+  _flickrgroups_fetch_group($group_id);
 }
 
 function flickrgroups_admin_form($a, $name=null) {
