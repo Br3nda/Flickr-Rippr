@@ -13,8 +13,12 @@ function flickrshadowbox_nodeapi(&$node, $op, $teaser, $page) {
   $image = theme('image', $thumb_path, $teaser, $teaser, NULL, FALSE);
 
   if ($teaser) {
+    $shadox_link = str_replace("'", '\\\'', l($image, $big_path, array('html' => TRUE)));
     $node->content['flickr_photo'] = array(
-      '#value' => l($image, $big_path, array('html' => TRUE)),
+      '#value' => "
+      <script>document.write('$shadowbox_link');</script>
+      <noscript>$image</noscript>
+      "
     );
 
     $node->content['flickr_page'] = array(
