@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.12 2010/10/26 01:38:49 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.13 2010/10/26 02:14:38 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -52,7 +52,7 @@ function flickrgroups_admin_form($a, $name=null) {
     '#type' => 'textfield',
     '#title' => t('Name'),
     '#required' => TRUE,
-    '#default_value' => "Kid's Eats",
+    '#default_value' => isset($name) ? $name : '',
   );
  
   $form['find'] = array(
@@ -88,14 +88,24 @@ function flickrgroups_admin_form($a, $name=null) {
 }
 
 function flickrgroups_admin_form_submit($form, &$form_state) {
-  $group->name = $form_state['values']['name'];
+
   
   if(isset($form_state['values']['flickrgroup_id'])) {
+
+    $flickr = flickrapi_phpFlickr();
+    if (!$flickr) {
+      drupal_set_message(t("Unable to query flickr.com"), 'error');
+      watchdog('flickrrippr', 'Unable to query flickr.com');
+    }
+    $results = $flickr->groups_getInfo($form_state['values']['flickrgroup_id']);
+    drupal_set_message(print_r($results, 1));
+    $group->name = $results['name'];
     $group->flickrgroup_id = $form_state['values']['flickrgroup_id'];
     drupal_write_record('flickrgroups', $group);
     drupal_goto('admin/flickr/flickrgroups');
   }
   else {
+    $group->name = $form_state['values']['name'];
     drupal_goto('admin/flickr/flickrgroups/add/'. $group->name);
   }
 }
