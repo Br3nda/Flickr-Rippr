@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.install,v 1.1.2.4 2010/10/25 23:14:03 taniwha Exp $
+// $Id: flickrgroups.install,v 1.1.2.5 2010/10/26 00:49:11 taniwha Exp $
 
 /**
  * @file manages the database schema
@@ -33,7 +33,6 @@ function flickrgroups_schema() {
     'unique indexes' => array(
       'flickrgroup_id_unique' => array('flickrgroup_id'),
       'name_unique' => array('name'),
-      'url_unique' => array('url'),
     ),
   );
   return $schema;
