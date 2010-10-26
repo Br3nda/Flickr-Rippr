@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.10 2010/10/26 00:56:49 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.11 2010/10/26 00:57:46 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -61,7 +61,7 @@ function flickrgroups_admin_form($a, $name=null) {
   );
   
   if (!empty($name)) {
-    drupal_set_message($name);
+//     drupal_set_message($name);
     $flickr = flickrapi_phpFlickr();
     if (!$flickr) {
       drupal_set_message(t("Unable to query flickr.com"), 'error');
