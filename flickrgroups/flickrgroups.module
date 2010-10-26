@@ -58,3 +58,13 @@ function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
   }
   
 }
+
+/**
+ * Implementation of hook_cron().
+ */
+function flickrgroups_cron() {
+  $result = db_query("SELECT * FROM {flickrgroups}");
+  while ($group = db_fetch_object($result)) {
+    _flickrgroups_fetch_group($group->group_id);
+  }
+}
