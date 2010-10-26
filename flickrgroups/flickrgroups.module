@@ -22,3 +22,7 @@ function flickrgroups_menu() {
 function flickrgroups_perm() {
   return array('administer imported flickr groups');
 }
+
+function flickrgroups_get_group($group_id) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrgroups} WHERE group_id=%d", $group_id));
+}
