@@ -6,7 +6,7 @@ function flickrgroups_menu() {
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrgroup_admin_page',
     'access arguments' => array('administer imported flickr groups'),
-    'file' => 'flickrgroups.admin.inc',
+    'file' => 'flickrgroups.content.inc',
   );
   $items['admin/content/flickrgroups/add'] = array(
     'title' => 'Flickr Groups',
@@ -14,8 +14,9 @@ function flickrgroups_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrgroups_admin_form'),
     'access arguments' => array('administer imported flickr groups'),
-    'file' => 'flickrgroups.admin.inc',
+    'file' => 'flickrgroups.content.inc',
   );
+  
   return $items;
 }
 

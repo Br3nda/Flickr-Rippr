@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.15 2010/10/26 02:17:32 taniwha Exp $ 
+// $Id: flickrgroups.content.inc,v 1.1.2.1 2010/10/26 02:19:51 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
