@@ -72,7 +72,7 @@ function flickrtags_form_alter(&$form, $form_state, $form_id) {
   $form['tags']['flickrtags_import'] = array(
     '#title' => t('Import tags?'), 
     '#type' => 'checkbox',
-    '#default_value' => variable_get('flickrrippr_import_tags', FALSE),
+    '#default_value' => variable_get('flickrtags_import', FALSE),
   );
 
   $options = array();
@@ -83,7 +83,7 @@ function flickrtags_form_alter(&$form, $form_state, $form_id) {
     '#title' => t('Vocabulary for tags'), 
     '#type' => 'select', 
     '#options' => $options,
-    '#default_value' => variable_get('flickrrippr_tags_vocab', 0),
+    '#default_value' => variable_get('flickrtags_vocab', 0),
   );
 
   
