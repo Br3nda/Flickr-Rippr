@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.test,v 1.1.2.7.2.1 2010/10/26 02:23:55 taniwha Exp $
+// $Id: flickrgroups.test,v 1.1.2.7.2.2 2010/10/26 22:35:07 taniwha Exp $
 
 /**
  * @file Unit tests for Flickr Groups
@@ -25,7 +25,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
   public function setUp() {
     // Enable any modules required for the test.
     parent::setUp('flickrrippr', 'flickrapi', 'job_queue', 'flickrgroups');
-    $this->admin_user = $this->drupalCreateUser( array('administer imported flickr groups', 'access administration pages', 'Administer global flickr api settings'));
+    $this->admin_user = $this->drupalCreateUser( array('administer imported flickr groups', 'access administration pages', 'Administer global flickr api settings', 'administer site configuration'));
     $this->normal_user = $this->drupalCreateUser( array('Configure own blogged flickr stream'));
   }
   
