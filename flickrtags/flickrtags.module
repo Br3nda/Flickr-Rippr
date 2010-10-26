@@ -18,7 +18,7 @@ function flickrtags_photo_add_tags($nid, $photo_info=null) {
     return;
   }
   $node = node_load(array('nid' => $nid));
-  $vid = variable_get('flickrrippr_tags_vocab', 0);
+  $vid = variable_get('flickrtags_vocab', 0);
 //   $node_terms = $node->taxonomy;
 
   $node_terms = array();
