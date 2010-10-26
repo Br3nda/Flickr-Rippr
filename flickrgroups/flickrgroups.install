@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.install,v 1.1.2.6 2010/10/26 00:50:17 taniwha Exp $
+// $Id: flickrgroups.install,v 1.1.2.7 2010/10/26 00:50:36 taniwha Exp $
 
 /**
  * @file manages the database schema
@@ -27,7 +27,6 @@ function flickrgroups_schema() {
       'group_id' => array('type' => 'serial'),
       'flickrgroup_id' => array('type' => 'text', 'not null' => TRUE),
       'name' => array('type' => 'text', 'not null' => TRUE),
-      'url' => array('type' => 'text', 'not null' => TRUE),
     ),
     'primary key' => ('group_id'),
     'unique indexes' => array(
