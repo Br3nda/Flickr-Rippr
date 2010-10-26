@@ -26,3 +26,34 @@ function flickrgroups_perm() {
 function flickrgroups_get_group($group_id) {
   return db_fetch_object(db_query("SELECT * FROM {flickrgroups} WHERE group_id=%d", $group_id));
 }
+
+function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
+  $group = flickrgroups_get_group($group_id);
+  $flickr = flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com"), 'error');
+    watchdog('flickrrippr', 'Unable to query flickr.com');
+  }
+  
+  $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
+  $photos = $flickr->groups_pools_getPhotos($group->flickrgroup_id, array(), null, null, $num_photos);
+
+  $num_photos = 0;
+  foreach ($photos['photo'] as $p) {
+    //hack to get around job_queue restricting descriptions to 255 chars
+    $description = t("Save node for flickr photo %id", array('%id' => $p['id']));
+    if (strlen($description) >= 255) {
+      $description = substr($description, 0, 254);
+    }
+    drupal_set_message($description);
+    if ($force_now) {
+      flickrrippr_makenode($p['id']);
+    }
+    else {
+      job_queue_add('flickrrippr_makenode', $description, array($p['id']));
+    }
+    
+    $num_photos++;
+  }
+  
+}

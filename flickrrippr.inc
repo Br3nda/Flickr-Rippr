@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.28 2010/10/19 00:11:10 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.29 2010/10/26 01:38:49 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -44,7 +44,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
   
   $flickruser = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrid = '%s'", $nsid));
   if (!$flickruser) {
-    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
+//     drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
     return;
   }
  
@@ -132,10 +132,10 @@ function flickrrippr_makenode($photo_id) {
   //get user details
 
   $user = flickrrippr_get_user_by_nsid($flickrid);
-  if (!$user) {
-    drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
-    return FALSE;
-  }
+//   if (!$user) {
+//     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
+//     return FALSE;
+//   }
 
   //assemble everything to pass to hook
   $details = array(
@@ -230,7 +230,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   $node->changed = strtotime($details['date_posted']);
 
   //if owner not set, then set it.
-  if (!isset($node->uid)) {
+  if (!isset($node->uid) && isset($details['user'])) {
     $node->uid = $details['user']->uid;
     $node->name = $details['user']->name;
   }
