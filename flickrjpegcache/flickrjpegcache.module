@@ -21,7 +21,12 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 //     foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
   }
 
+  if (!isset($node->flickr_photo)) {
+    flickrrippr_load($node);
+  }
+
   $flickr_photo = $node->flickr_photo;
+
   if (!$flickr_photo) {
     drupal_set_message(t('No flickr photo info attached to node!'), 'error');
     drupal_set_message(print_r($node, 1), 'error');
