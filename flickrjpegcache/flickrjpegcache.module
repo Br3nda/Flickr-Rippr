@@ -91,9 +91,11 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 //   drupal_set_message(print_r($file, 1));
   if (!empty($file->fid)) {
     drupal_write_record('files', $file, array('fid'));
+    $file->new = FALSE;
   }
   else {
     drupal_write_record('files', $file);
+    $file->new = TRUE;
   }
 //   drupal_set_message(print_r($file, 1));
 //   drupal_set_message(print_r($flickr_photo, 1));
