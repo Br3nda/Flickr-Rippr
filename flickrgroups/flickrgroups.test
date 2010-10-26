@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.test,v 1.1.2.7.2.3 2010/10/26 22:36:56 taniwha Exp $
+// $Id: flickrgroups.test,v 1.1.2.7.2.4 2010/10/26 22:43:05 taniwha Exp $
 
 /**
  * @file Unit tests for Flickr Groups
@@ -66,9 +66,12 @@ class FlickrGroupstests extends DrupalWebTestCase {
     $this->clickLink('Add group');
     $this->assertResponse(200);
     
-    $group = array('name' => 'Kid\'s Eats', 'url' => 'http://www.flickr.com/groups/kideats/pool/with/1471483911/');
-    $this->drupalPost($this->getUrl(), $group, 'Add');
+    $group = array('name' => 'Wellington');
+    $this->drupalPost($this->getUrl(), $group, 'Search');
     $this->assertResponse(200);
+
+    $group['nsid'] = '41894169203@N01';
+    $this->drupalPost($this->getUrl(), $group, 'Add');
     
     $this->assertText("Kid's Eats");
     $this->assertLink('Add group');
