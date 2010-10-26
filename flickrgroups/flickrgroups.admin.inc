@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.14 2010/10/26 02:15:12 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.15 2010/10/26 02:17:32 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -101,15 +101,14 @@ function flickrgroups_admin_form_submit($form, &$form_state) {
       watchdog('flickrrippr', 'Unable to query flickr.com');
     }
     $results = $flickr->groups_getInfo($form_state['values']['flickrgroup_id']);
-    drupal_set_message(print_r($results, 1));
     $group->name = $results['name'];
     $group->flickrgroup_id = $form_state['values']['flickrgroup_id'];
     drupal_write_record('flickrgroups', $group);
-    drupal_goto('admin/flickr/flickrgroups');
+    drupal_goto('admin/content/flickrgroups');
   }
   else {
     $group->name = $form_state['values']['name'];
-    drupal_goto('admin/flickr/flickrgroups/add/'. $group->name);
+    drupal_goto('admin/content/flickrgroups/add/'. $group->name);
   }
 }
 
