@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.content.inc,v 1.1.4.2 2010/10/26 02:23:55 taniwha Exp $ 
+// $Id: flickrgroups.content.inc,v 1.1.4.3 2010/10/26 03:43:24 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -13,7 +13,7 @@ function flickrgroup_admin_page() {
   $headers = array(
     array('field' => 'name', 'data' => 'Name', 'sort' => 'asc'),
   );
-  $output .= '<p>'. l('Add group', 'admin/flickr/flickrgroups/add') .'</p>';
+  $output .= '<p>'. l('Add group', 'admin/content/flickrgroups/add') .'</p>';
   $result = pager_query("SELECT * FROM {flickrgroups}". tablesort_sql($headers));
   $rows = array();
   while ($g = db_fetch_object($result)) {
