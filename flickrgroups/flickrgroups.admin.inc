@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.admin.inc,v 1.1.2.8 2010/10/26 00:48:54 taniwha Exp $ 
+// $Id: flickrgroups.admin.inc,v 1.1.2.9 2010/10/26 00:56:20 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -10,11 +10,16 @@
  */
 function flickrgroup_admin_page() {
   $output = '';
-  $headers = array('name');
+  $headers = array(
+    array('field' => 'name', 'data' => 'Name', 'sort' => 'asc'),
+  );
   $output .= '<p>'. l('Add group', 'admin/flickr/flickrgroups/add') .'</p>';
   $result = pager_query("SELECT * FROM {flickrgroups}". tablesort_sql($headers));
   while ($g = db_fetch_object($result)) {
-    $rows[] = array($g->name);
+    $rows[] = array(
+      check_plain($g->name),
+      drupal_get_form('flickrgroups_fetch_form', $g->group_id),
+    );
   }
   if (!count($rows)) {
     $output .= '<p>'. t('No groups') .'</p>';
@@ -22,6 +27,23 @@ function flickrgroup_admin_page() {
   $output .= theme('table', $headers, $rows);
   $output .= theme('pager');
   return $output;
+}
+
+function flickrgroups_fetch_form($a, $group_id) {
+  $form['group_id'] = array(
+    '#type' => 'hidden',
+    '#value' => $group_id,
+  );
+  $form['fetch'] = array(
+    '#type' => 'submit',
+    '#value' => t('Fetch'),
+  );
+  return $form;
+}
+
+function flickrgroups_fetch_form_submit($a, $form_state) {
+  $group_id = intval($_POST['group_id']);
+  drupal_set_message($group_id);
 }
 
 function flickrgroups_admin_form($a, $name=null) {
