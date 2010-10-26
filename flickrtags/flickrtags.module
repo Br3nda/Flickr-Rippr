@@ -97,11 +97,10 @@ function flickrtags_admin_validate($form_id, $form_state) {
 }
 
 function flickrtags_admin_submit($form_id, $form_state) {
-  drupal_set_message(__FUNCTION__);
   $import_tags = $form_state['values']['flickrtags_import'];
   variable_set('flickrtags_import', $import_tags);
   
   $vocab = $form_state['values']['flickrtags_vocab'];
   variable_set('flickrtags_vocab', $vocab);  
-  
+  drupal_set_message('Flickr tags settings saved');
 }
