@@ -5,10 +5,16 @@ function flickrgroups_menu() {
     'title' => 'Flickr Groups',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrgroup_admin_page',
-    'page arguments' => array(1),
     'access arguments' => array('administer imported flickr groups'),
     'file' => 'flickrgroups.admin.inc',
-    
+  );
+  $items['admin/flickr/flickrgroups/add'] = array(
+    'title' => 'Flickr Groups',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrgroups_admin_form'),
+    'access arguments' => array('administer imported flickr groups'),
+    'file' => 'flickrgroups.admin.inc',
   );
   return $items;
 }
