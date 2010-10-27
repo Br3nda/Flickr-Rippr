@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.72 2010/10/13 22:56:13 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.73 2010/10/27 02:27:29 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -53,7 +53,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
     ->execute()
     ->fetch();
   if (!$flickruser) {
-    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
+//     drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
     return;
   }
  
@@ -142,10 +142,10 @@ function flickrrippr_makenode($photo_id) {
   //get user details
 
   $user = flickrrippr_get_user_by_nsid($flickrid);
-  if (!$user) {
-    drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
-    return FALSE;
-  }
+//   if (!$user) {
+//     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
+//     return FALSE;
+//   }
 
   //assemble everything to pass to hook
   $details = array(
@@ -159,11 +159,11 @@ function flickrrippr_makenode($photo_id) {
 
   $details += $flickr_info;
   $details += $flickr_context;
-  foreach ($flickr_info['dates'] as $key => $d) {
-    $details['date_' . $key] = $d;
+  foreach($flickr_info['dates'] as $key => $d) {
+    $details['date_'. $key] = $d;
   }
-  foreach ($flickr_info['owner'] as $key => $o) {
-    $details['owner_' . $key] = $o;
+  foreach($flickr_info['owner'] as $key => $o) {
+    $details['owner_'. $key] = $o;
   }
   $details['flickrphoto_id'] = $details['id'];
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
@@ -214,6 +214,11 @@ function flickrrippr_makenode($photo_id) {
 
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
+  //the extra hooks
+  module_invoke_all('flickrrippr_node_alter', $node, $details);
+
+  return $node;
+
   //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
