@@ -167,15 +167,11 @@ function timemapLoad() {
                     items: [
 STR;
 
-   for($i=1800; $i<=2020; $i+=10) {
-     $start = strtotime("$i-01-01");
-     $end = $start+(60*60*24*256*10);
 //      drupal_seT_message("$start to $end");
      $result = db_query("SELECT *  FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid LIMIT 100", $start, $end);
       while($node = db_fetch_object($result)) {
-//         $js .= dnzrippr_timemap_json($node);
+        $js .= flickrgeo_timemap_json($node);
       }
-   }
 
 
 $js .= <<< STR
@@ -195,4 +191,29 @@ STR;
 
 
   return $output;
+}
+
+function flickrgeo_timemap_json($node) {
+  $title = str_replace('"', '\"', $node->title);  
+  $link = str_replace('"', '\"', l($node->title, 'node/'. $node->nid));
+  $start = $node->date_taken;
+//   $end = date('Y-m-d', $start + (60*60*24));
+  $lon = check_plain($node->longitude);
+  $lat = check_plain($node->latitude);
+  $js = <<< STR
+                        {
+                          "start" : "$start",
+			  "end": "$start",
+                          "point" : {
+                              "lat" : $lat,
+                              "lon" : $lon
+                           },
+                          "title" : "$title",
+                          "options" : {
+                            // set the full HTML for the info window
+                            "infoHtml": "<div class='custominfostyle'>$link $snippet</div>"
+                          }
+                        },
+STR;
+  return $js;
 }
