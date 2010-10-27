@@ -29,10 +29,8 @@ function flickrgeo_nodeapi(&$node, $op) {
       flickrgeo_insert($node);
     break;
     case 'update':
-      flickrgeo_update($node);
-    break;
     case 'view':
-      flickrgeo_view($node);
+      flickrgeo_save($node);
     break;
   }
 }
@@ -40,22 +38,60 @@ function flickrgeo_view($node) {
 }
 
 function flickrgeo_insert($node) {
-  drupal_set_message(__FUNCTION__);
-  drupal_set_message("photo_id=". $node->flickr_photo['flickrphoto_id']);
+//   drupal_set_message(__FUNCTION__);
+//   drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
 
 
 }
-function flickrgeo_update($node) {
-  
+function flickrgeo_save($node) {
   $photo_id = $node->flickr_photo['flickrphoto_id'];
-  $geo = flickrgeo_get_geo($photo_id);
-  drupal_set_message(print_r($geo, 1));
+  $geo = flickrgeo_fetch_geo_from_flickr($photo_id);
+//     drupal_set_message(print_r($geo, 1));
+
+  if (!$geo) {
+    return;
+  }
+  $record->flickrphoto_id = $photo_id;
+  $record->nid = $node->nid;
+  foreach(array('latitude', 'longitude', 'accuracy') as $key) {
+    $record->$key = $geo['location'][$key];
+  }
+/*      'longitude' => array('type' => 'float', 'not null' => TRUE),
+      'accuracy' => array('type' => 'int', 'not null' => TRUE),
+      'context' => array('type' => 'text'),
+      'locality_content' => array('type' => 'text'),
+      'locality_place_id' => array('type' => 'text'),
+      'locality_woeid' => array('type' => 'text'),
+      'county_content' => array('type' => 'text'),
+      'county_place_id' => array('type' => 'text'),
+      'county_woeid' => array('type' => 'text'),
+      'region_content' => array('type' => 'text'),
+      'region_place_id' => array('type' => 'text'),
+      'region_woeid' => array('type' => 'text'),
+      'country_content' => array('type' => 'text'),
+      'country_place_id' => array('type' => 'text'),
+      'country_woeid' => array('type' => 'text'), 
+      'place_id' => array('type' => 'text'),
+      'woeid' => array('type' => 'text'),*/
+//           drupal_set_message(print_r($record, 1));
+
+  $cached = flickrgeo_get_geo($photo_id);
+  if ($cached) {
+      drupal_write_record('flickrgeo', $record, array('nid', 'flickrphoto_id'));
+  }
+  else {
+    drupal_write_record('flickrgeo', $record);
+  }
+}
+
+function flickrgeo_get_geo($photo_id) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrgeo} WHERE flickrphoto_id=%d", $photo_id));
 }
 
 /**
  * Get the geo info for a public photo on flickr
  */
-function flickrgeo_get_geo($photo_id) {
+function flickrgeo_fetch_geo_from_flickr($photo_id) {
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
