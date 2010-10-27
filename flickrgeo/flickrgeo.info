@@ -3,4 +3,5 @@ core = 6.x
 package = Flickr
 
 dependencies[] = flickrrippr
+dependencies[] = gmaps
 
