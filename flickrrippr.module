@@ -68,7 +68,7 @@ function flickrrippr_menu() {
   );
 
   $items['user/%/flickrrippr/view/%'] = array(
-    'title' => t('View Photos'),
+    'title' => 'View Photos',
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_view_photos',
     'page arguments' => array(1, 4),
@@ -77,7 +77,7 @@ function flickrrippr_menu() {
   );
 
   $items['user/%/flickrrippr/delete/%'] = array(
-    'title' => t('edit'),
+    'title' => 'delete',
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrrippr_user_delete_account', 1, 4),
@@ -94,15 +94,20 @@ function flickrrippr_menu() {
     'access arguments' => array(1),
     'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/settings/flickrrippr'] = array(
-    'title' => 'Flickr Rippr',
+  $items['admin/flickr'] = array(
+    'title' => 'Flickr',
+    'page callback' => 'flickrrippr_admin_menu_page',
+    'access arguments' => array('access administration pages'),
+  );
+  $items['admin/flickr/flickrrippr'] = array(
+    'title' => 'Flickr Rippr settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrrippr_admin_settings_form'),
     'access arguments' => array('Administer global flickr api settings'),
     'description' => 'Configure the settings for Flickr Rippr.',
     'file' => 'flickrrippr.admin.inc',
   );
-  $items['admin/settings/flickrrippr/global'] = array(
+  $items['admin/flickr/flickrrippr/global'] = array(
     'title' => 'Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrrippr_admin_settings_form'),
@@ -115,6 +120,9 @@ function flickrrippr_menu() {
   return $items;
 }
 
+function flickrrippr_admin_menu_page() {
+    return '';
+}
 
 function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   $form = array();
@@ -134,7 +142,7 @@ function flickrrippr_user_delete_account($form, $uid, $flickrid) {
   return $form;
 }
 
-function flickrrippr_user_delete_account_submit($form_id, $form_state) {
+function flickrrippr_user_delete_account_submit($form, &$form_state) {
   $uid = $form_state['values']['uid'];
   $flickrid = $form_state['values']['flickrid'];
   db_query("DELETE FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid);
@@ -363,7 +371,7 @@ function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
 /**
  * Manually fetch all the latest for a user
  */
-function flickrrippr_user_fetch_now_submit($form_id, $fv) {
+function flickrrippr_user_fetch_now_submit($form, &$form_state) {
 //   $flickrid = $fv['values']['flickrid'];
   $flickrid = $_POST['flickrid'];
   $uid = $_POST['uid'];
