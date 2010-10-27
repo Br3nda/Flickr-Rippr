@@ -20,7 +20,8 @@ function flickrgeo_uninstall() {
 function flickrgeo_schema() {
   $schema['flickrgeo'] = array(
     'fields' => array(
-      'flickrphoto_id' => array('type' => 'int', 'not null' => TRUE),
+      'flickrphoto_id' => array('type' => 'int', 'size' => 'big', 'not null' => TRUE),
+      'nid' => array('type' => 'int', 'not null' => TRUE),
       'latitude' => array('type' => 'float', 'not null' => TRUE),
       'longitude' => array('type' => 'float', 'not null' => TRUE),
       'accuracy' => array('type' => 'int', 'not null' => TRUE),
