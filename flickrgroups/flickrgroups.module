@@ -1,0 +1,70 @@
+<?php
+
+function flickrgroups_menu() {
+  $items['admin/content/flickrgroups'] = array(
+    'title' => 'Flickr Groups',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'flickrgroup_admin_page',
+    'access arguments' => array('administer imported flickr groups'),
+    'file' => 'flickrgroups.content.inc',
+  );
+  $items['admin/content/flickrgroups/add'] = array(
+    'title' => 'Flickr Groups',
+    'type' => MENU_CALLBACK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('flickrgroups_admin_form'),
+    'access arguments' => array('administer imported flickr groups'),
+    'file' => 'flickrgroups.content.inc',
+  );
+  
+  return $items;
+}
+
+function flickrgroups_perm() {
+  return array('administer imported flickr groups');
+}
+
+function flickrgroups_get_group($group_id) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrgroups} WHERE group_id=%d", $group_id));
+}
+
+function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
+  $group = flickrgroups_get_group($group_id);
+  $flickr = flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com"), 'error');
+    watchdog('flickrrippr', 'Unable to query flickr.com');
+  }
+  
+  $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
+  $photos = $flickr->groups_pools_getPhotos($group->flickrgroup_id, array(), null, null, $num_photos);
+
+  $num_photos = 0;
+  foreach ($photos['photo'] as $p) {
+    //hack to get around job_queue restricting descriptions to 255 chars
+    $description = t("Save node for flickr photo %id", array('%id' => $p['id']));
+    if (strlen($description) >= 255) {
+      $description = substr($description, 0, 254);
+    }
+    drupal_set_message($description);
+    if ($force_now) {
+      $node = flickrrippr_makenode($p['id']);
+    }
+    else {
+      job_queue_add('flickrrippr_makenode', $description, array($p['id']));
+    }
+    
+    $num_photos++;
+  }
+  
+}
+
+/**
+ * Implementation of hook_cron().
+ */
+function flickrgroups_cron() {
+  $result = db_query("SELECT * FROM {flickrgroups}");
+  while ($group = db_fetch_object($result)) {
+    _flickrgroups_fetch_group($group->group_id);
+  }
+}

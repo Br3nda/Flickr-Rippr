@@ -13,25 +13,41 @@ function flickrjpegcache_flickrrippr_path_options() {
  */
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
+  if (!$node->nid || !$node->vid) {
+    drupal_set_message(t('Node not saved yet!'), 'error');
+//     foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
+  }
+
+  if (!isset($node->flickr_photo)) {
+    flickrrippr_load($node);
+  }
+
   $flickr_photo = $node->flickr_photo;
+
+  if (!$flickr_photo) {
+    drupal_set_message(t('No flickr photo info attached to node!'), 'error');
+    drupal_set_message(print_r($node, 1), 'error');
+    return;
+  }
   //make a file object which we'll save eventually
   $file = new stdClass();
   $file->filename = $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
   
-  if(!file_exists(file_directory_path() . DIRECTORY_SEPARATOR. $file->filename)) {
+  if (!file_exists(file_directory_path() . DIRECTORY_SEPARATOR . $file->filename)) {
     $refetch = TRUE;
   }
 
-  if(!$refetch) {
-    return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
+  if (!$refetch) {
+    return file_directory_path() . DIRECTORY_SEPARATOR . $file->filename;
   }
 //   drupal_set_message("Fetching!");
   
-  if(is_array($node->files)) foreach ($node->files as $fid => $f) {
-//     drupal_set_message("checking $f->filename");
-    if ($file->filename == $f->filename) {
-      $our_file = $f;
-      $file->fid = $fid;
+  if (isset($node->files) && is_array($node->files)) {
+    foreach ($node->files as $fid => $f) {
+      if ($file->filename == $f->filename) {
+        $our_file = $f;
+        $file->fid = $fid;
+      }
     }
   }
 //   drupal_set_message("File id = $file->fid");
@@ -39,6 +55,8 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   if (!$refetch) {
     return $file->filename;
   }
+
+  $sizes = _flickr_rippr_jpeg_sizes();
   
   $src = flickrrippr_path_remote($node, $size);
 //   drupal_set_message("Will download from $src");
@@ -64,30 +82,39 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   $file->list = FALSE;
   $file->new = !isset($file->fid);
 
-  $sizes = _flickr_rippr_jpeg_sizes();
 
   $file->description .= ' ' . $sizes[$size];
 // 
 //   drupal_set_message(print_r($file, 1));
-  if(!empty($file->fid)) {
+  if (!empty($file->fid)) {
     drupal_write_record('files', $file, array('fid'));
+    $file->new = FALSE;
   }
   else {
     drupal_write_record('files', $file);
+    $file->new = TRUE;
   }
 //   drupal_set_message(print_r($file, 1));
 //   drupal_set_message(print_r($flickr_photo, 1));
 
   $node->files[$file->fid] = $file;
   
+  
   upload_save($node);
 
-  return file_directory_path() . DIRECTORY_SEPARATOR. $file->filename;
+  return file_directory_path() . DIRECTORY_SEPARATOR . $file->filename;
 
   return $file;
 }
 
 function flickrjpegcache_flickrrippr_node_alter($node, $details) {
+  if (!$node->nid || !$node->vid) {
+    drupal_set_message(t('Node not saved yet!') . print_r($node, 1), 'error');
+    return;
+  }
+
+  //copy the details, to be read in get_path().
+  
   //force a refresh
-  flickrjpegcache_get_path($node, 'l', TRUE);
+  flickrjpegcache_get_path($node, 'b', TRUE);
 }

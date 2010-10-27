@@ -1,0 +1,38 @@
+<?php
+// $Id: flickrgroups.install,v 1.2 2010/10/27 01:56:31 taniwha Exp $
+
+/**
+ * @file manages the database schema
+ */
+
+/**
+* Implementation of hook_install().
+*/
+function flickrgroups_install() {
+  drupal_install_schema('flickrgroups');
+}
+
+/**
+* Implementation of hook_uninstall().
+*/
+function flickrgroups_uninstall() {
+  drupal_uninstall_schema('flickrgroups');
+}
+/**
+* Implementation of hook_schema().
+*/
+function flickrgroups_schema() {
+  $schema['flickrgroups'] = array(
+    'fields' => array(
+      'group_id' => array('type' => 'serial'),
+      'flickrgroup_id' => array('type' => 'text', 'not null' => TRUE),
+      'name' => array('type' => 'text', 'not null' => TRUE),
+    ),
+    'primary key' => ('group_id'),
+    'unique indexes' => array(
+      'flickrgroup_id_unique' => array('flickrgroup_id'),
+      'name_unique' => array('name'),
+    ),
+  );
+  return $schema;
+}
