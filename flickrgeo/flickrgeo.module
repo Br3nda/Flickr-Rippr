@@ -29,7 +29,7 @@ function flickrgeo_nodeapi(&$node, $op) {
       flickrgeo_insert($node);
     break;
     case 'update':
-      ($node);
+      flickrgeo_update($node);
     break;
     case 'view':
       flickrgeo_view($node);
@@ -41,23 +41,27 @@ function flickrgeo_view($node) {
 
 function flickrgeo_insert($node) {
   drupal_set_message(__FUNCTION__);
-  drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
+  drupal_set_message("photo_id=". $node->flickr_photo['flickrphoto_id']);
 
 
 }
 function flickrgeo_update($node) {
-  drupal_set_message(__FUNCTION__);
-  drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
-
+  
+  $photo_id = $node->flickr_photo['flickrphoto_id'];
+  $geo = flickrgeo_get_geo($photo_id);
+  drupal_set_message(print_r($geo, 1));
 }
 
+/**
+ * Get the geo info for a public photo on flickr
+ */
 function flickrgeo_get_geo($photo_id) {
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
     return FALSE;
   }
-//   $response = $flickr->photos_geo_getLocation($node->flickr_photo['photo_id']);  
+  return $flickr->photos_geo_getLocation($photo_id);
 }
 
 
