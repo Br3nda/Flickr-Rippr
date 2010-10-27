@@ -107,7 +107,6 @@ function flickrsets_form_alter(&$form, &$form_state, $form_id) {
       $form['#submit'][] = 'flickrsets_submit';  
     break;
     case 'flickrrippr_user_fetch_now':
-      drupal_set_message(__FUNCTION__ . '::'. $form_id);
       $form['#submit'][] = 'flickrsets_fetch_now_submit';
     break;
   }
