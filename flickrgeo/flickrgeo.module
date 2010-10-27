@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function flickrgeo_perm() {
+  return array('view flickr timeline');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function flickrgeo_menu() {
+  $items['flickrtimeline'] = array(
+    'page callback' => 'flickrgeo_timeline',
+    'access arguments' => array('view flickr timeline'),
+    'type' => MENU_NORMAL_ITEM,
+    'title' => 'Flickr Photos Timeline',
+  );
+  return $items;
+}
+
+function flickrgeo_nodeapi(&$node, $op) {
+  if ($node->type != 'flickrrippr_photo') {
+    return;
+  }
+  switch($op) {
+    case 'insert':
+      flickrgeo_insert($node);
+    break;
+    case 'update':
+      flickrgeo_update($node);
+    break;
+    case 'view':
+      flickrgeo_view($node);
+    break;
+  }
+}
+
+function flickrgeo_insert($node) {
+  $flickr = flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
+    return FALSE;
+  }
+  drupal_set_message(__FUNCTION__);
+  drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
+//   $response = $flickr->photos_geo_getLocation($node->flickr_photo['photo_id']);
+}
+  
+
+
+/**
+ * Page call back
+ */
+function flickrgeo_timeline() {
+  drupal_set_html_head('<script src="http://maps.google.com/maps?file=api&v=2&key='. variable_get('googlemap_api_key', '') .'" type="text/javascript"></script>');
+  drupal_set_html_head('<script src="http://static.simile.mit.edu/timeline/api/timeline-api.js" type="text/javascript"></script>');
+  $timemapjs = drupal_get_path('module', 'dnzrippr') .'/js/timemap_full.pack.js';
+  drupal_set_html_head('<script src="'. $timemapjs .'" type="text/javascript"></script>');
+  drupal_set_html_head('<link href="http://timemap.googlecode.com/svn/trunk/examples/examples.css" type="text/css" rel="stylesheet"/>');
+
+
+  $output .= '
+      <style>
+    div#timelinecontainer{ height: 300px; }
+    div#mapcontainer{ height: 500px; }
+    </style>
+    <div id="timemap">
+      <div id="timelinecontainer">
+        <div id="timeline"></div>
+      </div>
+      <div id="mapcontainer">
+        <div id="map"></div>
+      </div>
+    </div>';
+    $output .= '<script>$(document).ready(function() { timemapLoad() });</script>';
+
+
+  $js = <<< STR
+
+<script type="text/javascript">
+function timemapLoad() {
+    tm = TimeMap.init({
+        mapId: "map",               // Id of map div element (required)
+        timelineId: "timeline",     // Id of timeline div element (required)
+        options: {
+            eventIconPath: "../images/"
+        },
+        datasets: [
+            {
+                id: "artists",
+                title: "Artists",
+                theme: "orange",
+                // note that the lines below are now the preferred syntax
+                type: "basic",
+                options: {
+                    items: [
+STR;
+
+   for($i=1800; $i<=2020; $i+=10) {
+     $start = strtotime("$i-01-01");
+     $end = $start+(60*60*24*256*10);
+//      drupal_seT_message("$start to $end");
+     $result = db_query("SELECT *  FROM {dnznodes} d INNER JOIN {node} n ON d.nid = n.nid WHERE date <> '' AND date::bigint > %d AND date::bigint < %d ORDER BY geocoords DESC LIMIT 100", $start, $end);
+      while($node = db_fetch_object($result)) {
+        $js .= dnzrippr_timemap_json($node);
+      }
+   }
+
+
+$js .= <<< STR
+                    ]
+                }
+            }
+        ],
+        bandIntervals: [
+            Timeline.DateTime.YEAR,
+            Timeline.DateTime.DECADE
+        ]
+    });
+}
+    // manipulate the timemap further here if you like</script>
+STR;
+  drupal_set_html_head($js);
+
+
+  return $output;
+}
