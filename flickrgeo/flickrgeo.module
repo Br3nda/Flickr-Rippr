@@ -182,7 +182,8 @@ $js .= <<< STR
         bandIntervals: [
             Timeline.DateTime.MONTH,
             Timeline.DateTime.YEAR
-        ]
+        ],
+        scrollTo: "latest",
     });
 }
     // manipulate the timemap further here if you like</script>
