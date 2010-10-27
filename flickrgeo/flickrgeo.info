@@ -4,4 +4,5 @@ package = Flickr
 
 dependencies[] = flickrrippr
 dependencies[] = gmaps
+dependencies[] = gmap_location
 
