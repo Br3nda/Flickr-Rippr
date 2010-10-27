@@ -38,7 +38,6 @@ function flickrgeo_view(&$node) {
   if (!$cached) {
     return;
   }
-  drupal_set_message(__FUNCTION__);
   $map = gmap_defaults();
   $newmarker['latitude'] = $cached->latitude;
   $newmarker['longitude'] = $cached->longitude;
