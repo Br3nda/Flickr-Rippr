@@ -202,7 +202,7 @@ function flickrgeo_timemap_json($node) {
   $lon = check_plain($node->longitude);
   $lat = check_plain($node->latitude);
   $node->flickr_photo = (array)$node;
-  $thumb = str_replace('"', '\"', theme('image', flickrrippr_path($node, 's'),$node->title, $node->title, array(), FALSE) . $node->description);
+  $thumb = str_replace('"', '\"', theme('image', flickrrippr_path($node, 's'),$node->title, $node->title, array(), FALSE));
   $js = <<< STR
                         {
                           "start" : "$start",
