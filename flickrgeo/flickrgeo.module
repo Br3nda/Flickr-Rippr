@@ -38,16 +38,20 @@ function flickrgeo_nodeapi(&$node, $op) {
 }
 
 function flickrgeo_insert($node) {
+
+  drupal_set_message(__FUNCTION__);
+  drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
+
+}
+
+function flickrgeo_get_geo($photo_id) {
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
     drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
     return FALSE;
   }
-  drupal_set_message(__FUNCTION__);
-  drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
-//   $response = $flickr->photos_geo_getLocation($node->flickr_photo['photo_id']);
+//   $response = $flickr->photos_geo_getLocation($node->flickr_photo['photo_id']);  
 }
-  
 
 
 /**
