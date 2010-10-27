@@ -29,16 +29,23 @@ function flickrgeo_nodeapi(&$node, $op) {
       flickrgeo_insert($node);
     break;
     case 'update':
-      flickrgeo_update($node);
+      ($node);
     break;
     case 'view':
       flickrgeo_view($node);
     break;
   }
 }
+function flickrgeo_view($node) {
+}
 
 function flickrgeo_insert($node) {
+  drupal_set_message(__FUNCTION__);
+  drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
 
+
+}
+function flickrgeo_update($node) {
   drupal_set_message(__FUNCTION__);
   drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
 
