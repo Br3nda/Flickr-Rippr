@@ -25,24 +25,32 @@ function flickrgeo_nodeapi(&$node, $op) {
     return;
   }
   switch($op) {
-    case 'insert':
-      flickrgeo_insert($node);
-    break;
-    case 'update':
     case 'view':
+      flickrgeo_view($node);
+    case 'update':
+    case 'insert':
       flickrgeo_save($node);
     break;
   }
 }
-function flickrgeo_view($node) {
+function flickrgeo_view(&$node) {
+  $cached = flickrgeo_get_geo($node->flickr_photo['flickrphoto_id']);
+  if (!$cached) {
+    return;
+  }
+  drupal_set_message(__FUNCTION__);
+  $map = gmap_defaults();
+  $newmarker['latitude'] = $cached->latitude;
+  $newmarker['longitude'] = $cached->longitude;
+  $newmarker['markername'] = 'drupal';
+  $newmarker['opts']['title'] = check_plain($node->title);
+  $map['markers'][] = $newmarker;
+  
+  $node->content['flickrmap'] = array(
+    '#value' => '<div class="flickrmap">'. theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')) .'</div>',
+  );
 }
 
-function flickrgeo_insert($node) {
-//   drupal_set_message(__FUNCTION__);
-//   drupal_set_message("photo_id=". $node->flickr_photo['photo_id']);
-
-
-}
 function flickrgeo_save($node) {
   $photo_id = $node->flickr_photo['flickrphoto_id'];
   $geo = flickrgeo_fetch_geo_from_flickr($photo_id);
