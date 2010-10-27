@@ -41,7 +41,6 @@ function flickrgeo_view(&$node) {
   $map = array_merge(gmap_defaults());
   $map['latlong'] = ceil($cached->latitude) .','. ceil($cached->longitude);
   $map['zoom'] = 8;
-  drupal_set_message(print_r($map, 1));
   $map['markermode'] = 1;
 //   $mode = $usermap['markermode'];
   
