@@ -1,4 +1,4 @@
-Name = Flickr Rippr - Geo
+name = Flickr Rippr - Geo
 core = 6.x
 package = Flickr
 
