@@ -123,9 +123,11 @@ function flickrgeo_fetch_geo_from_flickr($photo_id) {
 function flickrgeo_timeline() {
   drupal_set_html_head('<script src="http://maps.google.com/maps?file=api&v=2&key='. variable_get('googlemap_api_key', '') .'" type="text/javascript"></script>');
   drupal_set_html_head('<script src="http://static.simile.mit.edu/timeline/api/timeline-api.js" type="text/javascript"></script>');
-  $timemapjs = drupal_get_path('module', 'dnzrippr') .'/js/timemap_full.pack.js';
+  $timemapjs = url(drupal_get_path('module', 'flickrgeo') .'/js/timemap_full.pack.js');
   drupal_set_html_head('<script src="'. $timemapjs .'" type="text/javascript"></script>');
-  drupal_set_html_head('<link href="http://timemap.googlecode.com/svn/trunk/examples/examples.css" type="text/css" rel="stylesheet"/>');
+//   drupal_set_html_head('<link href="http://timemap.googlecode.com/svn/trunk/examples/examples.css" type="text/css" rel="stylesheet"/>');
+  $timemapcss = url(drupal_get_path('module', 'flickrgeo') .'/css/map.css');
+  drupal_set_html_head('<link href="'. $timemapcss .'" type="text/css" rel="stylesheet"/>');
 
 
   $output .= '
@@ -156,8 +158,8 @@ function timemapLoad() {
         },
         datasets: [
             {
-                id: "artists",
-                title: "Artists",
+                id: "photos",
+                title: "Photos",
                 theme: "orange",
                 // note that the lines below are now the preferred syntax
                 type: "basic",
@@ -169,9 +171,9 @@ STR;
      $start = strtotime("$i-01-01");
      $end = $start+(60*60*24*256*10);
 //      drupal_seT_message("$start to $end");
-     $result = db_query("SELECT *  FROM {dnznodes} d INNER JOIN {node} n ON d.nid = n.nid WHERE date <> '' AND date::bigint > %d AND date::bigint < %d ORDER BY geocoords DESC LIMIT 100", $start, $end);
+     $result = db_query("SELECT *  FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid LIMIT 100", $start, $end);
       while($node = db_fetch_object($result)) {
-        $js .= dnzrippr_timemap_json($node);
+//         $js .= dnzrippr_timemap_json($node);
       }
    }
 
@@ -182,8 +184,8 @@ $js .= <<< STR
             }
         ],
         bandIntervals: [
-            Timeline.DateTime.YEAR,
-            Timeline.DateTime.DECADE
+            Timeline.DateTime.MONTH,
+            Timeline.DateTime.YEAR
         ]
     });
 }
