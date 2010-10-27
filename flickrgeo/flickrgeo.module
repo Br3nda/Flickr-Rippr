@@ -38,7 +38,16 @@ function flickrgeo_view(&$node) {
   if (!$cached) {
     return;
   }
-  $map = gmap_defaults();
+  $map = array_merge(gmap_defaults());
+  $map['latlong'] = ceil($cached->latitude) .','. ceil($cached->longitude);
+  $map['zoom'] = 8;
+  drupal_set_message(print_r($map, 1));
+  $map['markermode'] = 1;
+//   $mode = $usermap['markermode'];
+  
+//   $map['rmtcallback'] = url('map/user/load');
+//   $map['markermode'] = $usermap['markermode'];
+
   $newmarker['latitude'] = $cached->latitude;
   $newmarker['longitude'] = $cached->longitude;
   $newmarker['markername'] = 'drupal';
@@ -47,6 +56,7 @@ function flickrgeo_view(&$node) {
   
   $node->content['flickrmap'] = array(
     '#value' => '<div class="flickrmap">'. theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')) .'</div>',
+    '#weight' => -4,
   );
 }
 
