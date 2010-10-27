@@ -1,23 +1,27 @@
 <?php
 /**
- * Implementation of hook_nodeapi();
+ * Implements hook_node_view().
  */
-function flickrshadowbox_nodeapi(&$node, $op, $teaser, $page) {
-  if ('view' != $op) {
-    return;
-  }
+function flickrshadowbox_node_view(&$node, $view_mode, $langcode) {
   if(empty($node->flickr_photo)) {
     return;
   }
   
   $thumb_path = flickrrippr_path($node, variable_get('flickrrippr_teaser_size', 't'));
   $big_path =  flickrrippr_path($node, variable_get('flickrrippr_page_size', 'z'));
-  $image = theme('image', $thumb_path, $teaser, $teaser, NULL, FALSE);
-  $node->content['flickr_photo'] = array(
-    '#value' => l($image, $big_path, array('html' => TRUE)),
-    '#weight' => -1,
-  );
-  $node->content['flickr_page'] = array(
-    '#value' => '<p>'. l(check_plain($node->title), $node->flickr_photo['photopage']) .'. ' . t('Click image for larger view.') .'</p>',
-  );
+  $image = theme('image', $thumb_path, $node->title, $node->title, NULL, FALSE);
+
+  if ($view_mode == 'teaser') {
+    $shadox_link = str_replace("'", '\\\'', l($image, $big_path, array('html' => TRUE)));
+    $node->content['flickr_photo'] = array(
+      '#value' => "
+      <script>document.write('$shadowbox_link');</script>
+      <noscript>$image</noscript>
+      "
+    );
+
+    $node->content['flickr_page'] = array(
+      '#value' => '<p>'. l(check_plain($node->title), $node->flickr_photo['photopage']) .'</p>',
+    );
+  }
 }
