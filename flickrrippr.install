@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.12 2010/10/25 22:04:05 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.12.2.1 2010/10/27 21:27:53 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -27,8 +27,7 @@ function flickrrippr_schema() {
   $schema['flickrusers'] = array(
     'fields' => array(
       'uid' => array('type' => 'int'),
-      'flickrid' => array('type' => 'text'),
-      'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(
+      'flickrid' => array('type' => 'varchar', 'length' => 100),
       'tag' => array('type' => 'text'),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       'flickrispro' => array('type' => 'int', 'size' => 'tiny', 'default' => 0),
@@ -36,7 +35,10 @@ function flickrrippr_schema() {
       'flickrprofileurl' => array('type' => 'text'),
       'flickravatar' => array('type' => 'text'),
       ),
-    'primary key' => array('uid', 'flickrid')
+    'primary key' => array('uid', 'flickrid'),
+    'indexes' => array(
+      'flickrid_index' => array('flickrid'),
+    ),
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
@@ -64,7 +66,7 @@ function flickrrippr_schema() {
 //       'page_url' => array('type' => 'text'),
       'failed' => array('type' => 'int', 'default' => 0),
 //       'image_nid' => array('type' => 'int'),
-      'owner_nsid' => array('type' => 'text', 'not null' => TRUE),
+      'owner_nsid' => array('type' => 'varchar', 'length' => 100, 'not null' => TRUE),
       ),
       'primary key' => array('flickrphoto_id'),
       'indexes' => array(
@@ -368,4 +370,11 @@ function flickrrippr_update_6110() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_id_index', array('flickrphoto_id'));
   db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_id_unique', array('flickrphoto_id'));
   db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_nid_unique', array('nid'));
+}
+
+/**
+ * Add index on the flickr user name fields
+ */
+function flickrrippr_update_6120() {
+  db_add_index($ret, 'flickrusers', 'flickrid_index', array('flickrid'));
 }
