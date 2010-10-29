@@ -5,7 +5,7 @@ include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
  * Implementation of hook_perm().
  */
 function flickrrippr_perm() {
-  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', /* 'Cache own Flickr Photos on this server'*/);
+  return array('Configure own blogged flickr stream', 'Administer global flickr api settings', 'use flickr secret importer');
 }
 
 /**
@@ -14,6 +14,14 @@ function flickrrippr_perm() {
 function flickrrippr_menu() {
   GLOBAL $user;
   $items = array();
+  $items['flickr/secret'] = array(
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('flickrrippr_secret_form'),
+     'access arguments' => array('use flickr secret importer'),
+     'file' => 'flickrrippr.secret.inc',
+     'type' => MENU_NORMAL_ITEM,
+     'title' => 'Flickr Secret Import',
+  );
   $items['admin/content/flickrrippr'] = array(
     'title' => 'Flickr Rippr',
     'description' => 'View users, and force re-read from flickr.com',
@@ -217,7 +225,7 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
 /**
  * Get the latest from flickr.com for one user
  */
-function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
+function flickrrippr_fetch_latest($flickruser, $force_now=FALSE) {
 
   $num_queue = db_fetch_object(db_query("SELECT count(*) as c FROM {job_queue} WHERE function='flickrrippr_makenode'"))->c;
   if ($num_queue > 1000) {
@@ -240,7 +248,6 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   $query = array(
     'user_id' => $flickruser->flickrid,
     'per_page' => $num_photos,
-    'page' =>  $pagenum
   );
 
   if ($flickruser->tag) {
@@ -252,11 +259,18 @@ function flickrrippr_fetch_latest($flickruser, $pagenum=0) {
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
         //hack to get around job_queue restricting descriptions to 255 chars
-        $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => check_plain($flickruser->flickrusername)));
-        if(strlen($description) >= 255) {
-          $description = substr($description, 0, 254);
+
+        
+        if ($force_now) {
+          flickrrippr_makenode($p['id']);
         }
-        job_queue_add('flickrrippr_makenode', $description, array($p['id']));
+        else {
+          $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => check_plain($flickruser->flickrusername)));
+          if (strlen($description) >= 255) {
+            $description = substr($description, 0, 254);
+          }
+          job_queue_add('flickrrippr_makenode', $description, array($p['id']));
+        }
         $num_photos++;
       }
 //     }
@@ -344,7 +358,7 @@ function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
 /**
  * Manually fetch all the latest for a user
  */
-function flickrrippr_user_fetch_now_submit($form_id, $fv) {
+function flickrrippr_user_fetch_now_submit($form, &$form_state) {
 //   $flickrid = $fv['values']['flickrid'];
   $flickrid = $_POST['flickrid'];
   $uid = $_POST['uid'];
@@ -364,7 +378,7 @@ function flickrrippr_user_fetch_now_submit($form_id, $fv) {
 
 
   //and fetch
-  flickrrippr_fetch_latest($fuser);
+  flickrrippr_fetch_latest($fuser, TRUE);
 
   drupal_goto(check_plain($dest));
 }
@@ -520,3 +534,4 @@ function _flickr_rippr_jpeg_sizes() {
     'o'  => t('Original (2592 x 1944)')
   );
 }
+
