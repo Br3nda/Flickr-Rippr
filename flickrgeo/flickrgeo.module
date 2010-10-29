@@ -33,6 +33,42 @@ function flickrgeo_nodeapi(&$node, $op) {
     break;
   }
 }
+
+function flickrgeo_block($op = 'list', $delta = 0, $edit = array()) {
+  switch($op) {
+    case 'view': return flickrgeo_block_view();
+    break;
+    case 'list': return array(array('info' => t('Map of latest flickr photos')));
+    break;
+  }
+}
+
+function flickrgeo_block_view() {
+  $map = array_merge(gmap_defaults());
+  
+  $map['zoom'] = 8;
+//   $map['markermode'] = 1;
+  $map['width'] = '100%';
+  $map['height'] = '500px';
+
+
+  $result = db_query("SELECT * FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid ORDER BY p.date_taken DESC LIMIT 50");
+  while($cached = db_fetch_object($result)) {
+    $newmarker['latitude'] = $cached->latitude;
+    $newmarker['longitude'] = $cached->longitude;
+    $newmarker['markername'] = 'drupal';
+    $newmarker['opts']['title'] = check_plain($cached->title);
+    $newmarker['link'] = url('node/'. $cached->nid);
+    $map['markers'][] = $newmarker;
+    $map['latlong'] = ceil($cached->latitude) .','. ceil($cached->longitude);
+  }
+  
+  return array(
+    'subject' => t('Map of photo'),
+    'content' => theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')),
+  );
+}
+
 function flickrgeo_view(&$node) {
   $cached = flickrgeo_get_geo($node->flickr_photo['flickrphoto_id']);
   if (!$cached) {
@@ -42,6 +78,7 @@ function flickrgeo_view(&$node) {
   $map['latlong'] = ceil($cached->latitude) .','. ceil($cached->longitude);
   $map['zoom'] = 8;
   $map['markermode'] = 1;
+  $map['width'] = '100%';
 //   $mode = $usermap['markermode'];
   
 //   $map['rmtcallback'] = url('map/user/load');
@@ -55,8 +92,19 @@ function flickrgeo_view(&$node) {
   
   $node->content['flickrmap'] = array(
     '#value' => '<div class="flickrmap">'. theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')) .'</div>',
-    '#weight' => -4,
+    '#weight' => 1,
   );
+/*
+
+  $query = array('lat' => $cached->latitude, 'lng' => $cached->longitude);
+  $options = array('columns' => array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode) );
+  $result = geonames_query('findNearestAddress', $query, $options);
+  
+  $node->content['flickr_nearest_address'] = array(
+    '#value' => print_r($result, 1),
+    '#weight' => -3
+  );
+  //$re*/sult->results = array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode)
 }
 
 function flickrgeo_save($node) {
@@ -117,106 +165,3 @@ function flickrgeo_fetch_geo_from_flickr($photo_id) {
 }
 
 
-/**
- * Page call back
- */
-function flickrgeo_timeline() {
-  drupal_set_html_head('<script src="http://maps.google.com/maps?file=api&v=2&key='. variable_get('googlemap_api_key', '') .'" type="text/javascript"></script>');
-  drupal_set_html_head('<script src="http://static.simile.mit.edu/timeline/api/timeline-api.js" type="text/javascript"></script>');
-  $timemapjs = url(drupal_get_path('module', 'flickrgeo') .'/js/timemap_full.pack.js');
-  drupal_set_html_head('<script src="'. $timemapjs .'" type="text/javascript"></script>');
-//   drupal_set_html_head('<link href="http://timemap.googlecode.com/svn/trunk/examples/examples.css" type="text/css" rel="stylesheet"/>');
-  $timemapcss = url(drupal_get_path('module', 'flickrgeo') .'/css/map.css');
-  drupal_set_html_head('<link href="'. $timemapcss .'" type="text/css" rel="stylesheet"/>');
-
-
-  $output .= '
-      <style>
-    div#timelinecontainer{ height: 300px; }
-    div#mapcontainer{ height: 500px; }
-    </style>
-    <div id="timemap">
-      <div id="timelinecontainer">
-        <div id="timeline"></div>
-      </div>
-      <div id="mapcontainer">
-        <div id="map"></div>
-      </div>
-    </div>';
-    $output .= '<script>$(document).ready(function() { timemapLoad() });</script>';
-
-
-  $js = <<< STR
-
-<script type="text/javascript">
-function timemapLoad() {
-    tm = TimeMap.init({
-        mapId: "map",               // Id of map div element (required)
-        timelineId: "timeline",     // Id of timeline div element (required)
-        options: {
-            eventIconPath: "../images/"
-        },
-        datasets: [
-            {
-                id: "photos",
-                title: "Photos",
-                theme: "orange",
-                // note that the lines below are now the preferred syntax
-                type: "basic",
-                options: {
-                    items: [
-STR;
-
-//      drupal_seT_message("$start to $end");
-     $result = db_query("SELECT *  FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid LIMIT 1000", $start, $end);
-      while($node = db_fetch_object($result)) {
-        $js .= flickrgeo_timemap_json($node);
-      }
-
-
-$js .= <<< STR
-                    ]
-                }
-            }
-        ],
-        bandIntervals: [
-            Timeline.DateTime.MONTH,
-            Timeline.DateTime.YEAR
-        ],
-        scrollTo: "latest",
-    });
-}
-    // manipulate the timemap further here if you like</script>
-STR;
-  drupal_set_html_head($js);
-
-
-  return $output;
-}
-
-function flickrgeo_timemap_json($node) {
-  $title = str_replace('"', '\"', $node->title);  
-  $link = str_replace('"', '\"', l($node->title, 'node/'. $node->nid));
-  $start = $node->date_taken;
-//   $end = date('Y-m-d', $start + (60*60*24));
-  $lon = check_plain($node->longitude);
-  $lat = check_plain($node->latitude);
-  $node->flickr_photo = (array)$node;
-  $thumb = str_replace('"', '\"', theme('image', flickrrippr_path($node, 's'),$node->title, $node->title, array(), FALSE));
-  $js = <<< STR
-                        {
-                          "start" : "$start",
-			  "end": "$start",
-                          "point" : {
-                              "lat" : $lat,
-                              "lon" : $lon
-                           },
-                          "title" : "$title",
-                          "options" : {
-                            // set the full HTML for the info window
-                            "infoHtml": "<div class='custominfostyle'>$link<br/>$thumb</div>"
-                          }
-                        },
-STR;
-  return $js;
-}
