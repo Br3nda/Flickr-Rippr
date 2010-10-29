@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Implementation of hook_menu().
+ */
 function flickrgroups_menu() {
   $items['flickr/groups'] = array(
     'title' => 'Flickr Groups',
@@ -18,7 +21,7 @@ function flickrgroups_menu() {
   );
     $items['flickr/groups/%'] = array(
     'type' => MENU_LOCAL_TASK,
-    'page callback' => 'flickr_group_page',
+    'page callback' => 'flickrgroup_page',
     'page arguments' => array(2),
     'access arguments' => array('administer imported flickr groups'),
     'file' => 'flickrgroups.content.inc',
@@ -27,6 +30,9 @@ function flickrgroups_menu() {
   return $items;
 }
 
+/**
+ * Implementation of hook_perm().
+ */
 function flickrgroups_perm() {
   return array('administer imported flickr groups', 'view list of flickr groups');
 }
@@ -44,7 +50,7 @@ function flickrgroups_get_all_groups() {
   return $groups;
 }
 
-function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
+function flickrgroups_fetch_group($group_id, $force_now=FALSE) {
   $group = flickrgroups_get_group($group_id);
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
@@ -75,9 +81,15 @@ function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
   
 }
 
-function flickr_group_page($group_id) {
+function flickrgroup_page($group_id) {
   $group = flickrgroups_get_group($group_id);
-  
+  drupal_set_title($group->name);
+  $photos = flickrgroup_get_cached_photos($group_id);
+  $output = '';
+  foreach($photos as $p) {
+    $output .= theme('image', flickrrippr_path($p), $p->title, $p->title);
+  }
+  return $output;
 }
 
 /**
@@ -86,6 +98,6 @@ function flickr_group_page($group_id) {
 function flickrgroups_cron() {
   $result = db_query("SELECT * FROM {flickrgroups}");
   while ($group = db_fetch_object($result)) {
-    _flickrgroups_fetch_group($group->group_id);
+    flickrgroups_fetch_group($group->group_id);
   }
 }
