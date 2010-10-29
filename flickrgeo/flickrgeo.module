@@ -94,17 +94,17 @@ function flickrgeo_view(&$node) {
     '#value' => '<div class="flickrmap">'. theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')) .'</div>',
     '#weight' => 1,
   );
-/*
 
-  $query = array('lat' => $cached->latitude, 'lng' => $cached->longitude);
-  $options = array('columns' => array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode) );
-  $result = geonames_query('findNearestAddress', $query, $options);
-  
-  $node->content['flickr_nearest_address'] = array(
-    '#value' => print_r($result, 1),
-    '#weight' => -3
-  );
-  //$re*/sult->results = array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode)
+
+//   $query = array('lat' => $cached->latitude, 'lng' => $cached->longitude);
+//   $options = array('columns' => array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode) );
+//   $result = geonames_query('findNearestAddress', $query, $options);
+//   
+//   $node->content['flickr_nearest_address'] = array(
+//     '#value' => print_r($result, 1),
+//     '#weight' => -3
+//   );
+  //$result->results = array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode)
 }
 
 function flickrgeo_save($node) {
