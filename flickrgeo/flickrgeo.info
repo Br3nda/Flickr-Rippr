@@ -3,6 +3,6 @@ core = 6.x
 package = Flickr
 
 dependencies[] = flickrrippr
-dependencies[] = gmaps
-dependencies[] = gmap_location
+dependencies[] = gmap
+dependencies[] = geonames
 
