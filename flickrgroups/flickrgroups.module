@@ -19,12 +19,13 @@ function flickrgroups_menu() {
     'access arguments' => array('administer imported flickr groups'),
     'file' => 'flickrgroups.content.inc',
   );
-//     $items['flickr/groups/%'] = array(
-//     'type' => MENU_LOCAL_TASK,
-//     'page callback' => 'flickrgroup_page',
-//     'access arguments' => array('administer imported flickr groups'),
-//     'file' => 'flickrgroups.content.inc',
-//   );
+  $items['flickr/groups/%'] = array(
+    'type' => MENU_CALLBACK,
+    'page callback' => 'flickrgroup_page',
+    'page arguments' => array(2),
+    'access arguments' => array('administer imported flickr groups'),
+    'file' => 'flickrgroups.content.inc',
+  );
   
   return $items;
 }
@@ -100,13 +101,28 @@ function flickrgroup_nodeapi($node, $op) {
 
 function flickrgroup_page($flickrgroup_id) {
   $group = flickrgroups_get_group($flickrgroup_id);
+  if(!$group) {
+    drupal_set_message(t("Request for invalid group: %id", array('%id' => $flickrgroup_id)), 'error');
+    return '';
+  }
   drupal_set_title($group->name);
   $photos = flickrgroup_get_cached_photos($flickrgroup_id);
   $output = '';
+  $output .= drupal_get_form('flickrgroups_fetch_form', $flickrgroup_id);
+
   foreach($photos as $p) {
     $output .= theme('image', flickrrippr_path($p), $p->title, $p->title);
   }
   return $output;
+}
+
+function flickrgroup_get_cached_photos($flickrgroup_id, $limit=9) {
+  $result = db_query("SELECT * FROM {flickrgroup_photos} gp INNER JOIN {node} n ON n.nid = gp.nid LIMIT %d", $limit);
+  $nodes = array();
+  while ($n = db_fetch_object($result)) {
+    $nodes[] = $n;
+  }
+  return $nodes;
 }
 
 /**
