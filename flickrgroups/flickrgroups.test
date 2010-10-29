@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.test,v 1.1.2.7.2.5 2010/10/27 01:56:01 taniwha Exp $
+// $Id: flickrgroups.test,v 1.1.2.7.2.6 2010/10/29 02:02:34 taniwha Exp $
 
 /**
  * @file Unit tests for Flickr Groups
@@ -60,7 +60,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
     //re-read the variables that just got saved;
     $this->refreshVariables();
     
-    $this->drupalGet('admin/content/flickrgroups');
+    $this->drupalGet('flickr/groups');
     $this->assertResponse(200);
     
     $this->clickLink('Add group');
