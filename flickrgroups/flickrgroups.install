@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.install,v 1.1.2.7.2.2 2010/10/29 02:04:36 taniwha Exp $
+// $Id: flickrgroups.install,v 1.1.2.7.2.3 2010/10/29 03:55:38 taniwha Exp $
 
 /**
  * @file manages the database schema
@@ -36,9 +36,9 @@ function flickrgroups_schema() {
   $schema['flickrgroup_photos'] = array(
     'fields' => array(
       'flickrgroup_id' => array('type' => 'varchar', 'not null' => TRUE, 'length' => 100),
-      'nid' => array('type' => 'int', 'not null' => TRUE),
+      'flickrphoto_id' => array('type' => 'int', 'not null' => TRUE, 'size' => 'big'),
     ),
-    'primary key' => array('flickrgroup_id', 'nid'),
+    'primary key' => array('flickrgroup_id', 'flickrphoto_id'),
   );
   return $schema;
 }
@@ -47,12 +47,8 @@ function flickrgroups_schema() {
  * Add the flickrgroupphotos table
  */
 function flickrgroups_update_6000() {
-  db_create_table($ret, 'flickrgroup_photos', array(
-    'fields' => array(
-      'flickrgroup_id' => array('type' => 'varchar', 'length' => 100, 'not null' => TRUE),
-      'nid' => array('type' => 'int', 'not null' => TRUE),
-    ),
-    'primary key' => array('flickrgroup_id', 'nid'),
-  ));
+  $schema = flickrgroups_schema();
+  
+  db_create_table($ret, 'flickrgroup_photos', $schema['flickrgroup_photos']);
   return $ret;
 }
