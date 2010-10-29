@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.test,v 1.1.2.7.2.6 2010/10/29 02:02:34 taniwha Exp $
+// $Id: flickrgroups.test,v 1.1.2.7.2.7 2010/10/29 02:28:42 taniwha Exp $
 
 /**
  * @file Unit tests for Flickr Groups
@@ -44,11 +44,13 @@ class FlickrGroupstests extends DrupalWebTestCase {
     $form['flickrapi_cache_duration'] = 900;
     $this->drupalPost('admin/settings/flickrapi', $form, 'Save configuration');
     $this->assertResponse(200);
+    $this->assertNoRaw('<div class="messages error">');
     
     
     //configure flickrrippr
     $this->drupalGet('admin/flickr/flickrrippr');
     $this->assertResponse(200);
+    $this->assertNoRaw('<div class="messages error">');
     $form = array();
     $form['path_handler'] = 0;
     $form['markup_trust'] = FALSE;
@@ -56,19 +58,23 @@ class FlickrGroupstests extends DrupalWebTestCase {
     $form['teaser_size'] = 's';
     $form['page_size'] = 'b';
     $this->drupalPost($this->getUrl(), $form, 'Save');
+    $this->assertNoRaw('<div class="messages error">');
     
     //re-read the variables that just got saved;
     $this->refreshVariables();
     
     $this->drupalGet('flickr/groups');
     $this->assertResponse(200);
+    $this->assertNoRaw('<div class="messages error">');
     
     $this->clickLink('Add group');
     $this->assertResponse(200);
+    $this->assertNoRaw('<div class="messages error">');
     
     $group = array('name' => 'Wellington');
     $this->drupalPost($this->getUrl(), $group, 'Search');
     $this->assertResponse(200);
+    $this->assertNoRaw('<div class="messages error">');
 
     $group['flickrgroup_id'] = '41894169203@N01';
     $this->drupalPost($this->getUrl(), $group, 'Add');
@@ -79,6 +85,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
     //get the photos
     $this->drupalPost($this->getUrl(), array(), 'Fetch');
     $this->assertResponse(200);
+    $this->assertNoRaw('<div class="messages error">');
     
 /*    
     //log in as a normal user
@@ -125,7 +132,7 @@ class FlickrGroupstests extends DrupalWebTestCase {
     
     //TODO try to configure module, they shouldn't be able to.
     $this->drupalGet('admin/content/flickrrippr');
-    $this->assertResponse(403);
+    $this->asserRtesponse(403);
     $this->drupalGet('admin/settings/flickrrippr');
     $this->assertResponse(403);
     
