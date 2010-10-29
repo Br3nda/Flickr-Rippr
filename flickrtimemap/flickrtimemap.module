@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Implementatin of hook_menu().
+ */
+function flickrtimemap_menu() {
+  $items['user/flickrrippr/%/timemap'] = array(
+    'page callback' => 'flickrtimemap_user_page',
+    'page arguments' => array(2),
+    'title' => 'Flickr Time Map',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['flickr/groups/%/timemap'] = array(
+    'page callback' => 'flickrtimemap_group_page',
+    'page arguments' => array(2),
+    'title' => 'Flickr Time Map',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['flickr/tags/%/timemap'] = array(
+    'page callback' => 'flickrtimemap_tag_page',
+    'page arguments' => array(2),
+    'title' => 'Flickr Time Map',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function flickrtimemap_user_page($uid) {
+  return '';
+}
+
+function flickrtimemap_group_page($flickrgroup_id) {
+  return '';
+}
+
+function flickrtimemap_tag_page($tag) {
+  return '';
+}
