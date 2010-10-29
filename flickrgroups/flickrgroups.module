@@ -151,3 +151,21 @@ function flickrgroups_cron() {
     flickrgroups_fetch_group($group->flickrgroup_id);
   }
 }
+
+function flickrgroups_nodeapi(&$node, $op) {
+  if($op != 'alter' || $node->type != 'flickrrippr_photo') {
+    return;
+  }
+  $groups = flickrgroups_geT_groups_for_photo($node->flickr_photo['flickrphoto_id']);
+  foreach($groups as $g) {
+    $node->links['flickrgroup_'. $g->flickrgroup_id] = array('title' => $g->name, 'href' => 'flickr/groups/'. $g->flickrgroup_id);
+  }
+}
+function flickrgroups_get_groups_for_photo($photo_id) {
+  $result = db_query("SELECT * FROM {flickrgroups} g INNER JOIN {flickrgroup_photos} gp ON g.flickrgroup_id = gp.flickrgroup_id AND gp.flickrphoto_id=%d", $photo_id);
+  $groups = array();
+  while($g = db_fetch_object($result)) {
+    $groups[] = $g;
+  }
+  return $groups;
+}
