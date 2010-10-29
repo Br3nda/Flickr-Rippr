@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.content.inc,v 1.1.4.4 2010/10/29 01:36:31 taniwha Exp $ 
+// $Id: flickrgroups.content.inc,v 1.1.4.5 2010/10/29 02:32:20 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -13,13 +13,13 @@ function flickrgroup_admin_page() {
   $headers = array(
     array('field' => 'name', 'data' => 'Name', 'sort' => 'asc'),
   );
-  $output .= '<p>'. l('Add group', 'admin/content/flickrgroups/add') .'</p>';
+  $output .= '<p>'. l('Add group', 'flickr/groups/add') .'</p>';
   $result = pager_query("SELECT * FROM {flickrgroups}". tablesort_sql($headers));
   $rows = array();
   while ($g = db_fetch_object($result)) {
     $rows[] = array(
-      l($g->name, 'flickr/groups/'. $g->group_id),
-      drupal_get_form('flickrgroups_fetch_form', $g->group_id),
+      l($g->name, 'flickr/groups/'. $g->flickrgroup_id),
+      drupal_get_form('flickrgroups_fetch_form', $g->flickrgroup_id),
     );
   }
   if (!count($rows)) {
@@ -32,10 +32,10 @@ function flickrgroup_admin_page() {
   return $output;
 }
 
-function flickrgroups_fetch_form($a, $group_id) {
-  $form['group_id'] = array(
+function flickrgroups_fetch_form($a, $flickrgroup_id) {
+  $form['flickrgroup_id'] = array(
     '#type' => 'hidden',
-    '#value' => $group_id,
+    '#value' => $flickrgroup_id,
   );
   $form['fetch'] = array(
     '#type' => 'submit',
@@ -45,8 +45,8 @@ function flickrgroups_fetch_form($a, $group_id) {
 }
 
 function flickrgroups_fetch_form_submit($a, $form_state) {
-  $group_id = intval($_POST['group_id']);
-  _flickrgroups_fetch_group($group_id, TRUE);
+  $flickrgroup_id = $_POST['flickrgroup_id'];
+  flickrgroups_fetch_group($flickrgroup_id, TRUE);
 }
 
 function flickrgroups_admin_form($a, $name=null) {
@@ -104,11 +104,11 @@ function flickrgroups_admin_form_submit($form, &$form_state) {
     $group->name = $results['name'];
     $group->flickrgroup_id = $form_state['values']['flickrgroup_id'];
     drupal_write_record('flickrgroups', $group);
-    drupal_goto('admin/content/flickrgroups');
+    drupal_goto('flickr/groups');
   }
   else {
     $group->name = $form_state['values']['name'];
-    drupal_goto('admin/content/flickrgroups/add/'. $group->name);
+    drupal_goto('flickr/groups/add/'. $group->name);
   }
 }
 
