@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.3.2.3 2010/10/25 22:25:44 taniwha Exp $
+// $Id: flickrrippr.test,v 1.3.2.4.2.1 2010/10/29 03:28:35 taniwha Exp $
 
 /**
  * @file
@@ -36,9 +36,15 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     // Enable any modules required for the test.
     parent::setUp('flickrrippr', 'flickrapi', 'job_queue');
 
-    $this->admin_user = $this->drupalCreateUser( array('Administer global flickr api settings', 'administer site configuration'));
     $this->normal_user = $this->drupalCreateUser( array('Configure own blogged flickr stream'));
+    $this->admin_user = $this->drupalCreateUser( array('Administer global flickr api settings', 'administer site configuration', 'administer permissions'));
     // Create and log in our privileged user.
+  }
+
+  function testIssue854658() {
+    $this->drupalLogin($this->normal_user);
+    $this->drupalGet('user/1/flickrippr');
+    
   }
 
   function testConfiguringModule() {
@@ -59,14 +65,14 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
 
 
     //configure flickrrippr
-    $this->drupalGet('admin/settings/flickrrippr');
+    $this->drupalGet('admin/flickr/flickrrippr');
     $form = array();
     $form['path_handler'] = 0;
     $form['markup_trust'] = FALSE;
     $form['num_per_fetch'] = 5;
     $form['teaser_size'] = 's';
     $form['page_size'] = 'b';
-    $this->drupalPost('admin/settings/flickrrippr', $form, 'Save');
+    $this->drupalPost('admin/flickr/flickrrippr', $form, 'Save');
 
     //re-read the variables that just got saved;
     $this->refreshVariables();
@@ -104,39 +110,59 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     //do a fetch of this account
     $this->drupalPost($this->getUrl(), array(), 'Fetch now');
 
-    //TODO edit, and check the details appear
-    $this->clickLink('Edit', 1); //the 2nd Edit link, not the edit in the tabs
-    $this->assertNoText('add');
-    $this->assertText('Flickr Username');
-    $this->assertText('Filter by Tag');
-    $form = array('flickr_tag' => '');
-    $this->drupalPost($this->geturl(), $form, 'Save');
 
-    //add a kitty
-    $this->assertNoText('fruit');
-    $this->clickLink('Edit', 1);
+    $this->assertText('Fetching latest for 54551252@N03');
+    $this->assertText('Saved new photo 5053642940');
+    $this->clickLink("from the farmer's market");
+    $this->assertRaw('http://farm5.static.flickr.com/4083/5053642940_b337151462_b.jpg');
+    $this->assertText('Sun, 09/19/2010'); // check the photo time used
+    $node_url = $this->getUrl();
+
+
+    //TODO edit, and check the details appear
+/*    $this->clickLink('Delete', 1);
+    $this->drupalPost($this->getUrl(), array(), 'Delete');*/
+   
     //try adding the same account again, must fail
 
     //TODO try to configure module, they shouldn't be able to.
     $this->drupalGet('admin/content/flickrrippr');
     $this->assertResponse(403);
-    $this->drupalGet('admin/settings/flickrrippr');
+    $this->drupalGet('admin/flickr/flickrrippr');
     $this->assertResponse(403);
 
     $this->drupalLogout();
 
     //log in as admin again
     $this->drupalLogin($this->admin_user);
+    $this->drupalGet('admin/user/permission');
+    
     //set go to admin/content/flickrrippr
     $this->drupalGet('admin/content/flickrrippr');
     //TODO check the account created above are there
     //TODO  fetch photos for some accounts
 
+    $form = array();
+    $form['path_handler'] = 0;
+    $form['markup_trust'] = FALSE;
+    $form['num_per_fetch'] = 5;
+    $form['teaser_size'] = 't';
+    $form['page_size'] = 'm';
+    $this->drupalPost('admin/flickr/flickrrippr', $form, 'Save');
+
     $this->drupalLogout();
+
+    $this->drupalLogin($this->normal_user);
+    $this->drupalGet($node_url);
+    $this->assertRaw('http://farm5.static.flickr.com/4083/5053642940_b337151462_m.jpg');
+
+    //check we can edit our own node
+    $this->clickLink('edit');
+    
 
     //run cron
     //$this->cronRun();
-    $this->drupalGet('cron.php');
+//     $this->drupalGet('cron.php');
 
     //TODO Check that some photos got imported
   }
