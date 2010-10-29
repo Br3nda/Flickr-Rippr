@@ -1,18 +1,25 @@
 <?php
 
 function flickrgroups_menu() {
-  $items['admin/content/flickrgroups'] = array(
+  $items['flickr/groups'] = array(
     'title' => 'Flickr Groups',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'flickrgroup_admin_page',
     'access arguments' => array('administer imported flickr groups'),
     'file' => 'flickrgroups.content.inc',
   );
-  $items['admin/content/flickrgroups/add'] = array(
+  $items['flickr/groups/add'] = array(
     'title' => 'Flickr Groups',
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('flickrgroups_admin_form'),
+    'access arguments' => array('administer imported flickr groups'),
+    'file' => 'flickrgroups.content.inc',
+  );
+    $items['flickr/groups/%'] = array(
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'flickr_group_page',
+    'page arguments' => array(2),
     'access arguments' => array('administer imported flickr groups'),
     'file' => 'flickrgroups.content.inc',
   );
@@ -21,11 +28,20 @@ function flickrgroups_menu() {
 }
 
 function flickrgroups_perm() {
-  return array('administer imported flickr groups');
+  return array('administer imported flickr groups', 'view list of flickr groups');
 }
 
 function flickrgroups_get_group($group_id) {
   return db_fetch_object(db_query("SELECT * FROM {flickrgroups} WHERE group_id=%d", $group_id));
+}
+
+function flickrgroups_get_all_groups() {
+  $result = db_query("SELECT * FROM {flickrgroups}");
+  $groups = array();
+  while ($g = db_fetch_object($result)) {
+    $groups[] = $g;
+  }
+  return $groups;
 }
 
 function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
@@ -56,6 +72,11 @@ function _flickrgroups_fetch_group($group_id, $force_now=FALSE) {
     
     $num_photos++;
   }
+  
+}
+
+function flickr_group_page($group_id) {
+  $group = flickrgroups_get_group($group_id);
   
 }
 

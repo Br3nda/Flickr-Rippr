@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.content.inc,v 1.1.4.3 2010/10/26 03:43:24 taniwha Exp $ 
+// $Id: flickrgroups.content.inc,v 1.1.4.4 2010/10/29 01:36:31 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -18,7 +18,7 @@ function flickrgroup_admin_page() {
   $rows = array();
   while ($g = db_fetch_object($result)) {
     $rows[] = array(
-      check_plain($g->name),
+      l($g->name, 'flickr/groups/'. $g->group_id),
       drupal_get_form('flickrgroups_fetch_form', $g->group_id),
     );
   }
