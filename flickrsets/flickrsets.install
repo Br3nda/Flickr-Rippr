@@ -11,13 +11,13 @@ function flickrsets_uninstall() {
 function flickrsets_schema() {
   $schema['flickrsets_users'] = array(
     'fields' => array(
-      'flickrid' => array('type' => 'text'),
+      'flickrid' => array('type' => 'varchar', 'length' => 50),
       'import' => array('type' => 'int'),
     ),
     'primary key' => array('flickrid'),
   );
   $schema['flickrsets'] = array(
-    'fields' => array(
+    'fields' => array(s
       'nid' => array('type' => 'int'),
       'flickrid' => array('type' => 'text'),
     ),
