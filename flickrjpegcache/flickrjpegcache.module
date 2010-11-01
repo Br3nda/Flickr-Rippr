@@ -65,7 +65,19 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 //   drupal_set_message("Will download from $src");
   $response = drupal_http_request($src);
   if ($response->code != 200) {
-    drupal_set_message(t('Failed to fetch jpeg from flickr. %flickrmessage. Src = %src', array('%flickrmessage' => print_r($response, 1), '%src' => $src)), 'error');
+    
+    drupal_set_message(t('Failed to fetch jpeg from flickr. %httpcode %flickrmessage. Src = %src. Looking for a smaller image, if any.', array('%httpcode' => $response->code, '%flickrmessage' => print_r($response, 1), '%src' => $src)), 'warning');
+    //we should look for the next smaller size
+    $smaller  = _flickrjpegcache_next_smaller_size($size);
+    
+    if ($smaller) {
+      return flickrjpegcache_get_path($node, $smaller, $refetch);
+    }
+    else {
+      drupal_set_message(t('Failed to fetch jpeg from flickr. There are no smaller images available. Giving up.'), 'error');
+    }
+    
+    
     return $src;
   }
 
@@ -108,6 +120,16 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   return file_directory_path() . DIRECTORY_SEPARATOR . $file->filename;
 
   return $file;
+}
+
+function _flickrjpegcache_next_smaller_size($size) {
+  $sizes = _flickr_rippr_jpeg_sizes();
+  foreach($sizes as $s) {
+    if ($s == $size) {
+      return $prev;
+    }
+    $prev = $s;
+  }
 }
 
 function flickrjpegcache_flickrrippr_node_alter($node, $details) {
