@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.2 2010/11/01 03:10:50 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.3 2010/11/01 04:09:02 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -244,14 +244,14 @@ function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
 function flickrrippr_user_view_photos($uid, $flickruserid) {
   $output = '';
 
-  $result = pager_query("SELECT * FROM {flickrphotos} WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
+  $result = pager_query("SELECT * FROM {flickrphotos} p INNER JOIN {node} n ON p.nid = n.nid WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
 
   $rows = array();
-  while($photo = db_fetch_array($result)) {
+  while($node = db_fetch_object($result)) {
     //   drupal_set_message(print_r($photo, 1));
-    $node->flickr_photo = $photo;
+    $node->flickr_photo = (array)$node;
     $jpeg_path = flickrrippr_path($node, 't');
-    $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo['nid'], array('html' => TRUE));;
+    $col[] = l(theme('image', $jpeg_path, $node->title, $node->title, NULL, FALSE), 'node/'. $node->nid, array('html' => TRUE));;
     if (count($col) > 6) {
       $rows[] = $col;
       $col = array();
