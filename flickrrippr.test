@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.test,v 1.3.2.4.2.1 2010/10/29 03:28:35 taniwha Exp $
+// $Id: flickrrippr.test,v 1.3.2.4.2.2 2010/11/01 03:10:50 taniwha Exp $
 
 /**
  * @file
@@ -135,8 +135,6 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
 
     //log in as admin again
     $this->drupalLogin($this->admin_user);
-    $this->drupalGet('admin/user/permission');
-    
     //set go to admin/content/flickrrippr
     $this->drupalGet('admin/content/flickrrippr');
     //TODO check the account created above are there
@@ -156,9 +154,6 @@ class FlickrRipprTestCase extends DrupalWebTestCase {
     $this->drupalGet($node_url);
     $this->assertRaw('http://farm5.static.flickr.com/4083/5053642940_b337151462_m.jpg');
 
-    //check we can edit our own node
-    $this->clickLink('edit');
-    
 
     //run cron
     //$this->cronRun();

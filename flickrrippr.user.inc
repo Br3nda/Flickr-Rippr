@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.1 2010/10/27 07:22:48 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.2 2010/11/01 03:10:50 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -18,7 +18,6 @@ function flickrrippr_user_settings($uid = NULL) {
   $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
 
   $accounts = flickrrippr_get_flickr_accounts($user->uid);
-
 
   $headers = array('',
     t('Flickr ID'),
@@ -127,9 +126,9 @@ function flickrrippr_user_settings_form($a, $flickruser) {
   }
 
   if (isset($flickruser->flickrid)) {
-    $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
+    $form['flickrid'] = array('#type' => 'value', '#value' => $flickruser->flickrid);
   }
-  $form['uid'] = array('#type' => 'hidden', '#value' => $flickruser->uid);
+  $form['uid'] = array('#type' => 'value', '#value' => $flickruser->uid);
 
   if (isset($flickruser->flickrid)) {
     $form['flickr_username'] = array(
@@ -211,34 +210,27 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
     $flickr_account = flickrrippr_get_flickruser($form_state['values']['uid'], $form_state['values']['flickrid']);
   }
 
+
   //this fetches from flickr.com
-
-
+  $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
+ 
+  $flickr_account->flickr_tag = $form_state['values']['flickr_tag'];
 
   if (isset($flickr_account->flickrusername)) {
-
-    $result = db_query("UPDATE {flickrusers} SET tag='%s' WHERE uid = %d AND flickrid='%s'",
-      $form_state['values']['flickr_tag'],
-      $user->uid,
-      $form_state['values']['flickrid']);
-
+    $flickr_account->flickrusername = $flickr_details['username'];
+    $flickr_account->flickrid =  $form_state['values']['flickrid'];
+    drupal_write_record('flickrusers', $flickr_account, array('uid', 'flickrid'));
     drupal_set_message(t("Flickr account updated"));
   }
   else {
-    $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
-    $flickrid = $flickr_details['id'];
-    $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s', %d)",
-      $form_state['values']['flickr_username'],
-      $flickrid,
-      $form_state['values']['flickr_tag'],
-      $user->uid);
-    drupal_set_message(t("Flickr username set"));
-    $flickr_account->flickrid = $flickrid;
+    $flickr_account->flickrid = $flickr_details['id'];
+    $flickr_account->flickrusername = $form_state['values']['flickr_username'];
     $flickr_account->uid = $user->uid;
+    drupal_write_record('flickrusers', $flickr_account);
+    drupal_set_message(t("Flickr username set"));
   }
 
   flickrrippr_fetch_user_info_and_save($flickr_account);
-
 
   drupal_goto('user/'. $user->uid .'/flickrrippr');
 }
