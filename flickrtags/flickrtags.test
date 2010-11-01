@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrtags.test,v 1.1.2.2 2010/10/07 00:55:21 taniwha Exp $
+// $Id: flickrtags.test,v 1.1.2.2.2.1 2010/11/01 03:12:14 taniwha Exp $
 
 /**
  * @file
@@ -44,7 +44,7 @@ class FlickrRipprTagsTestCase extends DrupalWebTestCase {
 
   function _configureTaxonomy() {
     $this->drupalLogin($this->admin_user);
-    $this->drupalGet('admin/settings/flickrrippr');
+    $this->drupalGet('admin/flickr/flickrrippr');
     $this->clickLink('Add vocabulary');
     $form = array(
       'name' => 'Flickr Tags',
@@ -79,7 +79,7 @@ class FlickrRipprTagsTestCase extends DrupalWebTestCase {
   function testAdminScreen() {
 
     //configure flickrrippr
-    $this->drupalGet('admin/settings/flickrrippr');
+    $this->drupalGet('admin/flickr/flickrrippr');
 
     $this->assertText('Flickr Tags');
     $this->assertText('Vocabulary for tags');
@@ -90,7 +90,7 @@ class FlickrRipprTagsTestCase extends DrupalWebTestCase {
       'flickrtags' => 'Flickr Tags',
     );
     
-    $this->drupalPost('admin/settings/flickrrippr', $form, 'Save');
+    $this->drupalPost('admin/flickr/flickrrippr', $form, 'Save');
 
     
 
@@ -99,70 +99,6 @@ class FlickrRipprTagsTestCase extends DrupalWebTestCase {
   }
   
 
-  function testConfiguringAccount() {
-/*    
-    //log in as a normal user
-    $this->drupalLogin($this->normal_user);
-
-    //set their account details
-    $this->clickLink('My account');
-    $this->assertLink('Flickr Rippr');
-    $this->clickLink('Flickr Rippr');
-
-    $this->clickLink('Add new account');
-
-    $edit['flickr_username'] = strtolower($this->flickrusername);
-    $edit['flickr_tag'] = '';
-    $this->drupalPost($this->getUrl(), $edit, 'Save');
-
-    //check it all saved
-    $this->assertText($this->flickrusername); //it'll have been capitalised via the API
-    $this->assertText($this->nsid);
-    $this->assertText('fruit');
-
-    //check the image appeared
-    $this->assertRaw('http://farm5.static.flickr.com/4105/buddyicons/54551252@N03.jpg');
-
-    //do a fetch of this account
-    $this->drupalPost($this->getUrl(), array(), 'Fetch now');
-
-    //TODO edit, and check the details appear
-    $this->clickLink('Edit', 1); //the 2nd Edit link, not the edit in the tabs
-    $this->assertNoText('add');
-    $this->assertText('Flickr Username');
-    $this->assertText('Filter by Tag');
-    $form = array('flickr_tag' => '');
-    $this->drupalPost($this->geturl(), $form, 'Save');
-
-    //add a kitty
-    $this->assertNoText('fruit');
-    $this->clickLink('Edit', 1);
-    
-    //TODO try adding the same account again, must fail
-
-    //TODO try to configure module, they shouldn't be able to.
-    $this->drupalGet('admin/content/flickrrippr');
-    $this->assertResponse(403);
-    $this->drupalGet('admin/settings/flickrrippr');
-    $this->assertResponse(403);
-
-    $this->drupalLogout();
-
-    //log in as admin again
-    $this->drupalLogin($this->admin_user);
-    //set go to admin/content/flickrrippr
-    $this->drupalGet('admin/content/flickrrippr');
-    //TODO check the account created above are there
-    //TODO  fetch photos for some accounts
-
-    $this->drupalLogout();
-
-    //run cron
-    //$this->cronRun();
-    $this->drupalGet('cron.php');
-
-    //TODO Check that some photos got imported*/
-  }
 
 
 }
