@@ -1,5 +1,5 @@
 <?php
-// $Id: flickjpegcache.test,v 1.1.2.3.2.1 2010/11/01 03:10:42 taniwha Exp $
+// $Id: flickjpegcache.test,v 1.1.2.3.2.2 2010/11/01 20:33:47 taniwha Exp $
 
 /**
  * @file
@@ -120,13 +120,17 @@ class FlickrJpegCacheTests extends DrupalWebTestCase {
 
 //     $this->assertText('Saved new photo 5053642940');
     $this->assertText("Updated photo '5053642940'");
-    
+
     $this->assertNoText('Failed to fetch jpeg from flickr');
     $this->assertNoText('stdClass Object');
 
-    $this->clickLink("from the farmer's market");
+
     $this->assertNoRaw("from the farmer's market"); // check there's no instance of this unescaped.
+    
     $this->assertNoRaw('node/2'); // check it wasn't saved twice
+
+    $this->clickLink("from the farmer's market");
+    $this->assertRaw('5053642940_b337151462_b.jpg'); // check the image is there.
 
     $this->drupalGet($user_page);
     $this->clickLink('View Photos');
