@@ -1,4 +1,4 @@
-name = Flickr Rippr - Sets
+name = Flickr Rippr - Sets -ALPHA INCOMPLETE MODULE! DOES NOT WORK YET
 description = Imports sets from flickr
 package = Flickr
 core = 6.x

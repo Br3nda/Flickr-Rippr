@@ -1,4 +1,4 @@
-name = Flickr Rippr - Groups
+name = Flickr Rippr - Groups - Beta - send bug reports please
 package = Flickr
 dependencies[] = flickrrippr
 core = 6.x
