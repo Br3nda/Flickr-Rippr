@@ -1,6 +1,11 @@
 <?php
-
-
+/**
+ * Flickr Rippr tags -- imports tags when importing photos from flickr
+ */
+ 
+/**
+ * When we modify the node, get the tags
+ */
 function flickrtags_flickrrippr_node_alter($node, $details) {
   //TODO make the tags a hook
   if (variable_get('flickrtags_import', FALSE)) {
@@ -58,6 +63,9 @@ function flickrtags_matching_vid($terms, $vid) {
   }
 }
 
+/**
+ * Admin for, for controlling what vocab to use
+ */
 function flickrtags_form_alter(&$form, $form_state, $form_id) {
   if('flickrrippr_admin_settings_form' != $form_id) {
     return;
@@ -96,6 +104,9 @@ function flickrtags_form_alter(&$form, $form_state, $form_id) {
 function flickrtags_admin_validate($form_id, $form_state) {
 }
 
+/**
+ * Save which vocab we're using
+ */
 function flickrtags_admin_submit($form_id, $form_state) {
   $import_tags = $form_state['values']['flickrtags_import'];
   variable_set('flickrtags_import', $import_tags);
