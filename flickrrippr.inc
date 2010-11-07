@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.4 2010/11/07 20:07:15 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.5 2010/11/07 21:29:45 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -119,7 +119,7 @@ function flickrrippr_makenode($photo_id, $secret='') {
   //we can't get info from flickr -- mark this node as bad
   if (!$flickr_info) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
-    $photo = new StdObject();
+    $photo = new StdClass();
     $photo->failed = 1;
     $photo->flickrphoto_id = $photo_id;
     drupal_write_record('flickrphotos', $photo, array('flickrphoto_id'));
