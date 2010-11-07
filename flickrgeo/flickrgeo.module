@@ -31,6 +31,9 @@ function flickrgeo_nodeapi(&$node, $op) {
     case 'insert':
       flickrgeo_save($node);
     break;
+    case 'delete':
+      db_query('DELETE FROM {flickrgeo} WHERE nid = %d', $node->nid);
+    break;
   }
 }
 
