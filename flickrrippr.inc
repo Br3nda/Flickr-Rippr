@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.3 2010/11/01 03:47:07 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.4 2010/11/07 20:07:15 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -195,7 +195,14 @@ function flickrrippr_makenode($photo_id, $secret='') {
     $result = db_query("INSERT INTO {flickrphotos} (". implode($fields, ', ') . ", flickrphoto_id, nid, lastfetched)
       VALUES (". str_repeat("'%s', ",  count($fields) ). " %d, %d, %d )",
       $values);
-      drupal_set_message(t("Saved new photo %photo_id, ". l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+    if($result) {
+      drupal_set_message(t("Saved new photo %photo_id, !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
+    }
+    else {
+      drupal_set_message(t('Failed to record details of flickr photo %photo_id.', array('%photo_id' => $photo_id)), 'error');
+      watchdog('flickrrippr', 'Error INSERTING flickr photo details into database. photo_id=@photo_id', array('@photo_id' => $photo_id));
+      node_delete($node->nid);
+    }
   }
   else {
     $node->new = FALSE;
@@ -238,6 +245,8 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   $node->title = htmlentities($details['title']);
   $node->created = strtotime($details['date_taken']);
   $node->changed = strtotime($details['date_posted']);
+  $node->details = $details;
+  $node->body = theme('image', flickrrippr_path($node, 'm'), $node->title, $node->title, array(), FALSE);
 
   //if owner not set, then set it.
   if (!isset($node->uid)) {
