@@ -80,7 +80,7 @@ function flickrrippr_menu() {
     'type' => MENU_CALLBACK,
     'page callback' => 'flickrrippr_user_view_photos',
     'page arguments' => array(1, 4),
-    'access arguments' => array('Configure own blogged flickr stream'),
+    'access arguments' => array('access content'),
     'file' => 'flickrrippr.user.inc',
   );
 
