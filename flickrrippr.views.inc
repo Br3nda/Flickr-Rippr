@@ -39,6 +39,17 @@ function flickrrippr_views_data() {
   );
 
 
+  $data['flickrphotos']['photo'] = array(
+    'title' => t('Photo'),
+    'help' => t('The pretty photo'),
+    'field' => array(
+      'field' => 'flickrphoto_id',
+      'handler' => 'flickrrippr_handler_photo',
+      'click sortable' => FALSE,
+    ),
+  );
+
+
   $data['flickrphotos']['lastfetched'] = array(
      'title' => t('Last Fetched from Flickr.com'),
      'help' => t('Updated everytime we refetch a photo'),
@@ -214,53 +225,34 @@ function flickrrippr_views_data() {
 }
 
 
-function flickrrippir_views_handlers(){
+/**
+ * Implementation of hook_views_handlers().
+ */
+function project_issue_views_handlers() {
   return array(
-    // The 'info' index is optional; use it to describe to Views where your
-    // handler class definitions are, using the 'path' sub-index. Views will
-    // search for the handlers in a file called CLASSNAME.inc (for example,
-    // example_handler_filter_custom.inc).
-    //
-    // If this value is not present, Views will search in your module's root
-    // directory for a file called MODULE_views_TYPE_handlers.inc (for example,
-    // example_views_field_handlers.inc).
     'info' => array(
-      'path' => drupal_get_path('module', 'flickrrippr') . '/views/handlers',
+      'path' => drupal_get_path('module', 'flickrrippr') .'/views/handlers',
     ),
-
-    // Next, the required array of handlers, keyed by their class names. Each
-    // handler class must specify its parent class and, optionally, the file
-    // in which it resides.
-
-    // @todo: Expand this documentation, copy/pasting from Advanced Help
-    // probably.
-    // @todo: Show example of the 'file' key as well.
     'handlers' => array(
-      // @todo: These "when to use X" descriptions need help.
-
-
-      // Field handlers provide options to impact how Views displays fields.
-      // Most often, field handlers inherit from views_handler_field.
-      'example_handler_field_custom' => array(
+      'flickrrippr_handler_photo' => array(
         'parent' => 'views_handler_field',
       ),
-      'example_handler_field_custom_link' => array(
-        'parent' => 'views_handler_field',
-      ),
-      'example_handler_field_other_custom_link' => array(
-        'parent' => 'views_handler_field_custom_link',
-      ),
-
-      // Argument handlers provide options for dynamically filtering a View.
-      // You may need to define an argument handler if a field exposed by your
-      // Views integration requires more than basic data type handling.
-      // @todo: Example.
-//       '' => array(
-//       ),
-
-      // @todo: Examples of sorts, filters, and relationships.
-
     ),
-
   );
+}
+
+
+
+include_once(drupal_get_path('module', 'views') .'/handlers/views_handler_field.inc');
+class flickrrippr_handler_photo extends views_handler_field   {
+  function render($values) {
+    
+    $node->nid = $values->nid;
+    flickrrippr_load($node);
+    $src = flickrrippr_path($node);
+    $image = theme('image', $src, $values->node_title, $values->node_title, NULL, FALSE);
+
+    return $image;
+     
+  }
 }
