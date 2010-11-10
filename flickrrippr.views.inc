@@ -119,14 +119,14 @@ function flickrrippr_views_data() {
     'title' => t('Licence'),
     'help' => t('What licence is this photo under?'),
     'field' => array(
-      'views_handler_field',
-      'click sortable' => false,
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_string',
+      'handler' => 'views_handler_filter_numeric',
     ),
   );
 
@@ -134,16 +134,18 @@ function flickrrippr_views_data() {
   $data['flickrphotos']['rotation'] = array(
     'title' => t('Rotation'),
     'help' => t('Has this jpeg been rotated?'),
-    'field' => array(
-      'views_handler_field',
-      'click sortable' => false,
-    ),
-    'sort' => array(
-      'handler' => 'views_handler_sort',
-    ),
-    'filter' => array(
-      'handler' => 'views_handler_filter_string',
-    ),
+     'field' => array(
+       'handler' => 'views_handler_field_boolean',
+       'click sortable' => TRUE,
+     ),
+     'filter' => array(
+       'handler' => 'views_handler_filter_boolean_operator',
+       'label' => t('Failed to refetch'),
+       'type' => 'yes-no',
+     ),
+     'sort' => array(
+       'handler' => 'views_handler_sort',
+     ),
   );
 
   $data['flickrphotos']['date_posted'] = array(
