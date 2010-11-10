@@ -7,6 +7,7 @@ function flickrrippr_views_data() {
     'field' => 'nid',
     'title' => t('Photo'),
   );
+  
   $data['flickrphotos']['table']['join'] = array(
     'node' => array(
       'left_field' => 'nid',
@@ -14,6 +15,9 @@ function flickrrippr_views_data() {
     ),
     'help' => t('Photos imported from Flickr.com'),
   );
+
+
+
   $data['flickrphotos']['nid'] = array(
     'title' => t('Flickr Photo'),
     'relationship' => array(
@@ -46,6 +50,61 @@ function flickrrippr_views_data() {
       'field' => 'flickrphoto_id',
       'handler' => 'flickrrippr_handler_photo',
       'click sortable' => FALSE,
+    ),
+  );
+
+
+  $data['flickrphotos']['avatar'] = array(
+    'title' => t('Photo owner avatar'),
+    'field' => array(
+      'field' => 'flickrphoto_id',
+      'handler' => 'flickrrippr_handler_avatar',
+      'click sortable' => FALSE,
+    ),
+  );
+
+
+  $data['flickrphotos']['photopage'] = array(
+    'title' => t('Flickr Url'),
+    'help' => t('URL to this photo on flickr'),
+    'field' => array(
+      'views_handler_field',
+      'click sortable' => false,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+  );
+
+
+  $data['flickrphotos']['media'] = array(
+    'title' => t('Media Type'),
+    'field' => array(
+      'views_handler_field',
+      'click sortable' => false,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+  );
+  
+  $data['flickrphotos']['owner_nsid'] = array(
+    'title' => t('Owner NSID'),
+    'field' => array(
+      'views_handler_field',
+      'click sortable' => false,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
     ),
   );
 
@@ -111,6 +170,7 @@ function flickrrippr_views_data() {
       'handler' => 'views_handler_filter_string',
     ),
   );
+  
   $data['flickrphotos']['dateuploaded'] = array(
     'title' => t('Date Uploaded'),
     'help' => t('when uploaded to flickr.com'),
@@ -258,10 +318,23 @@ class flickrrippr_handler_photo extends views_handler_field   {
   function options_form(&$form, &$form_state) {
     $sizes = _flickr_rippr_jpeg_sizes();
     $form['photo_size'] = array(
+      '#title' => t('Photo size'),
       '#type' => 'radios',
       '#options' => $sizes,
       '#default_value' => $this->options['photo_size'],
     );
+    parent::options_form($form, $form_state);
+  }
+
+}
+
+class flickrrippr_handler_avatar extends views_handler_field   {
+  function render($values) {
+
+    $node->nid = $values->nid;
+    flickrrippr_load($node);
+    return print_r($node, 1);
+
   }
 
 }
