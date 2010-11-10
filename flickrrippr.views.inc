@@ -249,10 +249,19 @@ class flickrrippr_handler_photo extends views_handler_field   {
     
     $node->nid = $values->nid;
     flickrrippr_load($node);
-    $src = flickrrippr_path($node);
+    $src = flickrrippr_path($node, $this->options['photo_size']);
     $image = theme('image', $src, $values->node_title, $values->node_title, NULL, FALSE);
 
     return $image;
      
   }
+  function options_form(&$form, &$form_state) {
+    $sizes = _flickr_rippr_jpeg_sizes();
+    $form['photo_size'] = array(
+      '#type' => 'radios',
+      '#options' => $sizes,
+      '#default_value' => $this->options['photo_size'],
+    );
+  }
+
 }
