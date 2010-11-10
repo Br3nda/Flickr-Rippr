@@ -7,6 +7,12 @@ function flickrgeo_perm() {
   return array('view flickr timeline');
 }
 
+function flickrgeo_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+
 /**
  * Implementation of hook_menu().
  */
@@ -120,8 +126,16 @@ function flickrgeo_save($node) {
   }
   $record->flickrphoto_id = $photo_id;
   $record->nid = $node->nid;
-  foreach(array('latitude', 'longitude', 'accuracy') as $key) {
+  foreach(array('latitude', 'longitude', 'accuracy', 'context', 'place_id') as $key) {
     $record->$key = $geo['location'][$key];
+  }
+
+  foreach(array('locality', 'county', 'region') as $a) {
+    foreach(array('content', 'place_id', 'woe_id') as $b) {
+      $key = $a .'_'. $b;
+      
+      $record->$key = isset($geo['location'][$a]["_$b"]) ? $geo['location'][$a]["_$b"] : null;
+    }
   }
 /*      'longitude' => array('type' => 'float', 'not null' => TRUE),
       'accuracy' => array('type' => 'int', 'not null' => TRUE),
