@@ -57,7 +57,7 @@ function flickrrippr_views_data() {
   $data['flickrphotos']['avatar'] = array(
     'title' => t('Photo owner avatar'),
     'field' => array(
-      'field' => 'flickrphoto_id',
+      'field' => 'owner_nsid',
       'handler' => 'flickrrippr_handler_avatar',
       'click sortable' => FALSE,
     ),
@@ -331,10 +331,14 @@ class flickrrippr_handler_photo extends views_handler_field   {
 class flickrrippr_handler_avatar extends views_handler_field   {
   function render($values) {
 
-    $node->nid = $values->nid;
-    flickrrippr_load($node);
-    return print_r($node, 1);
-
+//     $node->nid = $values->nid;
+//     flickrrippr_load($node);
+    $user = flickrrippr_get_user_by_nsid($values->flickrphotos_owner_nsid);
+    
+    if(isset($user->flickr_info) && !empty($user->flickr_info->flickravatar)) {
+      return theme('image', check_plain($user->flickr_info->flickravatar), check_plain($user->flickr_info->flickrusername), check_plain($user->flickr_info->flickrusername), array(), FALSE);
+    }
+    return '';
   }
 
 }

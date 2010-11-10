@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.5 2010/11/07 21:29:45 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.6 2010/11/10 03:16:13 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -48,7 +48,9 @@ function flickrrippr_get_user_by_nsid($nsid) {
     return;
   }
  
-  return user_load(array('uid' => $flickruser->uid));
+  $user = user_load(array('uid' => $flickruser->uid));
+  $user->flickr_info = $flickruser;
+  return $user;
 }
 
 
@@ -71,6 +73,7 @@ function flickrrippr_path($node, $size = FALSE) {
     return flickrrippr_path_remote($node, $size);
   }
 
+// drupal_set_message("path handler = $path_handler");
   return module_invoke($path_handler, 'get_path', $node, $size);
 }
 
@@ -252,8 +255,8 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   if (!isset($node->uid)) {
     //get from details
     if(isset($details['user'])) {
-      $node->uid = $details['user']->uid;
-      $node->name = $details['user']->name;
+      $node->uid = isset($details['user']->uid) ? $details['user']->uid : null;
+      $node->name = isset($details['user']->name) ? $details['user']->name : null;
     }
     //else set anonymous
     else {

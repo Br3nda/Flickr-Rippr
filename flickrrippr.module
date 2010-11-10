@@ -8,6 +8,27 @@ function flickrrippr_perm() {
   return array('Configure own blogged flickr stream', 'Administer global flickr api settings', 'use flickr secret importer');
 }
 
+
+/**
+ * Register View API information. This is required for your module to have
+ * its include files loaded; for example, when implementing
+ * flickrrippr_views_default_views().
+ *
+ * @return
+ *   An array with the following possible keys:
+ *   - api:  (required) The version of the Views API the module implements.
+ *   - path: (optional) If includes are stored somewhere other than within
+ *       the root module directory or a subdirectory called includes, specify
+ *       its path here.
+ */
+function flickrrippr_views_api() {
+  return array(
+    'api' => 2,
+//     'path' => drupal_get_path('module', 'flickrirp') . '/includes/views',
+  );
+}
+
+
 /**
  * Implementation of hook_menu().
  */
@@ -448,9 +469,9 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   //get the image, using theme()
 
   $jpeg_path = flickrrippr_path($node, $size);
+  
   $image = l(theme('image', $jpeg_path, $teaser, $teaser, NULL, FALSE), $link, array('html' => TRUE));
-
-  $node->content['flickr_photo'] = array(
+  $node->content['flickr_photo_'.$size] = array(
     '#weight' => 0,
    '#value' => '<div class="flickrrippr_photo">'. $image .'</div>',
   );
@@ -487,7 +508,7 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
   switch ($op) {
     case 'delete':
       db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid);
-      drupal_set_message("Flickr Rippr photo deleted.");
+      drupal_set_message(t("Flickr Rippr photo deleted."));
     break;
     case 'view':
       flickrrippr_view($node, $teaser, $page);
