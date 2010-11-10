@@ -2,6 +2,108 @@
 
 
 function flickrrippr_views_data() {
+  flickrrippr_photos_views_data($data);
+  flickrrippr_accounts_views_data($data);
+  return $data;
+}
+
+function flickrrippr_accounts_views_data(&$data) {
+  $data['flickrusers']['table']['group'] = t('Flickr Accounts');
+  $data['flickrusers']['table']['base'] = array(
+    'field' => 'flickrid',
+    'title' => t('Account'),
+  );
+
+  $data['flickrusers']['uid'] = array(
+    'title' => t('User ID'),
+//     'help' => t('Description on photo from flickr.com'),
+    'field' => array(
+      'views_handler_field',
+      'click sortable' => false,
+    ),
+  );
+
+    $data['flickrusers']['flickrusername'] = array(
+      'title' => t('Username'),
+      'help' => t('Name used on flickr.com'),
+      'field' => array(
+        'views_handler_field',
+        'click sortable' => false,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_string',
+      ),
+    );
+
+
+  $data['flickrusers']['flickrispro'] = array(
+     'title' => t('Pro'),
+     'help' => t('Is this a pro account?'),
+     'field' => array(
+       'handler' => 'views_handler_field_boolean',
+       'click sortable' => TRUE,
+     ),
+     'filter' => array(
+       'handler' => 'views_handler_filter_boolean_operator',
+       'label' => t('Failed to refetch'),
+       'type' => 'yes-no',
+     ),
+     'sort' => array(
+       'handler' => 'views_handler_sort',
+     ),
+   );
+
+    $data['flickrusers']['flickrphotosurl'] = array(
+      'title' => t('Photos Url'),
+      'help' => t('Url to photos on flickr.com'),
+      'field' => array(
+        'views_handler_field',
+        'click sortable' => false,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_string',
+      ),
+    );
+
+    $data['flickrusers']['flickrprofileurl'] = array(
+      'title' => t('Profile Url'),
+      'help' => t('Url to profile on flickr.com'),
+      'field' => array(
+        'views_handler_field',
+        'click sortable' => false,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_string',
+      ),
+    );
+
+    $data['flickrusers']['flickravatar'] = array(
+      'title' => t('Avatar Url'),
+      'help' => t('Url to avatar image'),
+      'field' => array(
+        'views_handler_field',
+        'click sortable' => false,
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_string',
+      ),
+    );
+
+}
+
+function flickrrippr_photos_views_data(&$data) {
   $data['flickrphotos']['table']['group'] = t('Flickr');
   $data['flickrphotos']['table']['base'] = array(
     'field' => 'nid',
@@ -13,10 +115,12 @@ function flickrrippr_views_data() {
       'left_field' => 'nid',
       'field' => 'nid'
     ),
+    'flickrusers' => array(
+      'left_field' => 'flickrid',
+      'field' => 'owner_nsid',
+    ),
     'help' => t('Photos imported from Flickr.com'),
   );
-
-
 
   $data['flickrphotos']['nid'] = array(
     'title' => t('Photo'),
@@ -27,6 +131,8 @@ function flickrrippr_views_data() {
       'label' => t('Flickr Photo'),
     )
   );
+
+
   $data['flickrphotos']['description'] = array(
     'title' => t('Photo description'),
     'help' => t('Description on photo from flickr.com'),
@@ -106,6 +212,12 @@ function flickrrippr_views_data() {
     'filter' => array(
       'handler' => 'views_handler_filter_string',
     ),
+    'relationship' => array(
+      'base' => 'flickrusers',
+      'field' => 'flickrid',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Flickr Account'),
+    )
   );
 
 
@@ -280,8 +392,6 @@ function flickrrippr_views_data() {
      ),
   );
 
-
-  return $data;
 }
 
 
