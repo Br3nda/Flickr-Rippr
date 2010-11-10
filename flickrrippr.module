@@ -24,7 +24,7 @@ function flickrrippr_perm() {
 function flickrrippr_views_api() {
   return array(
     'api' => 2,
-//     'path' => drupal_get_path('module', 'flickrirp') . '/includes/views',
+    'path' => drupal_get_path('module', 'flickrrippr') .'/views/',
   );
 }
 
