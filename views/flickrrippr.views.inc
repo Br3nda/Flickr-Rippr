@@ -2,7 +2,7 @@
 
 
 function flickrrippr_views_data() {
-  $data['flickrphotos']['table']['group'] = t('Flickr Rippr');
+  $data['flickrphotos']['table']['group'] = t('Flickr');
   $data['flickrphotos']['table']['base'] = array(
     'field' => 'nid',
     'title' => t('Photo'),
@@ -19,7 +19,7 @@ function flickrrippr_views_data() {
 
 
   $data['flickrphotos']['nid'] = array(
-    'title' => t('Flickr Photo'),
+    'title' => t('Photo'),
     'relationship' => array(
       'base' => 'node',
       'field' => 'nid',
