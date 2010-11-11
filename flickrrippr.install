@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.12.2.2 2010/11/10 01:53:21 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.12.2.3 2010/11/11 23:56:35 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -34,6 +34,7 @@ function flickrrippr_schema() {
       'flickrphotosurl' => array('type' => 'text'),
       'flickrprofileurl' => array('type' => 'text'),
       'flickravatar' => array('type' => 'text'),
+      'date_field' => array('type' => 'text'),
       ),
     'primary key' => array('uid', 'flickrid'),
     'indexes' => array(
@@ -416,10 +417,18 @@ function flickrrippr_update_6150() {
 
   $schema = flickrrippr_schema();
   foreach(array('rotation', 'license', 'date_posted', 'date_lastupdate', 'views') as $col) {
-    $def = $schema['flickrphotos']['fields'][$col];
+    $schema = flickrrippr_schema();
     unset($def['not null']);
-    db_change_field($ret, 'flickrphotos', $col, $col, $def);
-  }
+$schema = flickrrippr_schema();  }
   $ret[]= update_sql("COMMIT");
+  return $ret;
+}
+
+/**
+ * Add the date_field column to flickrusername
+ */
+function flickrrippr_update_6160() {
+  db_add_field($ret, 'flickrusers', 'date_field', array('type' => 'text'));
+  update_sql("UPDATE {flickrusers} SET date_field='date_taken'");
   return $ret;
 }
