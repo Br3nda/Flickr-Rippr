@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.7 2010/11/11 23:12:14 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.8 2010/11/11 23:29:46 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -60,9 +60,9 @@ function flickrrippr_get_user_by_nsid($nsid) {
  */
 function flickrrippr_path($node, $size = FALSE) {
   if(empty($node->flickr_photo)) {
-    drupal_set_message("node does not have flickr photo info. this should never happen", 'error');
-    drupal_set_messagE(print_r($node, 1), 'error');
-    drupal_seT_message(print_r(debug_backtrace(), 1), 'error');
+//     drupal_set_message("node does not have flickr photo info. this should never happen", 'error');
+//     drupal_set_messagE(print_r($node, 1), 'error');
+//     drupal_seT_message(print_r(debug_backtrace(), 1), 'error');
     return;
   }
   $flickr_photo = $node->flickr_photo;
