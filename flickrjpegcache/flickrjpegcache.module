@@ -15,7 +15,9 @@ function flickrjpegcache_get_file($filename) {
  * Save the file on the file system - not as a deep linking src to flickr.com
  */
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
-
+  if ('flickrjpegcache' != variable_set('flickrrippr_path_handler', 0)) {
+    return;
+  }
   if (!$node->nid || !$node->vid) {
     drupal_set_message(t('Node not saved yet!'), 'error');
 //     foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
@@ -68,16 +70,18 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   
   if ($response->code != 200) {
     
-    drupal_set_message(t('Failed to fetch jpeg from flickr. %httpcode %flickrmessage. Src = %src. Looking for a smaller image, if any.', array('%httpcode' => $response->code, '%flickrmessage' => print_r($response, 1), '%src' => $src)), 'warning');
+//     drupal_set_message(t('Failed to fetch jpeg from flickr. %httpcode %flickrmessage. Src = %src. Looking for a smaller image, if any.',
+//       array('%httpcode' => $response->code, '%flickrmessage' => isset($response->error) ? $response->error : '', '%src' => $src)), 'warning'
+//     );
     //we should look for the next smaller size
     $smaller  = _flickrjpegcache_next_smaller_size($size);
     
     if ($smaller) {
-      drupal_set_message("Looking for a smaller image: $smaller");
+//       drupal_set_message("Looking for a smaller image: $smaller");
       return flickrjpegcache_get_path($node, $smaller, $refetch);
     }
 
-    drupal_set_message(t('Failed to fetch jpeg from flickr. There are no smaller images available. Giving up.'), 'error');
+    drupal_set_message(t('Failed to fetch jpeg from flickr for !link. There are no smaller images available. Giving up.', array('!link' =>l('Photo', 'node/'. $node->nid))), 'error');
     return $src;
    
   }
@@ -127,6 +131,7 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
 
 function _flickrjpegcache_next_smaller_size($size) {
   $sizes = _flickr_rippr_jpeg_sizes();
+  $prev = false;
   foreach(array_keys($sizes) as $s) {
     if ($s == $size) {
       return $prev;
