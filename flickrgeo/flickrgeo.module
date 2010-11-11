@@ -18,12 +18,16 @@ function flickrgeo_views_api() {
  */
 function flickrgeo_menu() {
   $items['flickrtimeline'] = array(
-    'page callback' => 'flickrgeo_timeline',
+    'page callback' => '<a href="http://www.flickr.com/photos/taniwha/4600247583/" title="high chair by Br3nda, on Flickr"><img src="http://farm2.static.flickr.com/1161/4600247583_ac3a2c1268.jpg" width="375" height="500" alt="high chair" /></a>',
     'access arguments' => array('view flickr timeline'),
     'type' => MENU_NORMAL_ITEM,
     'title' => 'Flickr Photos Timeline',
   );
   return $items;
+}
+
+function flickrgeo_timeline_page() {
+return '';
 }
 
 function flickrgeo_nodeapi(&$node, $op) {
@@ -55,13 +59,13 @@ function flickrgeo_block($op = 'list', $delta = 0, $edit = array()) {
 function flickrgeo_block_view() {
   $map = array_merge(gmap_defaults());
   
-  $map['zoom'] = 8;
+  $map['zoom'] = 1;
 //   $map['markermode'] = 1;
   $map['width'] = '100%';
   $map['height'] = '500px';
 
 
-  $result = db_query("SELECT * FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid ORDER BY p.date_taken DESC LIMIT 50");
+  $result = db_query("SELECT * FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid ORDER BY p.date_taken DESC LIMIT 500");
   while($cached = db_fetch_object($result)) {
     $newmarker['latitude'] = $cached->latitude;
     $newmarker['longitude'] = $cached->longitude;
@@ -73,7 +77,7 @@ function flickrgeo_block_view() {
   }
   
   return array(
-    'subject' => t('Map of photo'),
+    'subject' => t('Map of Photos'),
     'content' => theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')),
   );
 }
@@ -117,6 +121,9 @@ function flickrgeo_view(&$node) {
 }
 
 function flickrgeo_save($node) {
+  if(empty($node->flickr_photo)) {
+    return;
+  }
   $photo_id = $node->flickr_photo['flickrphoto_id'];
   $geo = flickrgeo_fetch_geo_from_flickr($photo_id);
 //     drupal_set_message(print_r($geo, 1));
