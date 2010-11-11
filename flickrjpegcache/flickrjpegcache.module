@@ -15,7 +15,7 @@ function flickrjpegcache_get_file($filename) {
  * Save the file on the file system - not as a deep linking src to flickr.com
  */
 function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
-  if ('flickrjpegcache' != variable_set('flickrrippr_path_handler', 0)) {
+  if ('flickrjpegcache' != variable_get('flickrrippr_path_handler', 0)) {
     return;
   }
   if (!$node->nid || !$node->vid) {
