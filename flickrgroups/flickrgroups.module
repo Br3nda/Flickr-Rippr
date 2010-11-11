@@ -1,5 +1,12 @@
 <?php
 
+function flickrgroups_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+
+
 /**
  * Implementation of hook_menu().
  */
@@ -90,7 +97,7 @@ function flickrgroups_fetch_group($flickrgroup_id, $force_now=FALSE) {
 }
 
 function flickrgroup_makenode($photo_id, $group_id) {
-  drupal_set_message(__FUNCTION__);
+//   drupal_set_message(__FUNCTION__);
   flickrrippr_makenode($photo_id);
   
   $result = db_fetch_object(db_query("SELECT * FROM {flickrgroup_photos} WHERE flickrphoto_id=%d AND flickrgroup_id='%s'", $photo_id, $group_id));
@@ -101,7 +108,7 @@ function flickrgroup_makenode($photo_id, $group_id) {
     drupal_set_message(t("Saved into group %id", array('%id' => $group_id)));
   }
   else {
-    drupal_set_message("group record already set");
+//     drupal_set_message("group record already set");
   }
 }
 
@@ -113,7 +120,8 @@ function flickrgroup_page($flickrgroup_id) {
     return '';
   }
   drupal_set_title($group->name);
-  $photos = flickrgroup_get_cached_photos($flickrgroup_id);
+  $photos = flickrgroup_get_cached_photos($flickrgroup_id, 100);
+//   return nl2br(htmlentities(print_r($photos, 1)));
   $output = '';
   $output .= drupal_get_form('flickrgroups_fetch_form', $flickrgroup_id);
 
