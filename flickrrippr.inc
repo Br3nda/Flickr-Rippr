@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.8 2010/11/11 23:29:46 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.9 2010/11/11 23:39:20 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -207,6 +207,7 @@ function flickrrippr_makenode($photo_id, $secret='') {
       $values);
     if($result) {
       drupal_set_message(t("Saved new photo %photo_id, !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
+
     }
     else {
       drupal_set_message(t('Failed to record details of flickr photo %photo_id.', array('%photo_id' => $photo_id)), 'error');
@@ -230,6 +231,7 @@ function flickrrippr_makenode($photo_id, $secret='') {
 
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
+  $node->flickr_photo = $details;
 
   //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
