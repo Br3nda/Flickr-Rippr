@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.6 2010/11/10 03:16:13 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.7 2010/11/11 23:12:14 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -59,7 +59,12 @@ function flickrrippr_get_user_by_nsid($nsid) {
  * Work out the path to a photo - also handles the cache on the local filesystem
  */
 function flickrrippr_path($node, $size = FALSE) {
-  
+  if(empty($node->flickr_photo)) {
+    drupal_set_message("node does not have flickr photo info. this should never happen", 'error');
+    drupal_set_messagE(print_r($node, 1), 'error');
+    drupal_seT_message(print_r(debug_backtrace(), 1), 'error');
+    return;
+  }
   $flickr_photo = $node->flickr_photo;
 
   if (empty($flickr_photo['secret'])) {
@@ -81,6 +86,7 @@ function flickrrippr_path($node, $size = FALSE) {
  * Calculates path to photo on flickr
  */
 function flickrrippr_path_remote($node, $size) {
+//   drupal_seT_message(__FUNCTION__ .'($node, "'. $size .'")');
   $flickr_photo = $node->flickr_photo;
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   return 'http://farm'. $flickr_photo['farm'] .'.static.flickr.com/'. $flickr_photo['server'] .'/'. $flickr_photo['flickrphoto_id'] .'_'. $flickr_photo['secret'] . ($size ? '_'. $size : '') .'.jpg';
@@ -90,11 +96,12 @@ function flickrrippr_path_remote($node, $size) {
  * Makes a node for a flickr photo - or updates if it already exists
  */
 function flickrrippr_makenode($photo_id, $secret='') {
-
+//   drupal_seT_message(__FUNCTION__ .'('. $photo_id .', "'. $secret .'")');
   if (!$photo_id) {
     drupal_set_message(t("Photo_id required."), 'error');
     return FALSE;
   }
+//   drupal_set_message("Making node for photo=$photo_id");
 
 //   drupal_set_message(t("Request to get photo %id, secret=%secret", array('%id' => $photo_id, '%secret' => $secret)));
   //TODO, this code is in two place -- make a function
