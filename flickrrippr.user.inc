@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.3 2010/11/01 04:09:02 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.4 2010/11/11 23:59:45 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -151,6 +151,15 @@ function flickrrippr_user_settings_form($a, $flickruser) {
       '#description' => t('If entered, only photos that have this tag will be imported. Be aware that your friends and family on flickr may also be allowed to tag your photos.'),
       '#default_value' => isset($flickruser->tag) ? $flickruser->tag : '',
     );
+
+  $form['date_field'] = array(
+    '#type' => 'radios',
+    '#title' => t('Date field'),
+    '#description' => t('Which field to use as the post\'s created date + time?'),
+    '#options' => flickrrippr_date_options(),
+    '#required' => TRUE,
+    '#default_value' => empty($flickruser->date_field) ? 'date_taken' : $flickruser->date_field,
+  );
 
   $form['save'] = array(
     '#type' => 'submit',
