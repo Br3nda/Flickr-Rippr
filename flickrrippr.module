@@ -238,14 +238,23 @@ function flickrrippr_check_latest_for_user($user_id, $pagenum = 1) {
  * Get the latest from flickr.com for one user
  */
 function flickrrippr_fetch_latest($flickruser, $force_now=FALSE) {
-
-  $num_queue = db_fetch_object(db_query("SELECT count(*) as c FROM {job_queue} WHERE function='flickrrippr_makenode'"))->c;
-  if ($num_queue > 1000) {
-    watchdog('flickrrippr', 'More than 1,000 flickr rippr jobs queued. Not queueing anymore');
-    return;
+  if($force_now) {
+    drupal_set_message(t("Forcing refetch now, not queuing"));
   }
-  //update their user info
-  job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+  else {
+    $num_queue = db_fetch_object(db_query("SELECT count(*) as c FROM {job_queue} WHERE function='flickrrippr_makenode'"))->c;
+    if ($num_queue > 1000) {
+      watchdog('flickrrippr', 'More than 1,000 flickr rippr jobs queued. Not queueing anymore');
+      return;
+    }
+  }
+
+  if ($force_now) {
+  }
+  else {
+    //update their user info
+    job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+  }
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
 
@@ -325,6 +334,12 @@ function flickrrippr_cron() {
   while ($fuser = db_fetch_object($result)) {
     flickrrippr_check_latest_for_user($fuser->uid);
   }
+}
+
+function flickrrippr_image($node, $size) {
+  $src = flickrrippr_path($node, $size);
+//   drupal_set_message('node='. print_r($node->title, 1));
+  return theme('image', $src, $node->title, $node->title, array(), FALSE);
 }
 
 function flickrrippr_user_avatar($a) {
