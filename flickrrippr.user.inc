@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.6 2010/11/12 00:11:59 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.7 2010/11/12 00:13:36 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -222,10 +222,12 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
  
   $flickr_account->flickr_tag = $form_state['values']['flickr_tag'];
-
+  $flickr_account->date_field = $form_state['values']['date_field'];
+  
   if (isset($flickr_account->flickrusername)) {
     $flickr_account->flickrusername = $flickr_details['username'];
     $flickr_account->flickrid =  $form_state['values']['flickrid'];
+    
     drupal_write_record('flickrusers', $flickr_account, array('uid', 'flickrid'));
     drupal_set_message(t("Flickr account updated"));
   }
