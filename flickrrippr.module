@@ -455,13 +455,13 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   }
 
   if (!$photo['farm'] || !$photo['server'] || !$photo['secret']) {
-      GLOBAL $_FR_refresh_count;
+    GLOBAL $_FR_refresh_count;
 
-      if ($_FR_refresh_count  < 5) {
-        flickrrippr_makenode($photo['flickrphoto_id']);
-        $photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
-        $_FR_refresh_count++;
-      }
+    if ($_FR_refresh_count  < 5) {
+      flickrrippr_makenode($photo['flickrphoto_id']);
+      $photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
+      $_FR_refresh_count++;
+    }
   }
 
   if (!$photo || $photo['failed'] == 1) {
