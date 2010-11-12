@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.11 2010/11/12 00:22:48 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.12 2010/11/12 01:05:12 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -268,7 +268,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
 //   drupal_set_message("Using $date_field as out creation timestamp");
   //the date taken needs converting, everything else is already an int
   if($date_field == 'date_taken') {
-    $timestamp = strototime($details['date_taken']);
+    $timestamp = strtotime($details['date_taken']);
   }
   else {
     $timestamp = $details[$date_field];
