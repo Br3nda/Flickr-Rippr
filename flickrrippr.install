@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.21.2.12.2.3 2010/11/11 23:56:35 taniwha Exp $
+// $Id: flickrrippr.install,v 1.21.2.12.2.4 2010/11/12 00:11:59 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -24,17 +24,22 @@ function flickrrippr_uninstall() {
  * Implementation of hook_schema().
  */
 function flickrrippr_schema() {
+  //the stuff that is from flickr, and not editable here, the column start with 'flickr'
   $schema['flickrusers'] = array(
     'fields' => array(
       'uid' => array('type' => 'int'),
-      'flickrid' => array('type' => 'varchar', 'length' => 100),
       'tag' => array('type' => 'text'),
+      'date_field' => array('type' => 'text'),
+      'flickrid' => array('type' => 'varchar', 'length' => 100),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       'flickrispro' => array('type' => 'int', 'size' => 'tiny', 'default' => 0),
       'flickrphotosurl' => array('type' => 'text'),
       'flickrprofileurl' => array('type' => 'text'),
       'flickravatar' => array('type' => 'text'),
-      'date_field' => array('type' => 'text'),
+      'flickrrealname' => array('type' => 'text'),
+      'flickrpath_alias' => array('type' => 'text'),
+      'flickrlocation' => array('type' => 'text'),
+      'flickrmobileurl' => array('type' => 'text'),
       ),
     'primary key' => array('uid', 'flickrid'),
     'indexes' => array(
@@ -428,6 +433,11 @@ $schema = flickrrippr_schema();  }
  * Add the date_field column to flickrusername
  */
 function flickrrippr_update_6160() {
+  db_add_field($ret, 'flickrusers', 'flickrrealname', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrpath_alias', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrlocation', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrmobileurl', array('type' => 'text'));
+  
   db_add_field($ret, 'flickrusers', 'date_field', array('type' => 'text'));
   update_sql("UPDATE {flickrusers} SET date_field='date_taken'");
   return $ret;

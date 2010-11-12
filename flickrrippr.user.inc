@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.5 2010/11/12 00:03:56 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.6 2010/11/12 00:11:59 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -83,6 +83,10 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   $flickruser->flickrphotosurl = $user_info['photosurl'];
   $flickruser->flickrprofileurl = $user_info['profileurl'];
   $flickruser->flickravatar = flickrrippr_get_avatar($user_info);
+  $flickruser->flickrrealname = $user_info['realname'];
+  $flickruser->flickrpath_alias  = $user_info['path_alias'];
+  $flickruser->flickrlocation = $user_info['location'];
+  $flickruser->flickrmobileurl = $user_info['mobileurl'];
   drupal_write_record('flickrusers', $flickruser, array('flickrid', 'uid'));
 }
 
