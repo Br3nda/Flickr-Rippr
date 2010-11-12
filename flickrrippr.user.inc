@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.7 2010/11/12 00:13:36 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.8 2010/11/12 01:13:26 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -83,9 +83,9 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   $flickruser->flickrphotosurl = $user_info['photosurl'];
   $flickruser->flickrprofileurl = $user_info['profileurl'];
   $flickruser->flickravatar = flickrrippr_get_avatar($user_info);
-  $flickruser->flickrrealname = $user_info['realname'];
+  $flickruser->flickrrealname = isset($user_info['realname']) ? $user_info['realname'] : '';
   $flickruser->flickrpath_alias  = $user_info['path_alias'];
-  $flickruser->flickrlocation = $user_info['location'];
+  $flickruser->flickrlocation = isset($user_info['location']) ? $user_info['location'] : '';
   $flickruser->flickrmobileurl = $user_info['mobileurl'];
   drupal_write_record('flickrusers', $flickruser, array('flickrid', 'uid'));
 }
@@ -130,6 +130,11 @@ function flickrrippr_user_settings_form($a, $flickruser) {
 
   if (isset($flickruser->flickrid)) {
     $form['flickr_username'] = array(
+      '#type' => 'value',
+      '#value' => $flickruser->flickrusername,
+    );
+
+    $form['flickr_username_markup'] = array(
       '#type' => 'markup',
       '#value' => flickrrippr_user_avatar($flickruser) .'<p><strong>'. t('Flickr Username: ') . ' </strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
     );
