@@ -337,6 +337,9 @@ function flickrrippr_cron() {
 }
 
 function flickrrippr_image($node, $size) {
+  if(!$node) {
+    return;
+  }
   $src = flickrrippr_path($node, $size);
 //   drupal_set_message('node='. print_r($node->title, 1));
   return theme('image', $src, $node->title, $node->title, array(), FALSE);
@@ -545,3 +548,14 @@ function _flickr_rippr_jpeg_sizes() {
   );
 }
 
+
+function flickrrippr_date_options() {
+  return array(
+//     'dateuploaded' => t('Uploaded to Flickr'),
+    'date_taken' => t('Photo was taken'),
+    'lastfetched' => t('Last fetched from flickr'),
+    'date_posted'  => t('Posted to Flickr'),
+    'date_lastupdate' => t('Last update on Flickr'),
+  );
+  
+}
