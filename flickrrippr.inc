@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.9 2010/11/11 23:39:20 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.10 2010/11/12 00:20:51 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -255,8 +255,29 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   $node->type = 'flickrrippr_photo';
 
   $node->title = htmlentities($details['title']);
-  $node->created = strtotime($details['date_taken']);
-  $node->changed = strtotime($details['date_posted']);
+
+  //What date field does this account want to user
+  $date_field = $details['user']->flickr_info->date_field;
+  //What are our options for date_fields
+  $date_options = flickrrippr_date_options();
+  //check it's a valid date_field
+  if (!in_array($date_field, array_keys($date_options))){
+    //not a valid option, so use date_taken
+    $date_field = 'date_taken';
+  }
+//   drupal_set_message("Using $date_field as out creation timestamp");
+  //the date taken needs converting, everything else is already an int
+  if($date_field == 'date_taken') {
+    $timestamp = strototime($details['date_taken']);
+  }
+  else {
+    $timestamp = $details[$date_field];
+  }
+//   drupal_seT_message("timestamp = $timestamp");
+
+  $node->created = $timestamp;
+//   $node->changed = strtotime($details['date_posted']);
+  
   $node->details = $details;
   $node->body = theme('image', flickrrippr_path($node, 'm'), $node->title, $node->title, array(), FALSE);
 
