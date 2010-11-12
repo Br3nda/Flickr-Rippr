@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.32.2.30.2.10 2010/11/12 00:20:51 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.32.2.30.2.11 2010/11/12 00:22:48 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -257,7 +257,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   $node->title = htmlentities($details['title']);
 
   //What date field does this account want to user
-  $date_field = $details['user']->flickr_info->date_field;
+  $date_field = isset($details['user']->flickr_info->date_field) ? $details['user']->flickr_info->date_field : 'date_taken';
   //What are our options for date_fields
   $date_options = flickrrippr_date_options();
   //check it's a valid date_field
