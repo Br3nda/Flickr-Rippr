@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.8 2010/11/12 01:13:26 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.9 2010/11/12 01:36:33 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -63,7 +63,7 @@ function flickrrippr_user_settings($uid = NULL) {
 
 
 
-function flickrrippr_fetch_user_info_and_save($flickruser) {
+function flickrrippr_fetch_user_info_and_save($flickruser, $new=false) {
 
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
@@ -87,7 +87,12 @@ function flickrrippr_fetch_user_info_and_save($flickruser) {
   $flickruser->flickrpath_alias  = $user_info['path_alias'];
   $flickruser->flickrlocation = isset($user_info['location']) ? $user_info['location'] : '';
   $flickruser->flickrmobileurl = $user_info['mobileurl'];
-  drupal_write_record('flickrusers', $flickruser, array('flickrid', 'uid'));
+  if ($new) {
+    drupal_write_record('flickrusers', $flickruser);
+  }
+  else {
+    drupal_write_record('flickrusers', $flickruser, array('flickrid'));
+  }
 }
 
 

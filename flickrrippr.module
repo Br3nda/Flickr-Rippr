@@ -188,7 +188,19 @@ function flickrrippr_node_refresh_perm($nid) {
  * Get the details of a flickr user from the database
  */
 function flickrrippr_get_flickruser($uid, $flickrid) {
-  return db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
+  $cached = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
+  if ($cached) {
+    return $cached;
+  }
+  drupal_set_message("fetching info on $flickrid");
+
+
+  $flickruser->flickrid = $flickrid;
+  $flickruser->uid = 0;
+  include_once(drupal_get_path('module', 'flickrrippr').  '/flickrrippr.user.inc');
+  flickrrippr_fetch_user_info_and_save($flickruser, true);
+  
+//   drupal_set_message(print_r($user_info, 1));
 }
 
 /**
@@ -502,7 +514,12 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
     '#weight' => 5
   );
 
-//   $node->content['body'] = array();
+  $owner = flickrrippr_get_flickruser($node->uid, $node->flickr_photo['owner_nsid']);
+
+  $node->content['photographer'] = array(
+    '#value' => print_r($node->flickr_photo, 1),
+    
+  );
 
   return $node;
 }
