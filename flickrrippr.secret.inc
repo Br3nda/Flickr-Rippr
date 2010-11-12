@@ -34,8 +34,10 @@ function flickrrippr_secret_form_submit($form, $form_state) {
 
   
   $node = flickrrippr_makenode($flickrphoto_id, $secret);
-  $image = l(flickrrippr_image($node, 'm'), 'node/'. $node->nid, array('html' => TRUE));
-  drupal_set_message($image);
+  if ($node) {
+    $image = l(flickrrippr_image($node, 'm'), 'node/'. $node->nid, array('html' => TRUE));
+    drupal_set_message($image);
+  }
   if (!$node) {
      form_set_error('', 'That didn\'t work');
      return;
