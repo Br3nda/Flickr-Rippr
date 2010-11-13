@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.18 2010/10/27 02:11:16 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.19 2010/11/13 20:26:39 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -64,7 +64,9 @@ function flickrrippr_user_settings($uid = NULL) {
 
 
 
-function flickrrippr_fetch_user_info_and_save($flickruser) {
+
+
+function flickrrippr_fetch_user_info_and_save($flickruser, $new=false) {
 
  //search flickr for latest photos from that user.
   $flickr = flickrapi_phpFlickr();
