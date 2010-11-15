@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.content.inc,v 1.1.4.5 2010/10/29 02:32:20 taniwha Exp $ 
+// $Id: flickrgroups.content.inc,v 1.1.4.6 2010/11/15 03:12:30 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -50,21 +50,21 @@ function flickrgroups_fetch_form_submit($a, $form_state) {
 }
 
 function flickrgroups_admin_form($a, $name=null) {
+  if (empty($name)) {
+    $form['name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Name'),
+      '#required' => TRUE,
+      '#default_value' => isset($name) ? $name : '',
+    );
 
-  $form['name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Name'),
-    '#required' => TRUE,
-    '#default_value' => isset($name) ? $name : '',
-  );
- 
-  $form['find'] = array(
-    '#type' => 'submit',
-    '#value' => t('Search'),
-  );
-  
-  if (!empty($name)) {
-//     drupal_set_message($name);
+    $form['find'] = array(
+      '#type' => 'submit',
+      '#value' => t('Search'),
+    );
+  }
+  else {
+     drupal_set_message($name);
     $flickr = flickrapi_phpFlickr();
     if (!$flickr) {
       drupal_set_message(t("Unable to query flickr.com"), 'error');
@@ -72,18 +72,25 @@ function flickrgroups_admin_form($a, $name=null) {
     }
     
     $results = $flickr->groups_search($name);
+//     drupal_set_message(print_r($results, 1));
     foreach($results['group'] as $g) {
       $groups[$g['nsid']] = $g['name'];
     }
-    $form['flickrgroup_id'] = array(
-      '#type' => 'radios',
-      '#options' => $groups
-    );  
-    
-    $form['add'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add'),
-    );
+    if (count($groups)) {
+      $form['flickrgroup_id'] = array(
+        '#type' => 'radios',
+        '#options' => $groups
+      );
+
+      $form['add'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add'),
+      );
+    }
+    else {
+      drupal_set_message("No groups found");
+      drupal_goto('flickr/groups/add');
+    }
   }
   
   
@@ -92,9 +99,9 @@ function flickrgroups_admin_form($a, $name=null) {
 
 function flickrgroups_admin_form_submit($form, &$form_state) {
 
-  
+//     drupal_set_message(__FUNCTION__);
   if(isset($form_state['values']['flickrgroup_id'])) {
-
+// 
     $flickr = flickrapi_phpFlickr();
     if (!$flickr) {
       drupal_set_message(t("Unable to query flickr.com"), 'error');
