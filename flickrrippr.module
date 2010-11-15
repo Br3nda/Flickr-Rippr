@@ -203,7 +203,7 @@ function flickrrippr_get_flickruser($uid, $flickrid) {
   }
   drupal_set_message("fetching info on $flickrid");
 
-
+  $flickruser = new StdClass();
   $flickruser->flickrid = $flickrid;
   $flickruser->uid = 0;
   include_once(drupal_get_path('module', 'flickrrippr').  '/flickrrippr.user.inc');
