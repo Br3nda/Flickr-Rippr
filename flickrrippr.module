@@ -29,6 +29,15 @@ function flickrrippr_views_api() {
 }
 
 
+function flickrrippr_node_alter(&$node) {
+  if (isset($node->flickr_photo)) {
+    $node->links['photopage'] = array(
+      'title' => 'Flickr Photo Page',
+      'href' => $node->flickr_photo['photopage'],
+    );
+  }
+}
+
 /**
  * Implementation of hook_menu().
  */
@@ -515,10 +524,21 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   );
 
   $owner = flickrrippr_get_flickruser($node->uid, $node->flickr_photo['owner_nsid']);
+  //stdClass Object ( [uid] => 0 [tag] => [date_field] => [flickrid] => 14565961@N05 [flickrusername] => cooleyjj [flickrispro] => 1 [flickrphotosurl] => http://www.flickr.com/photos/j_cooley/ [flickrprofileurl] => http://www.flickr.com/people/j_cooley/ [flickravatar] => http://farm3.static.flickr.com/2051/buddyicons/14565961@N05.jpg [flickrrealname] => [flickrpath_alias] => j_cooley [flickrlocation] => [flickrmobileurl] => http://m.flickr.com/photostream.gne?id=14560621 )
 
-  $node->content['photographer'] = array(
-    '#value' => print_r($node->flickr_photo, 1),
-    
+
+
+  $owner_name = !empty($owner->flickrrealname) ? $owner->flickrrealname : $owner->flickrusername;
+  $list[] = t('Photo owner: !realname', array('!realname' => l(check_plain($owner_name), $owner->flickrphotosurl)));
+
+  $list[] = t('Date Taken: @date_taken', array('@date_taken' => format_date(strtotime($node->flickr_photo['date_taken']), 'short')));
+  $list[] = t('Date Uploaded: @date_posted', array('@date_posted' => format_date($node->flickr_photo['date_posted'], 'short')));
+  $list[] = t('Views: @views', array('@views' => numbeR_format($node->flickr_photo['views'])));
+  
+//   $list[] = print_r($node->flickr_photo, 1);
+  
+  $node->content['details'] = array(
+    '#value' => '<div class="flickrphoto_details">' . theme('item_list', $list) .'</div>'
   );
 
   return $node;
@@ -548,6 +568,10 @@ function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
     case 'view':
       flickrrippr_view($node, $teaser, $page);
     break;
+    case 'alter':
+      flickrrippr_node_alter($node);
+    break;
+    
   }
 }
 /**
