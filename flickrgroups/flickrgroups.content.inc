@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrgroups.content.inc,v 1.1.4.6 2010/11/15 03:12:30 taniwha Exp $ 
+// $Id: flickrgroups.content.inc,v 1.1.4.7 2010/11/15 03:25:22 taniwha Exp $ 
 
 /**
  * @file administering the automatic import of flickr groups
@@ -40,13 +40,23 @@ function flickrgroups_fetch_form($a, $flickrgroup_id) {
   $form['fetch'] = array(
     '#type' => 'submit',
     '#value' => t('Fetch'),
+  );  
+  $form['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete'),
   );
   return $form;
 }
 
 function flickrgroups_fetch_form_submit($a, $form_state) {
   $flickrgroup_id = $_POST['flickrgroup_id'];
-  flickrgroups_fetch_group($flickrgroup_id, TRUE);
+  if(t('Delete') == $form_state['values']['op']) {
+    db_query("DELETE FROM {flickrgroup_photos} WHERE flickrgroup_id='%s'", $flickrgroup_id);
+    db_query("DELETE FROM {flickrgroups} WHERE flickrgroup_id='%s'", $flickrgroup_id);
+  }
+  if(t('Fetch') == $form_state['values']['op']) {
+    flickrgroups_fetch_group($flickrgroup_id, TRUE);
+  }
 }
 
 function flickrgroups_admin_form($a, $name=null) {
