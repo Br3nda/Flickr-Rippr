@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.9 2010/11/12 01:36:33 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.10 2010/11/15 03:04:57 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -91,8 +91,9 @@ function flickrrippr_fetch_user_info_and_save($flickruser, $new=false) {
     drupal_write_record('flickrusers', $flickruser);
   }
   else {
-    drupal_write_record('flickrusers', $flickruser, array('flickrid'));
+    drupal_write_record('flickrusers', $flickruser, array('flickrid', 'uid'));
   }
+  return $flickruser; 
 }
 
 
