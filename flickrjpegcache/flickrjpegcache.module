@@ -18,10 +18,11 @@ function flickrjpegcache_get_path(&$node, $size=FALSE, $refetch=FALSE) {
   if ('flickrjpegcache' != variable_get('flickrrippr_path_handler', 0)) {
     return;
   }
-  if (!$node->nid || !$node->vid) {
-    drupal_set_message(t('Node not saved yet!'), 'error');
+//   if (!$node->nid || !$node->vid) {
+//     drupal_set_message(t('Node not saved yet!'), 'error');
+//     return;
 //     foreach(debug_backtrace() as $line) { drupal_set_message(print_r($line, 1)); }
-  }
+//   }
 
   if (!isset($node->flickr_photo)) {
     flickrrippr_load($node);
