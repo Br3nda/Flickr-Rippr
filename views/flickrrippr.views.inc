@@ -476,9 +476,9 @@ include_once(drupal_get_path('module', 'views') .'/handlers/views_handler_field.
 
 class flickrrippr_handler_photo_path extends views_handler_field   {
   function render($values) {
-    $node->nid = $values->nid;
-    flickrrippr_load($node);
-    return flickrrippr_path($node, $this->options['photo_size']);
+    $node = node_load($values->nid);
+    $image = flickrrippr_path($node, $this->options['photo_size']);
+
   }
   function options_form(&$form, &$form_state) {
     $sizes = _flickr_rippr_jpeg_sizes();
@@ -494,11 +494,8 @@ class flickrrippr_handler_photo_path extends views_handler_field   {
 
 class flickrrippr_handler_photo extends views_handler_field   {
   function render($values) {
-    
-    $node->nid = $values->nid;
-    flickrrippr_load($node);
-    $src = flickrrippr_path($node, $this->options['photo_size']);
-    $image = theme('image', $src, $values->node_title, $values->node_title, NULL, FALSE);
+    $node = node_load($values->nid);
+    $image = flickrrippr_image($node, $this->options['photo_size']);
 
     return $image;
      
