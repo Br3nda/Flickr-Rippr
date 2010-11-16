@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.25 2010/11/16 00:37:38 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.26 2010/11/16 00:44:05 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -16,9 +16,9 @@ function flickrrippr_user_settings($uid = NULL) {
     GLOBAL $user;
   }
   $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
-
+  
   $accounts = flickrrippr_get_flickr_accounts($user->uid);
-
+  
   $headers = array('',
     t('Flickr ID'),
     t('Flickr username'),
@@ -41,21 +41,21 @@ function flickrrippr_user_settings($uid = NULL) {
       }
     }
 
-    $avatar = flickrrippr_user_avatar($a);
-
+    $avatar = ''; //flickrrippr_user_avatar($a);
     $rows[] = array(
       $avatar,
       check_plain($a->flickrid),
       check_plain($a->flickrusername),
       $tag_links,
-      drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
+//       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
       l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
       l('View Photos', 'user/'. $user->uid .'/flickrrippr/view/'. $a->flickrid),
     );
 
   }
+  
   if (count($rows)) {
-    $output .= theme('table', $headers, $rows);
+    $output .= theme('table', array('header' => $headers, 'rows' => $rows));
   }
   return $output;
 
@@ -269,14 +269,14 @@ function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
 function flickrrippr_user_view_photos($uid, $flickruserid) {
   $output = '';
 
-  $result = pager_query("SELECT * FROM {flickrphotos} WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
+  $result = pager_query("SELECT * FROM {flickrphotos} p INNER JOIN {node} n ON p.nid = n.nid WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
 
   $rows = array();
-  while($photo = db_fetch_array($result)) {
+  while($node = db_fetch_object($result)) {
     //   drupal_set_message(print_r($photo, 1));
-    $node->flickr_photo = $photo;
+    $node->flickr_photo = (array)$node;
     $jpeg_path = flickrrippr_path($node, 't');
-    $col[] = l(theme('image', $jpeg_path, $photo->title, $photo->title, NULL, FALSE), 'node/'. $photo->nid, array('html' => TRUE));
+    $col[] = l(theme('image', $jpeg_path, $node->title, $node->title, NULL, FALSE), 'node/'. $node->nid, array('html' => TRUE));;
     if (count($col) > 6) {
       $rows[] = $col;
       $col = array();
