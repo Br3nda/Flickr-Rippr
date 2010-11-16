@@ -152,6 +152,12 @@ function flickrrippr_menu() {
   return $items;
 }
 
+function flickrrippr_node_refresh_permission($nid) {
+  $node = node_load($nid);
+  if($node->type == 'flickrrippr_photo') {
+    return true;
+  }
+}
 
 function flickrrippr_admin_menu_page() {
     return '';
@@ -227,7 +233,6 @@ function flickrrippr_get_flickruser($uid, $flickrid) {
  * Loading of the node
  */
 function flickrrippr_node_load($nodes, $types) {
-
   $photos = db_select('flickrphotos', 'p')
     ->fields('p')
     ->condition('nid', array_keys($nodes))
@@ -240,9 +245,8 @@ function flickrrippr_node_load($nodes, $types) {
     );
 
   }
-    
-  if (isset($node->flickr_photo)) {
-  }
+
+//   drupal_set_message(print_r($nodes, 1));
 }
 
 /**
@@ -371,7 +375,6 @@ function flickrrippr_image($node, $size) {
     return;
   }
   $src = flickrrippr_path($node, $size);
-//   drupal_set_message('node='. print_r($node->title, 1));
   return theme('image', $src, $node->title, $node->title, array(), FALSE);
 }
 
@@ -551,7 +554,6 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
   $list[] = t('Date Uploaded: @date_posted', array('@date_posted' => format_date($node->flickr_photo['date_posted'], 'short')));
   $list[] = t('Views: @views', array('@views' => numbeR_format($node->flickr_photo['views'])));
   
-//   $list[] = print_r($node->flickr_photo, 1);
   
   $node->content['details'] = array(
     '#value' => '<div class="flickrphoto_details">' . theme('item_list', $list) .'</div>'

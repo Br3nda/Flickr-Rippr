@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.12 2010/11/16 02:06:14 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.13 2010/11/16 02:25:49 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -240,9 +240,9 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
  * get the photo id for a nid
  */
 function flickrrippr_node_get_photoid($nid) {
-  $rec = db_select('flickrphotos')
-    ->addField('flickrphoto_id')
-    ->condition('nid', $nid)
+  $rec = db_select('flickrphotos', 'p')
+    ->fields('p', array('flickrphoto_id'))
+    ->condition('nid', array($nid))
     ->execute()
     ->fetch();
   return (!empty($rec->flickrphoto_id) ? $rec->flickrphoto_id : NULL);
