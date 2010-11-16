@@ -282,19 +282,10 @@ function flickrrippr_fetch_latest($flickruser, $force_now=FALSE) {
   if($force_now) {
     drupal_set_message(t("Forcing refetch now, not queuing"));
   }
-  else {
-    $num_queue = db_fetch_object(db_query("SELECT count(*) as c FROM {job_queue} WHERE function='flickrrippr_makenode'"))->c;
-    if ($num_queue > 1000) {
-      watchdog('flickrrippr', 'More than 1,000 flickr rippr jobs queued. Not queueing anymore');
-      return;
-    }
-  }
-
   if ($force_now) {
-  }
-  else {
-    //update their user info
-    job_queue_add('flickrrippr_fetch_user_info_and_save', t('Update details for flickr user %flickrusername', array('%flickrusername' => $flickruser->flickrusername)), array($flickruser), drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+//   , drupal_get_path('module', 'flickrrippr') .'/flickrrippr.user.inc');
+    flickrrippr_fetch_user_info_and_save($flickruser);
+    
   }
 
   $num_photos = variable_get('flickrrippr_num_per_fetch', 100);
@@ -321,18 +312,7 @@ function flickrrippr_fetch_latest($flickruser, $force_now=FALSE) {
   if (is_array($photos['photo'])) {
     foreach ($photos['photo'] as $p) {
         //hack to get around job_queue restricting descriptions to 255 chars
-
-        
-        if ($force_now) {
-          flickrrippr_makenode($p['id']);
-        }
-        else {
-          $description = t("Save node for flickr photo %id owned by %username", array('%id' => $p['id'], '%username' => check_plain($flickruser->flickrusername)));
-          if (strlen($description) >= 255) {
-            $description = substr($description, 0, 254);
-          }
-          job_queue_add('flickrrippr_makenode', $description, array($p['id']));
-        }
+        flickrrippr_makenode($p['id']);
         $num_photos++;
       }
 //     }

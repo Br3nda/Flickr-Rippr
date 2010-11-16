@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.11 2010/11/16 01:29:01 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.12 2010/11/16 02:06:14 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -48,7 +48,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
   }
   
   $flickruser = db_select('flickrusers', 'f')
-    ->addField('d', 'uid')
+    ->fields('f', array('uid'))
     ->condition('flickrid', $nsid)
     ->execute()
     ->fetch();
@@ -150,7 +150,7 @@ function flickrrippr_makenode($photo_id) {
   //assemble everything to pass to hook
   $details = array(
     'flickrid' => $flickrid,
-    'photo_id' => $flickr_info['id'],
+    'flickrphoto_id' => $flickr_info['id'],
     'flickrusername' => $flickrusername,
     'context' => $flickr_context,
 //     'info' => $flickr_info,
@@ -169,9 +169,12 @@ function flickrrippr_makenode($photo_id) {
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
 //   drupal_set_message(print_r($flickr_info, 1));
 
-  $fields = array('farm', 'server', 'secret', 'dateuploaded', 'license', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
+  $fields = array('flickrphoto_id', 'farm', 'server', 'secret', 'dateuploaded', 'license', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
+  
+  $photo = new StdClass();
   foreach ($fields as $f) {
-    $values[$f] = $details[$f];
+    $photo->$f = $details[$f];
+//     $values[$f] = $details[$f];
   }
 
   
@@ -186,32 +189,12 @@ function flickrrippr_makenode($photo_id) {
   }
  
   if (isset($node->is_new) && $node->is_new) {
-//     drupal_set_message("New node, nid = $node->nid");
-  
-    $fields['flickrphoto_id'] = $details['id'];
-    $fields['nid'] = $node->nid;
-    $fields['lastfetched'] = strtotime('now');
-  
-
-    $result = db_insert('flickrphotos')
-      ->fields($fields)
-      ->execute();
-      drupal_set_message(t("Saved new photo %photo_id, " . l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
+    drupal_write_record('flickrphotos', $photo);
+    drupal_set_message(t("Saved new photo %photo_id, " . l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
   else {
-
-    $sql = "UPDATE {flickrphotos} SET ";
-    foreach ($fields as $v) {
-      $sql .= "$v = '%s', ";
-    }
-    $sql .= " lastfetched=%d, failed=0 WHERE flickrphoto_id=%d AND nid=%d ";
-
-    $values[] = strtotime('now');
-    $values[] = $details['id'];
-    $values[] = $node->nid;
-
-    $result = db_query($sql, $values);
-
+//     drupal_set_message(print_r($photo, 1));
+    drupal_write_record('flickrphotos', $photo, array('flickrphoto_id'));
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
   //the extra hooks
@@ -270,7 +253,7 @@ function flickrrippr_node_get_photoid($nid) {
  */
 function flickrrippr_photo_get_nid($photo_id) {
   $rec = db_select('flickrphotos')
-    ->addField('flickrphotos', 'nid')
+    ->fields('flickrphotos', array('nid'))
     ->condition('flickrphoto_id', $photo_id)
     ->execute()
     ->fetch();
@@ -282,7 +265,7 @@ function flickrrippr_photo_get_nid($photo_id) {
  */
 function flickrrippr_get_photo_details_by_photoid($pid) {
   return db_select('flickrphotos', 'p')
-      ->addField('p', '*')
+      ->fields('p')
       ->condition('flickrphoto_id', $pid)
       ->execute()
       ->fetch();
