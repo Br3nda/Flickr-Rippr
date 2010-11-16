@@ -377,7 +377,7 @@ function flickrrippr_image($node, $size) {
   $src = flickrrippr_path($node, $size);
   return theme('image',
     array(
-      'src' => $src,
+      'path' => $src,
       'alt' => $node->title,
       'title' => $node->title,
       'getsize' => FALSE
@@ -534,6 +534,7 @@ function flickrrippr_node_view($node, $view_mode, $langcode) {
   //get the image, using theme()
 
   $jpeg_path = flickrrippr_path($node, $size);
+
   $image = l(flickrrippr_image($node, $size), $link, array('html' => TRUE));
   $node->content['flickr_photo_'.$size] = array(
     '#weight' => 0,
@@ -541,14 +542,15 @@ function flickrrippr_node_view($node, $view_mode, $langcode) {
 //     '#theme' => 'theme_flickrrippr_photo',
   );
 
-  return;
+
 
   $markup_trust = variable_get('flickrrippr_markup_trust', FALSE);
 
   $node->content['body'] = array(
-    '#value' => '<div class="flickrrippr_description">'. nl2br($markup_trust ? $photo['description'] : check_plain($photo['description']))  .'</div>', //decode then encode
+    '#markup' => '<div class="flickrrippr_description">'. nl2br($markup_trust ? $photo['description'] : check_plain($photo['description']))  .'</div>', //decode then encode
     '#weight' => 5
   );
+  return;
 
   $owner = flickrrippr_get_flickruser($node->uid, $node->flickr_photo['owner_nsid']);
   //stdClass Object ( [uid] => 0 [tag] => [date_field] => [flickrid] => 14565961@N05 [flickrusername] => cooleyjj [flickrispro] => 1 [flickrphotosurl] => http://www.flickr.com/photos/j_cooley/ [flickrprofileurl] => http://www.flickr.com/people/j_cooley/ [flickravatar] => http://farm3.static.flickr.com/2051/buddyicons/14565961@N05.jpg [flickrrealname] => [flickrpath_alias] => j_cooley [flickrlocation] => [flickrmobileurl] => http://m.flickr.com/photostream.gne?id=14560621 )
