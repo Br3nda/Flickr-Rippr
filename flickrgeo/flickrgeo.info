@@ -1,0 +1,4 @@
+name = Flickr Geo
+core = 7.x
+dependencies[] = flickrrippr
+package = Flickr
