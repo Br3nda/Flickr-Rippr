@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.42 2010/11/16 00:02:43 taniwha Exp $
+// $Id: flickrrippr.install,v 1.43 2010/11/16 00:34:23 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -85,7 +85,9 @@ function flickrrippr_schema() {
         'flickrphotos_nid_unique' => array('nid'),
       ),
     );
+    
   variable_set("upload_flickrrippr_photo", 1);
+  return $schema;
 }
 
 /**
