@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.27 2010/11/16 00:44:27 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.28 2010/11/16 01:01:36 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -122,11 +122,13 @@ function flickrrippr_user_add_account($uid) {
 /**
  * Form for a user editing their own settings
  */
-function flickrrippr_user_settings_form($a, $flickruser) {
+function flickrrippr_user_settings_form($a, $b, $flickruser) {
+  
 
+//    drupal_set_message(print_r($flickruser, 1));
   $form = array();
   if (isset($flickruser->flickrusername)) {
-    drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $flickruser->flickrusername)));
+    drupal_set_title(t('Flickr Rippr settings for @username', array('@username' => $flickruser->flickrusername)));
   }
 
   if (isset($flickruser->flickrid)) {
@@ -139,11 +141,11 @@ function flickrrippr_user_settings_form($a, $flickruser) {
       '#type' => 'value',
       '#value' => $flickruser->flickrusername,
     );
-
-    $form['flickr_username_markup'] = array(
-      '#type' => 'markup',
-      '#value' => flickrrippr_user_avatar($flickruser) .'<p><strong>'. t('Flickr Username: ') . ' </strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
-    );
+// 
+//     $form['flickr_username_markup'] = array(
+//       '#type' => 'markup',
+//       '#value' => flickrrippr_user_avatar($flickruser) .'<p><strong>'. t('Flickr Username: ') . ' </strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
+//     );
   }
   else {
     $form['flickr_username'] = array(
@@ -192,7 +194,6 @@ function flickrrippr_user_settings_form($a, $flickruser) {
 function flickrrippr_user_settings_form_validate($form, &$form_state) {
 
   if(!isset($form_state['values']['flickrid'])) {
-//     $existing = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE flickrusername='%s'", $form_state['values']['flickr_username']));
     $existing = db_select('flickrusers', 'fu')
       ->fields('fu', array('flickrid'))
       ->condition('flickrusername', $form_state['values']['flickr_username'])
@@ -270,7 +271,7 @@ function flickrrippr_user_view_photos($uid, $flickruserid) {
   $output = '';
 
   $result = pager_query("SELECT * FROM {flickrphotos} p INNER JOIN {node} n ON p.nid = n.nid WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
-
+  
   $rows = array();
   while($node = db_fetch_object($result)) {
     //   drupal_set_message(print_r($photo, 1));
