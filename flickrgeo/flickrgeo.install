@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Implementatino of hook_install().
+ */
+function flickrgeo_install() {
+  drupal_install_schema('flickrgeo');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function flickrgeo_uninstall() {
+  drupal_uninstall_schema('flickrgeo');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function flickrgeo_schema() {
+  $schema['flickrgeo'] = array(
+    'fields' => array(
+      'flickrphoto_id' => array('type' => 'int', 'size' => 'big', 'not null' => TRUE),
+      'nid' => array('type' => 'int', 'not null' => TRUE),
+      'latitude' => array('type' => 'float', 'not null' => TRUE),
+      'longitude' => array('type' => 'float', 'not null' => TRUE),
+      'accuracy' => array('type' => 'int', 'not null' => TRUE),
+      'context' => array('type' => 'text'),
+      'locality_content' => array('type' => 'text'),
+      'locality_place_id' => array('type' => 'text'),
+      'locality_woeid' => array('type' => 'text'),
+      'county_content' => array('type' => 'text'),
+      'county_place_id' => array('type' => 'text'),
+      'county_woeid' => array('type' => 'text'),
+      'region_content' => array('type' => 'text'),
+      'region_place_id' => array('type' => 'text'),
+      'region_woeid' => array('type' => 'text'),
+      'country_content' => array('type' => 'text'),
+      'country_place_id' => array('type' => 'text'),
+      'country_woeid' => array('type' => 'text'), 
+      'place_id' => array('type' => 'text'),
+      'woeid' => array('type' => 'text'),
+    ),
+    'primary key' => array('flickrphoto_id'),
+  );
+  return $schema;
+}
+
