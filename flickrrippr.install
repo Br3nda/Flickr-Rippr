@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.install,v 1.41 2010/10/27 02:15:10 taniwha Exp $
+// $Id: flickrrippr.install,v 1.42 2010/11/16 00:02:43 taniwha Exp $
 /**
  * @file DB stuff for Flickr Rippr
  */
@@ -24,19 +24,27 @@ function flickrrippr_uninstall() {
  * Implementation of hook_schema().
  */
 function flickrrippr_schema() {
+  //the stuff that is from flickr, and not editable here, the column start with 'flickr'
   $schema['flickrusers'] = array(
     'fields' => array(
       'uid' => array('type' => 'int'),
-      'flickrid' => array('type' => 'text'),
-      'cachejpegs' => array('type' => 'int', 'size' => 'tiny'), //can has boolean? :-(
       'tag' => array('type' => 'text'),
+      'date_field' => array('type' => 'text'),
+      'flickrid' => array('type' => 'varchar', 'length' => 100),
       'flickrusername' => array('type' => 'text', 'not null' => TRUE),
       'flickrispro' => array('type' => 'int', 'size' => 'tiny', 'default' => 0),
       'flickrphotosurl' => array('type' => 'text'),
       'flickrprofileurl' => array('type' => 'text'),
       'flickravatar' => array('type' => 'text'),
+      'flickrrealname' => array('type' => 'text'),
+      'flickrpath_alias' => array('type' => 'text'),
+      'flickrlocation' => array('type' => 'text'),
+      'flickrmobileurl' => array('type' => 'text'),
       ),
-    'primary key' => array('uid', 'flickrid')
+    'primary key' => array('uid', 'flickrid'),
+    'indexes' => array(
+      'flickrid_index' => array('flickrid'),
+    ),
 );
   $schema['flickrphotos'] = array(
     'fields' => array(
@@ -49,22 +57,22 @@ function flickrrippr_schema() {
       'server' => array('type' => 'text', 'not null' => TRUE),
       'secret' => array('type' => 'text', 'not null' => TRUE),
       'dateuploaded' => array('type' => 'text', 'not null' => TRUE),
-      'license' => array('type' => 'text', 'not null' => TRUE),
+      'license' => array('type' => 'int', 'not null' => TRUE),
       'originalsecret' => array('type' => 'text', 'not null' => FALSE), //allow nulls
       'originalformat' => array('type' => 'text', 'not null' => FALSE), //allow nulls
-      'rotation' => array('type' => 'text', 'not null' => TRUE),
+      'rotation' => array('type' => 'int', 'not null' => TRUE),
       'title' => array('type' => 'text', 'not null' => TRUE),
-      'date_posted' => array('type' => 'text', 'not null' => TRUE),
+      'date_posted' => array('type' => 'int', 'not null' => TRUE),
       'date_taken' => array('type' => 'text', 'not null' => TRUE),
-      'date_lastupdate' => array('type' => 'text', 'not null' => TRUE),
-      'views' => array('type' => 'text', 'not null' => TRUE),
+      'date_lastupdate' => array('type' => 'int', 'not null' => TRUE),
+      'views' => array('type' => 'int', 'not null' => TRUE),
       'photopage' => array('type' => 'text', 'not null' => TRUE),
       'media' => array('type' => 'text', 'not null' => TRUE),
       'description' => array('type' => 'text', 'not null' => TRUE),
 //       'page_url' => array('type' => 'text'),
       'failed' => array('type' => 'int', 'default' => 0),
 //       'image_nid' => array('type' => 'int'),
-      'owner_nsid' => array('type' => 'text', 'not null' => TRUE),
+      'owner_nsid' => array('type' => 'varchar', 'length' => 100, 'not null' => TRUE),
       ),
       'primary key' => array('flickrphoto_id'),
       'indexes' => array(
@@ -78,161 +86,126 @@ function flickrrippr_schema() {
       ),
     );
   variable_set("upload_flickrrippr_photo", 1);
-
-/*
-Array
-(
-    [id] => 3371958338
-    [secret] => fe246384ea
-    [server] => 3465
-    [farm] => 4
-    [dateuploaded] => 1237602707
-    [isfavorite] => 0
-    [license] => 4
-    [rotation] => 0
-    [originalsecret] => c0604ae53d
-    [originalformat] => jpg
-    [owner] => Array
-        (
-            [nsid] => 36251685@N00
-            [username] => Br3nda
-            [realname] => Brenda Wallace
-            [location] => Taumatawhakatangihangakoauauotamateapokaiwhenuakitanatahu, Aotearoa
-        )
-
-    [title] => DSC_1006.JPG
-    [description] => 
-    [visibility] => Array
-        (
-            [ispublic] => 1
-            [isfriend] => 0
-            [isfamily] => 0
-        )
-
-    [dates] => Array
-        (
-            [posted] => 1237602707
-            [taken] => 2009-03-21 12:05:29
-            [takengranularity] => 0
-            [lastupdate] => 1237607105
-        )
-
-    [views] => 19
-    [editability] => Array
-        (
-            [cancomment] => 0
-            [canaddmeta] => 0
-        )
-
-    [usage] => Array
-        (
-            [candownload] => 1
-            [canblog] => 0
-            [canprint] => 0
-            [canshare] => 0
-        )
-
-    [comments] => 0
-    [notes] => Array
-        (
-            [note] => Array
-                (
-                )
-
-        )
-
-    [tags] => Array
-        (
-            [tag] => Array
-                (
-                    [0] => Array
-                        (
-                            [id] => 126545-3371958338-3179191
-                            [author] => 36251685@N00
-                            [raw] => Eye-Fi
-                            [_content] => eyefi
-                            [machine_tag] => 0
-                        )
-
-                    [1] => Array
-                        (
-                            [id] => 126545-3371958338-1997
-                            [author] => 36251685@N00
-                            [raw] => zoo
-                            [_content] => zoo
-                            [machine_tag] => 0
-                        )
-
-                    [2] => Array
-                        (
-                            [id] => 126545-3371958338-16439
-                            [author] => 36251685@N00
-                            [raw] => wellington
-                            [_content] => wellington
-                            [machine_tag] => 0
-                        )
-
-                    [3] => Array
-                        (
-                            [id] => 126545-3371958338-211826
-                            [author] => 36251685@N00
-                            [raw] => wellingtonzoo
-                            [_content] => wellingtonzoo
-                            [machine_tag] => 0
-                        )
-
-                    [4] => Array
-                        (
-                            [id] => 126545-3371958338-14591
-                            [author] => 36251685@N00
-                            [raw] => redpanda
-                            [_content] => redpanda
-                            [machine_tag] => 0
-                        )
-
-                )
-
-        )
-
-    [urls] => Array
-        (
-            [url] => Array
-                (
-                    [0] => Array
-                        (
-                            [type] => photopage
-                            [_content] => http://www.flickr.com/photos/taniwha/3371958338/
-                        )
-
-                )
-
-        )
-
-    [media] => photo
-)*/
-
-function flickrrippr_update_6070(&$sandbox) {
-
-  return $schema;
 }
 
 /**
- * Hook update_N
- * variables moved to own function - migrate them
+ * Use batch processing to migrate all photos to the new schema
+ */
+function flickrrippr_update_6070(&$sandbox) {
+
+if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['photoid'] = 0;
+    
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(flickrphoto_id) FROM {flickrphotos} WHERE farm IS NULL and failed = 0 '));
+  }
+  $result = db_query("SELECT flickrphoto_id FROM {flickrphotos} WHERE flickrphoto_id > %d AND farm IS NULL and failed = 0 ORDER BY flickrphoto_id LIMIT 50", $sandbox['photoid']);
+
+  while($photo = db_fetch_object($result)) {
+    error_log("Photo number ". $photo->flickrphoto_id);
+    job_queue_add('flickrrippr_makenode', t('Updating photo %id', array('%id' => $photo->flickrphoto_id)), array($photo->flickrphoto_id));
+    $sandbox['progress']++;
+    $sandbox['photoid'] = $photo->flickrphoto_id;
+    
+    $sandbox['message'] = t('Queued %count photos for refetching', array('%count' => $sandbox['progress']));
+  }
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  return $ret;
+}
+
+/**
+ * variables names changes - migrate them in the database
  */
 function flickrrippr_update_6080() {
   variable_set('flickrtags_import', variable_get('flickrrippr_import_tags', FALSE));
   variable_set('flickrtags_vocab',variable_get('flickrrippr_tags_vocab', 0));
 }
 
+/**
+ * add some indexes
+ */
 function flickrrippr_update_6090() {
   db_add_index($ret, 'flickrphotos', 'flickrphotos_nid', array('nid'));
   db_add_index($ret, 'flickrphotos', 'flickrphotos_owner', array('owner_nsid'));
   return $ret;
 }
-
-
-function flicrrippr_update_6100() {
+/**
+ * mark flickr rippr photos as having uploads (attached files)
+ */
+function flickrrippr_update_6100() {
   variable_set("upload_flickrrippr_photo", 1);
 }
 
+/**
+ * enforce uniqueness, and not null, on database columns
+ */
+function flickrrippr_update_6110() {
+  db_add_index($ret, 'flickrphotos', 'flickrphotos_id_index', array('flickrphoto_id'));
+  db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_id_unique', array('flickrphoto_id'));
+  db_add_unique_key($ret, 'flickrphotos', 'flickrphotos_nid_unique', array('nid'));
+}
+
+/**
+ * Add index on the flickr user name fields
+ */
+function flickrrippr_update_6120() {
+  db_add_index($ret, 'flickrusers', 'flickrid_index', array('flickrid'));
+}
+
+/*
+function flickrrippr_update_6140(&$sandbox) {
+
+if (!isset($sandbox['progress'])) {
+    $sandbox['progress'] = 0;
+    $sandbox['photoid'] = 0;
+
+    $sandbox['max'] = db_result(db_query('SELECT COUNT(flickrphoto_id) FROM {flickrphotos} WHERE (rotation IS NULL OR license IS NULL OR date_posted IS NULL OR date_lastupdate IS NULL OR views IS NULL )'));
+    $sandbox['photoid'] = 0;
+    return ;
+  }
+
+  include_once(drupal_get_path('module', 'flickrrippr') .'/flickrrippr.inc');
+  $result = db_query("SELECT * FROM {flickrphotos} WHERE (rotation IS NULL OR license IS NULL OR date_posted IS NULL OR date_lastupdate IS NULL OR views IS NULL ) AND flickrphoto_id > %d LIMIT 10", $sandbox['photoid']);
+  
+  while($photo = db_fetch_object($result)) {
+    flickrrippr_makenode($photo->flickrphoto_id);
+    drupal_seT_message(print_r($photo, 1));
+    $sandbox['progress']++;
+    $sandbox['photoid'] = $photo->flickrphoto_id;
+    error_log($photo->flickrphoto_id);
+    
+    $sandbox['message'] = t("Updated photo %id %title", array('%id' => $photo->flickrphoto_id, '%title' => $photo->title));
+  }
+  
+  $ret['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['progress'] / $sandbox['max']);
+  return $ret;
+  
+}*/
+/**
+ * convert some columns to more appropriate types
+ */
+function flickrrippr_update_6150() {
+//   $ret[]= update_sql("BEGIN");
+
+  $schema = flickrrippr_schema();
+  foreach(array('rotation', 'license', 'date_posted', 'date_lastupdate', 'views') as $col) {
+    $schema = flickrrippr_schema();
+    unset($def['not null']);
+$schema = flickrrippr_schema();  }
+//   $ret[]= update_sql("COMMIT");
+  return $ret;
+}
+
+/**
+ * Add the date_field column to flickrusername
+ */
+function flickrrippr_update_6160() {
+  db_add_field($ret, 'flickrusers', 'flickrrealname', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrpath_alias', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrlocation', array('type' => 'text'));
+  db_add_field($ret, 'flickrusers', 'flickrmobileurl', array('type' => 'text'));
+  
+  db_add_field($ret, 'flickrusers', 'date_field', array('type' => 'text'));
+  update_sql("UPDATE {flickrusers} SET date_field='date_taken'");
+  return $ret;
+}
