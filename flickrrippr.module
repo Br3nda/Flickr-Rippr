@@ -42,15 +42,6 @@ function flickrrippr_views_api() {
 }
 
 
-function flickrrippr_node_alter(&$node) {
-  if (isset($node->flickr_photo)) {
-    $node->links['photopage'] = array(
-      'title' => 'Flickr Photo Page',
-      'href' => $node->flickr_photo['photopage'],
-    );
-  }
-}
-
 /**
  * Implementation of hook_menu().
  */
@@ -235,8 +226,23 @@ function flickrrippr_get_flickruser($uid, $flickrid) {
 /**
  * Loading of the node
  */
-function flickrrippr_load(&$node) {
-  $node->flickr_photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
+function flickrrippr_node_load($nodes, $types) {
+
+  $photos = db_select('flickrphotos', 'p')
+    ->fields('p')
+    ->condition('nid', array_keys($nodes))
+    ->execute();
+  foreach($photos as $p) {
+    $nodes[$p->nid]->flickr_photo = $p;
+    $nodes[$p->nid]->links['photopage'] = array(
+      'title' => t('Flickr Photo Page'),
+      'href' => $p['photopage'],
+    );
+
+  }
+    
+  if (isset($node->flickr_photo)) {
+  }
 }
 
 /**
@@ -558,32 +564,11 @@ function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
 function flickrrippr_node_form(&$form_state, $node) {
 }
 
-/**
- *
- */
-function flickrrippr_nodeapi(&$node, $op, $teaser, $page) {
-  if (!isset($node->nid)) {
-    return;
-  }
-  $photo_id = flickrrippr_node_get_photoid($node->nid);
-  if (!$photo_id) {
-    //not a flickr photo
-    return;
-  }
-  switch ($op) {
-    case 'delete':
-      db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid);
-      drupal_set_message(t("Flickr Rippr photo deleted."));
-    break;
-    case 'view':
-      flickrrippr_view($node, $teaser, $page);
-    break;
-    case 'alter':
-      flickrrippr_node_alter($node);
-    break;
-    
-  }
+function flickrrippr_node_delete($node) {
+  db_query('DELETE FROM {flickrphotos} WHERE nid = %d', $node->nid);
+  drupal_set_message(t("Flickr Rippr photo deleted."));
 }
+
 
 /**
  * All the different sizes flickr have
