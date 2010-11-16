@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.23 2010/11/16 00:36:45 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.24 2010/11/16 00:37:21 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -203,14 +203,13 @@ function flickrrippr_user_settings_form_validate($form, &$form_state) {
     }
   }
 
-  if(isset($form_state['values']['flickr_username'])) {
+  if (isset($form_state['values']['flickr_username'])) {
     $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
-    if(!$flickr_details) {
+    if (!$flickr_details) {
       form_set_error('flickr_username', t('Account not found on flickr.com'));
     }
   }
 }
-
 /**
  * Save submission of a user editting their own settings
  */
