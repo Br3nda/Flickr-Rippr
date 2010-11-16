@@ -492,55 +492,56 @@ function flickrrippr_failed_form_submit($form, $fv) {
 
 }
 
-function flickrrippr_view(&$node, $teaser = FALSE, $page = FALSE) {
+function theme_flickrrippr_photo($node, $size) {
+}
 
-  $photo = (array)$node->flickr_photo;
-  if (empty($photo)) {
-    drupal_set_message('No photo info attached', 'error');
+function flickrrippr_node_view($node, $view_mode, $langcode) {
+
+  if (empty($node->flickr_photo)) {
+    drupal_set_message(t('No photo info attached'), 'error');
     watchdog('flickrrippr', 'Node has no photo info. !link', array('!link' => l($node->title, 'node/'. $node->nid)), WATCHDOG_ERROR);
     return $node;
   }
 
-  if (!$photo['farm'] || !$photo['server'] || !$photo['secret']) {
-    GLOBAL $_FR_refresh_count;
+  $photo = (array)$node->flickr_photo;
+  
 
-    if ($_FR_refresh_count  < 5) {
-      flickrrippr_makenode($photo['flickrphoto_id']);
-      $photo = db_fetch_array(db_query("SELECT * FROM {flickrphotos} WHERE nid=%d", $node->nid));
-      $_FR_refresh_count++;
-    }
-  }
-
-  if (!$photo || $photo['failed'] == 1) {
+  if ($photo['failed'] == 1) {
     if (node_access('delete', $node)) {
       drupal_set_message(t("Failed to find flickr photo info for !link", array('!link' => l($node->title, 'node/' . $node->nid))), 'error');
-      $node->content['delete'] = array(
-        '#value' => drupal_get_form('flickrrippr_failed_form', $node),
-        '#weight' => -10,
-      );
+//       $node->content['delete'] = array(
+//         '#value' => drupal_get_form('flickrrippr_failed_form', $node),
+//         '#weight' => -10,
+//       );
     }
-    return $node;
+    return;
   }
+//   drupal_set_message($view_mode);
 
-  if ($page) {
+  switch($view_mode) {
+    default:
+    case 'full':
     $size = variable_get('flickrrippr_page_size', 'z');
     $link = $photo['photopage'];
-  }
-  else {
+    break;
+    case 'teaser':
     $size = variable_get('flickrrippr_teaser_size', 't');
     $link = 'node/'. $node->nid;
+    break;
   }
+  
 
   //get the image, using theme()
 
   $jpeg_path = flickrrippr_path($node, $size);
-  
-  $image = l(theme('image', $jpeg_path, $teaser, $teaser, NULL, FALSE), $link, array('html' => TRUE));
+  $image = l(flickrrippr_image($node, $size), $link, array('html' => TRUE));
   $node->content['flickr_photo_'.$size] = array(
     '#weight' => 0,
-   '#value' => '<div class="flickrrippr_photo">' . $image . '</div>',
+    '#markup' => '<div class="flickrrippr_photo">' . $image . '</div>',
+//     '#theme' => 'theme_flickrrippr_photo',
   );
 
+  return;
 
   $markup_trust = variable_get('flickrrippr_markup_trust', FALSE);
 
