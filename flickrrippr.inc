@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.14 2010/11/16 02:37:55 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.15 2010/11/16 03:08:39 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -95,23 +95,12 @@ function flickrrippr_path_remote($node, $size) {
 /**
  * Makes a node for a flickr photo - or updates if it already exists
  */
-function flickrrippr_makenode($photo_id) {
+function flickrrippr_makenode($photo_id, $secret='') {
 
   if (!$photo_id) {
     drupal_set_message(t("Photo_id required."), 'error');
     return FALSE;
   }
-
-  //TODO, this code is in two place -- make a function
-  $local_cached_details = flickrrippr_get_photo_details_by_photoid($photo_id);
-  $age = $local_cached_details ? strtotime('now') - $local_cached_details->lastfetched : 0;
-  //
-  watchdog('flickrrippr', 'Photo was fetched %age seconds ago', array('%age' => $age));
-  //if it's already been fetched in the last hour....
-//   if ($age < 60*60) {
-//     return FALSE;
-//   }
-
 
   $flickr = flickrapi_phpFlickr();
   if (!$flickr) {
@@ -120,7 +109,7 @@ function flickrrippr_makenode($photo_id) {
   }
 
   //Info to put into the node
-  $flickr_info = $flickr->photos_getInfo($photo_id);
+  $flickr_info = $flickr->photos_getInfo($photo_id, $secret);
   //we can't get info from flickr -- mark this node as bad
   if (!$flickr_info) {
     drupal_set_message(t('No info found on photo %photoid.', array('%photoid' => $photo_id)), 'error');
@@ -158,7 +147,9 @@ function flickrrippr_makenode($photo_id) {
   );
 
   $details += $flickr_info;
-  $details += $flickr_context;
+  if(is_array($flickr_context)) {
+    $details += $flickr_context;
+  }
   foreach($flickr_info['dates'] as $key => $d) {
     $details['date_'. $key] = $d;
   }
@@ -167,7 +158,6 @@ function flickrrippr_makenode($photo_id) {
   }
   $details['flickrphoto_id'] = $details['id'];
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
-//   drupal_set_message(print_r($flickr_info, 1));
 
   $fields = array('flickrphoto_id', 'farm', 'server', 'secret', 'dateuploaded', 'license', 'rotation', 'title', 'date_posted', 'date_taken', 'date_lastupdate', 'views', 'photopage', 'media', 'description', 'owner_nsid');
   
@@ -189,7 +179,7 @@ function flickrrippr_makenode($photo_id) {
   }
   $photo->nid = $node->nid;
   $photo->lastfetched = strtotime('now');
-  drupal_set_message(print_r($node, 1));
+
   if (isset($node->new)) {
     drupal_write_record('flickrphotos', $photo);
     drupal_set_message(t("Saved new photo %photo_id, " . l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
@@ -201,11 +191,7 @@ function flickrrippr_makenode($photo_id) {
   //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
-  return $node;
-
-  //the extra hooks
-  module_invoke_all('flickrrippr_node_alter', $node, $details);
-
+  $node->flickr_photo = $details;
   return $node;
 
 }

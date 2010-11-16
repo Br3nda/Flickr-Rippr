@@ -239,10 +239,7 @@ function flickrrippr_node_load($nodes, $types) {
     ->execute();
   foreach($photos as $p) {
     $nodes[$p->nid]->flickr_photo = $p;
-    $nodes[$p->nid]->links['photopage'] = array(
-      'title' => t('Flickr Photo Page'),
-      'href' => $p->photopage,
-    );
+
 
   }
 
@@ -570,7 +567,12 @@ function flickrrippr_node_view($node, $view_mode, $langcode) {
     '#markup' => '<div class="flickrphoto_details">' . theme('item_list', array('items' => $list)) .'</div>'
   );
 
-  return $node;
+//   $node->links['photopage'] = array(
+//       'title' => t('Flickr Photo Page'),
+//       'href' => $node->flickr_photo->photopage,
+//     );
+
+
 }
 
 
