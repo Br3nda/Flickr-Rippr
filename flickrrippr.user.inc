@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.28 2010/11/16 01:01:36 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.29 2010/11/16 01:17:50 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -48,8 +48,9 @@ function flickrrippr_user_settings($uid = NULL) {
       check_plain($a->flickrusername),
       $tag_links,
 //       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
+      l(t('Fetch Now'), 'user/'. $user->uid . '/flickrrippr/fetch/'. $a->flickrid),
       l(t('Edit'), 'user/' . $user->uid . '/flickrrippr/edit/' . $a->flickrid),
-      l('View Photos', 'user/' . $user->uid . '/flickrrippr/view/' . $a->flickrid),
+      l(t('View Photos'), 'user/' . $user->uid . '/flickrrippr/view/' . $a->flickrid),
     );
 
   }
@@ -270,11 +271,19 @@ function flickrrippr_user_fetch_user_from_flickr($flickrusername) {
 function flickrrippr_user_view_photos($uid, $flickruserid) {
   $output = '';
 
-  $result = pager_query("SELECT * FROM {flickrphotos} p INNER JOIN {node} n ON p.nid = n.nid WHERE owner_nsid='%s' AND failed <> 1 ORDER BY flickrphoto_id DESC", 60, 0, null, $flickruserid);
+  $select = db_select('flickrphotos', 'p');
+  $select->join('node', 'n', 'p.nid = n.nid');
+  $select->fields('p');
+  $select->fields('n');
+  $select->condition('owner_nsid', $flickruserid);
+  $select->condition('failed',  1, '<>');
+  $select->orderBy('flickrphoto_id', 'DESC');
+  $select->range(0, 60);
+  $select->execute();
   
   $rows = array();
-  while($node = db_fetch_object($result)) {
-    //   drupal_set_message(print_r($photo, 1));
+  foreach($select as $node) {
+    drupal_set_message(print_r($node, 1));
     $node->flickr_photo = (array)$node;
     $jpeg_path = flickrrippr_path($node, 't');
     $col[] = l(theme('image', $jpeg_path, $node->title, $node->title, NULL, FALSE), 'node/'. $node->nid, array('html' => TRUE));;
