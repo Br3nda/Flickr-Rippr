@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.9 2010/09/30 01:39:28 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.10 2010/11/16 01:24:18 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -53,7 +53,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
     ->execute()
     ->fetch();
   if (!$flickruser) {
-    drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
+//     drupal_set_message(t("NSID %nsid is not a registered user of this site.", array('%nsid' => $nsid)), 'error');
     return;
   }
  
@@ -63,25 +63,31 @@ function flickrrippr_get_user_by_nsid($nsid) {
 
 
 /**
-* Work out the path to a photo - also handles the cache on the local filesystem
-*/
-function flickrrippr_path($flickr_photo, $size = FALSE, $node=NULL) {
-  if (!$flickr_photo['farm'] ||  !$flickr_photo['secret']) {
-    drupal_set_message(t("Cannot calculate path without farm and secret."), 'error');
+ * Work out the path to a photo - also handles the cache on the local filesystem
+ */
+function flickrrippr_path($node, $size = FALSE) {
+  
+  $flickr_photo = $node->flickr_photo;
+
+  if (empty($flickr_photo['secret'])) {
+    drupal_set_message(t("Cannot calculate path without the 'secret'. Something is wrong with node %nid.", array('%nid' => $node->nid)), 'error');
+    
     return '';
   }
   $path_handler = variable_get('flickrrippr_path_handler', 0);
   if (!$path_handler) {
     //none chosen, use default
-    return flickrrippr_path_remote($flickr_photo, $size);
+    return flickrrippr_path_remote($node, $size);
   }
-  return module_invoke($path_handler, 'get_path', $flickr_photo, $size, $node);
+
+  return module_invoke($path_handler, 'get_path', $node, $size);
 }
 
 /**
  * Calculates path to photo on flickr
  */
-function flickrrippr_path_remote($flickr_photo, $size) {
+function flickrrippr_path_remote($node, $size) {
+  $flickr_photo = $node->flickr_photo;
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   return 'http://farm' . $flickr_photo['farm'] . '.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['flickrphoto_id'] . '_' . $flickr_photo['secret'] . ($size ? '_' . $size : '') . '.jpg';
 }
@@ -98,7 +104,8 @@ function flickrrippr_makenode($photo_id) {
 
   //TODO, this code is in two place -- make a function
   $local_cached_details = flickrrippr_get_photo_details_by_photoid($photo_id);
-  $age = strtotime('now') - $local_cached_details->lastfetched;
+  $age = $local_cached_details ? strtotime('now') - $local_cached_details->lastfetched : 0;
+  //
   watchdog('flickrrippr', 'Photo was fetched %age seconds ago', array('%age' => $age));
   //if it's already been fetched in the last hour....
 //   if ($age < 60*60) {
@@ -135,10 +142,10 @@ function flickrrippr_makenode($photo_id) {
   //get user details
 
   $user = flickrrippr_get_user_by_nsid($flickrid);
-  if (!$user) {
-    drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
-    return FALSE;
-  }
+//   if (!$user) {
+//     drupal_set_message(t("User %flickrusername doesn't exist, unable to save photo %photo_id", array('%flickrusername' => $flickrusername, '%photo_id' => $photo_id)), 'error');
+//     return FALSE;
+//   }
 
   //assemble everything to pass to hook
   $details = array(
@@ -152,12 +159,13 @@ function flickrrippr_makenode($photo_id) {
 
   $details += $flickr_info;
   $details += $flickr_context;
-  foreach ($flickr_info['dates'] as $key => $d) {
-    $details['date_' . $key] = $d;
+  foreach($flickr_info['dates'] as $key => $d) {
+    $details['date_'. $key] = $d;
   }
-  foreach ($flickr_info['owner'] as $key => $o) {
-    $details['owner_' . $key] = $o;
+  foreach($flickr_info['owner'] as $key => $o) {
+    $details['owner_'. $key] = $o;
   }
+  $details['flickrphoto_id'] = $details['id'];
   $details['photopage'] = $flickr_info['urls']['url'][0]['_content'];
 //   drupal_set_message(print_r($flickr_info, 1));
 
@@ -206,7 +214,12 @@ function flickrrippr_makenode($photo_id) {
 
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
-  //the extra hookes
+  //the extra hooks
+  module_invoke_all('flickrrippr_node_alter', $node, $details);
+
+  return $node;
+
+  //the extra hooks
   module_invoke_all('flickrrippr_node_alter', $node, $details);
 
   return $node;
@@ -229,6 +242,7 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
 
   $node->title = htmlentities($details['title']);
   $node->created = strtotime($details['date_taken']);
+  $node->changed = strtotime($details['date_posted']);
 
   //if owner not set, then set it.
   if (!isset($node->uid)) {
@@ -282,6 +296,7 @@ function flickrrippr_get_flickr_accounts($uid) {
     ->fields('flickrusers')
     ->condition('uid', $uid)
     ->orderBy('lower(flickrusername)')
-    ->execute();
+    ->execute()
+    ->fetchAll();
 }
 

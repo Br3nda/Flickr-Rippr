@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.41.2.3 2010/09/30 00:24:33 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.41.2.4 2010/11/16 01:24:18 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
@@ -61,12 +61,7 @@ function flickrrippr_path_options() {
 
   return $options;
 }
-function flickrrippr_node_handler_options() {
-  $options = array('flickrrippr' => t('Flickr Rippr'));  
-  $options += module_invoke_all(__FUNCTION__);
 
-  return $options;
-}
 
 function flickrrippr_admin_settings_form() {
 
@@ -84,17 +79,7 @@ function flickrrippr_admin_settings_form() {
     '#options' => $path_options,
     '#default_value' => variable_get('flickrrippr_path_handler', 0),
     '#required' => TRUE,
-    '#description' => t('Note: Changing the path handler does not modify existing photos previously fetch from flickr.com.'),
-  );
-
-  $node_handlers = flickrrippr_node_handler_options();
-  $form['general']['node_handler'] = array(
-    '#type' => 'radios', 
-    '#title' => t('Flickr Node Handler'), 
-    '#options' => $node_handlers,
-    '#default_value' => variable_get('flickrrippr_node_handler', 'flickrrippr'),
-    '#required' => TRUE,
-    '#description' => t('Note: Changing the Node handler does not modify existing nodes.'),
+    '#description' => t('Modifies where and how images are stored.'),
   );
 
   $form['general']['markup_trust'] = array(
@@ -136,21 +121,21 @@ function flickrrippr_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  $form['failed'] = array(
-    '#title' => 'Failed Imports',
-    '#type' => 'fieldset',
-    'failed_action' => array(
-      '#type' => 'radios',
-      '#title' => t('When photos cannot be refetched from flickr.com'),
-      '#options' => array(
-        'delete' => t('Delete completely from this website.'),
-        'unpublish' => t('Unpublish the photo.'),
-        'nothing' => t('Do nothing. Leave the content on this website'),
-      ),
-      '#required' => TRUE,
-      '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
-    ),
-  );
+//   $form['failed'] = array(
+//     '#title' => 'Failed Imports',
+//     '#type' => 'fieldset',
+//     'failed_action' => array(
+//       '#type' => 'radios',
+//       '#title' => t('When photos cannot be refetched from flickr.com'),
+//       '#options' => array(
+//         'delete' => t('Delete completely from this website.'),
+//         'unpublish' => t('Unpublish the photo.'),
+//         'nothing' => t('Do nothing. Leave the content on this website'),
+//       ),
+//       '#required' => TRUE,
+//       '#description' => t('Photos by be imported and then later they deleted from flickr, or made private. This module needs to know what to do with these photos.'),
+//     ),
+//   );
 
 
   $form['save'] = array(
@@ -160,18 +145,6 @@ function flickrrippr_admin_settings_form() {
   );
   
   return $form;
-}
-
-function _flickr_rippr_jpeg_sizes() {
-  return array(
-//     'sq' => t('Square (75 x 75)'), 
-    't'  => t('Thumbnail (100 x 75)'),      
-    's'  => t('Small (240 x 180)'),
-    0  => t('Medium 500 (500 x 375)'), 
-    'z'  => t('Medium 640 (640 x 480)'),
-    'b'  => t('Large (1024 x 768)'),
-    'o'  => t('Original (2592 x 1944)')
-  );
 }
 
 function flickrrippr_admin_settings_form_validate($form_id, $form_values) {
@@ -187,13 +160,10 @@ function flickrrippr_admin_settings_form_submit($form_id, $form_values) {
   $path_handler = $form_values['values']['path_handler'];
   variable_set('flickrrippr_path_handler', $path_handler);
 
-  $node_handler = $form_values['values']['node_handler'];
-  variable_set('flickrrippr_node_handler', $node_handler);
-
   $num_per_fetch = $form_values['values']['num_per_fetch'];
   variable_set('flickrrippr_num_per_fetch', $num_per_fetch); 
 
-  $markup_trust = $form_values['values']['markup_trust'];
+  $markup_trust = $form_state['values']['markup_trust'];
   variable_set('flickrrippr_markup_trust', $markup_trust);
 
 
