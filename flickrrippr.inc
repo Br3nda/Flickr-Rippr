@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.73 2010/10/27 02:27:29 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.74 2010/11/16 00:41:30 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -296,6 +296,7 @@ function flickrrippr_get_flickr_accounts($uid) {
     ->fields('flickrusers')
     ->condition('uid', $uid)
     ->orderBy('lower(flickrusername)')
-    ->execute();
+    ->execute()
+    ->fetchAll();
 }
 
