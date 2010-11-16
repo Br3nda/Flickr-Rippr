@@ -568,8 +568,8 @@ function flickrrippr_node_form(&$form_state, $node) {
 
 function flickrrippr_node_delete($node) {
   db_delete('flickrphotos')
-    ->where('nid', array($node->nid));
-  drupal_set_message(t("Flickr Rippr photo deleted."));
+    ->condition('nid', array($node->nid));
+  drupal_set_message(t("Flickr Rippr photo %title deleted.", array('%title' => $node->title)));
 }
 
 
