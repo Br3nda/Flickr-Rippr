@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.21 2010/11/16 00:34:16 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.22 2010/11/16 00:35:45 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -18,7 +18,6 @@ function flickrrippr_user_settings($uid = NULL) {
   $output .= l(t('Add new account'), 'user/'. $user->uid . '/flickrrippr/add');
 
   $accounts = flickrrippr_get_flickr_accounts($user->uid);
-
 
   $headers = array('',
     t('Flickr ID'),
@@ -64,8 +63,6 @@ function flickrrippr_user_settings($uid = NULL) {
 
 
 
-
-
 function flickrrippr_fetch_user_info_and_save($flickruser, $new=false) {
 
  //search flickr for latest photos from that user.
@@ -81,18 +78,22 @@ function flickrrippr_fetch_user_info_and_save($flickruser, $new=false) {
   $user_info = $flickr->people_getInfo($flickruser->flickrid);
   //e.g. Array ( [id] => 95198959@N00 [nsid] => 95198959@N00 [ispro] => 1 [iconserver] => 5 [iconfarm] => 1 [path_alias] => alan50 [username] => Alan50 [realname] => Alan [location] => Hamilton, New Zealand [photosurl] => http://www.flickr.com/photos/alan50/ [profileurl] => http://www.flickr.com/people/alan50/ [mobileurl] => http://m.flickr.com/photostream.gne?id=274055 [photos] => Array ( [firstdatetaken] => 2002-11-23 12:11:53 [firstdate] => 1111902587 [count] => 941 ) )
 
-  $avatar = flickrrippr_get_avatar($user_info);
-//   drupal_set_message(print_r($user_info, 1));
-  $result = db_query("UPDATE {flickrusers} SET flickrusername='%s', flickrispro=%d, flickrphotosurl='%s', flickrprofileurl='%s', flickravatar='%s'
-    WHERE uid=%d AND flickrid='%s'",
-    $user_info['username'],
-    $user_info['ispro'],
-    $user_info['photosurl'],
-    $user_info['profileurl'],
-    $avatar,
-    $flickruser->uid,
-    $flickruser->flickrid
-  );
+  $flickruser->flickrusername = $user_info['username'];
+  $flickruser->flickrispro = $user_info['ispro'];
+  $flickruser->flickrphotosurl = $user_info['photosurl'];
+  $flickruser->flickrprofileurl = $user_info['profileurl'];
+  $flickruser->flickravatar = flickrrippr_get_avatar($user_info);
+  $flickruser->flickrrealname = isset($user_info['realname']) ? $user_info['realname'] : '';
+  $flickruser->flickrpath_alias  = $user_info['path_alias'];
+  $flickruser->flickrlocation = isset($user_info['location']) ? $user_info['location'] : '';
+  $flickruser->flickrmobileurl = $user_info['mobileurl'];
+  if ($new) {
+    drupal_write_record('flickrusers', $flickruser);
+  }
+  else {
+    drupal_write_record('flickrusers', $flickruser, array('flickrid', 'uid'));
+  }
+  return $flickruser; 
 }
 
 
@@ -235,11 +236,13 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   else {
     $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
     $flickrid = $flickr_details['id'];
+    
     $result = db_query("INSERT INTO {flickrusers} (flickrusername, flickrid, tag, uid) VALUES ('%s', '%s', '%s', %d)",
       $form_state['values']['flickr_username'],
       $flickrid,
       $form_state['values']['flickr_tag'],
       $user->uid);
+      
     drupal_set_message(t("Flickr username set"));
     $flickr_account->flickrid = $flickrid;
     $flickr_account->uid = $user->uid;
