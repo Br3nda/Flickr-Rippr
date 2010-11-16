@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.26 2010/11/16 00:44:05 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.27 2010/11/16 00:44:27 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -48,8 +48,8 @@ function flickrrippr_user_settings($uid = NULL) {
       check_plain($a->flickrusername),
       $tag_links,
 //       drupal_get_form('flickrrippr_user_fetch_now', $user->uid, $a->flickrid),
-      l(t('Edit'), 'user/'. $user->uid .'/flickrrippr/edit/'. $a->flickrid),
-      l('View Photos', 'user/'. $user->uid .'/flickrrippr/view/'. $a->flickrid),
+      l(t('Edit'), 'user/' . $user->uid . '/flickrrippr/edit/' . $a->flickrid),
+      l('View Photos', 'user/' . $user->uid . '/flickrrippr/view/' . $a->flickrid),
     );
 
   }
