@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.22 2010/11/16 00:35:45 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.23 2010/11/16 00:36:45 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -122,20 +122,25 @@ function flickrrippr_user_add_account($uid) {
 /**
  * Form for a user editing their own settings
  */
-function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
+function flickrrippr_user_settings_form($a, $flickruser) {
+
   $form = array();
   if (isset($flickruser->flickrusername)) {
-    drupal_set_title(t('Flickr Rippr settings for @username', array('@username' => $flickruser->flickrusername)));
+    drupal_set_title(t('Flickr Rippr settings for %username', array('%username' => $flickruser->flickrusername)));
   }
-  $form['debug'] = array('#type' => 'markup', '#value' => nl2br(check_plain(print_r($flickruser, 1))));
 
   if (isset($flickruser->flickrid)) {
-    $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickruser->flickrid);
+    $form['flickrid'] = array('#type' => 'value', '#value' => $flickruser->flickrid);
   }
-  $form['uid'] = array('#type' => 'hidden', '#value' => $flickruser->uid);
+  $form['uid'] = array('#type' => 'value', '#value' => $flickruser->uid);
 
   if (isset($flickruser->flickrid)) {
     $form['flickr_username'] = array(
+      '#type' => 'value',
+      '#value' => $flickruser->flickrusername,
+    );
+
+    $form['flickr_username_markup'] = array(
       '#type' => 'markup',
       '#value' => flickrrippr_user_avatar($flickruser) .'<p><strong>'. t('Flickr Username: ') . ' </strong><br/>'. check_plain($flickruser->flickrusername) .'</p>',
     );
@@ -156,13 +161,22 @@ function flickrrippr_user_settings_form($form, &$form_state, $flickruser) {
       '#default_value' => isset($flickruser->tag) ? $flickruser->tag : '',
     );
 
+  $form['date_field'] = array(
+    '#type' => 'radios',
+    '#title' => t('Date field'),
+    '#description' => t('Which field to use as the post\'s created date + time?'),
+    '#options' => flickrrippr_date_options(),
+    '#required' => TRUE,
+    '#default_value' => empty($flickruser->date_field) ? 'date_taken' : $flickruser->date_field,
+  );
+
   $form['save'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
     '#weight' => 9,
     );
 
-  if(isset($flickruser->flickrid)) {
+  if (isset($flickruser->flickrid)) {
     $form['delete'] = array(
       '#type' => 'submit',
       '#value' => t('Delete'),
