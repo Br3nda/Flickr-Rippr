@@ -210,8 +210,16 @@ function flickrrippr_node_refresh_perm($nid) {
  * Get the details of a flickr user from the database
  */
 function flickrrippr_get_flickruser($uid, $flickrid) {
-  $cached = db_fetch_object(db_query("SELECT * FROM {flickrusers} WHERE uid=%d AND flickrid='%s'", $uid, $flickrid));
+  $cached = db_select('flickrusers', 'fu')
+    ->fields('fu')
+    ->condition('uid', $uid)
+    ->condition('flickrid', $flickrid)
+    ->addTag('FlickrRippr')
+    ->execute()
+    ->fetch();
+    
   if ($cached) {
+    drupal_set_message(print_r($cached, 1));
     return $cached;
   }
   drupal_set_message("fetching info on $flickrid");
