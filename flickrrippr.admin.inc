@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.admin.inc,v 1.41.2.4 2010/11/16 01:24:18 taniwha Exp $
+// $Id: flickrrippr.admin.inc,v 1.41.2.5 2010/11/16 01:29:12 taniwha Exp $
 /**
  * @file Admin of Flickr Rippr
  */
