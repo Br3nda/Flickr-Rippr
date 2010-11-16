@@ -1,6 +1,6 @@
 <?php
 
-// $Id: flickrrippr.inc,v 1.67.2.13 2010/11/16 02:25:49 taniwha Exp $
+// $Id: flickrrippr.inc,v 1.67.2.14 2010/11/16 02:37:55 taniwha Exp $
 /**
  * @file flickrriprr.inc 
  * Functions that are likely to be of use to other modules, are in this file.
@@ -67,7 +67,7 @@ function flickrrippr_get_user_by_nsid($nsid) {
  */
 function flickrrippr_path($node, $size = FALSE) {
   
-  $flickr_photo = $node->flickr_photo;
+  $flickr_photo = (array)$node->flickr_photo;
 
   if (empty($flickr_photo['secret'])) {
     drupal_set_message(t("Cannot calculate path without the 'secret'. Something is wrong with node %nid.", array('%nid' => $node->nid)), 'error');
@@ -87,7 +87,7 @@ function flickrrippr_path($node, $size = FALSE) {
  * Calculates path to photo on flickr
  */
 function flickrrippr_path_remote($node, $size) {
-  $flickr_photo = $node->flickr_photo;
+  $flickr_photo = (array)$node->flickr_photo;
  //http://farm{farm-id}.static.flickr.com/{server-id}/{id}_{secret}.jpg
   return 'http://farm' . $flickr_photo['farm'] . '.static.flickr.com/' . $flickr_photo['server'] . '/' . $flickr_photo['flickrphoto_id'] . '_' . $flickr_photo['secret'] . ($size ? '_' . $size : '') . '.jpg';
 }
@@ -187,13 +187,14 @@ function flickrrippr_makenode($photo_id) {
     drupal_set_message(t("Make node failed, giving up"), 'error');
     return FALSE;
   }
- 
-  if (isset($node->is_new) && $node->is_new) {
+  $photo->nid = $node->nid;
+  $photo->lastfetched = strtotime('now');
+  drupal_set_message(print_r($node, 1));
+  if (isset($node->new)) {
     drupal_write_record('flickrphotos', $photo);
     drupal_set_message(t("Saved new photo %photo_id, " . l($node->title, 'node/' . $node->nid), array('%photo_id' => $photo_id)));
   }
   else {
-//     drupal_set_message(print_r($photo, 1));
     drupal_write_record('flickrphotos', $photo, array('flickrphoto_id'));
     drupal_set_message(t("Updated photo '%photo_id', !link", array('!link' => l($node->title, 'node/' . $node->nid), '%photo_id' => $photo_id)));
   }
@@ -220,6 +221,9 @@ function flickrrippr_flickrrippr_node_save_handler($details) {
   if (!empty($nid) && $nid) {
     //already exists
     $node = node_load($nid);
+  }
+  else {
+    $node->new = true;
   }
   $node->type = 'flickrrippr_photo';
 

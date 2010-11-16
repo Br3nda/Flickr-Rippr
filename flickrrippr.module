@@ -241,7 +241,7 @@ function flickrrippr_node_load($nodes, $types) {
     $nodes[$p->nid]->flickr_photo = $p;
     $nodes[$p->nid]->links['photopage'] = array(
       'title' => t('Flickr Photo Page'),
-      'href' => $p['photopage'],
+      'href' => $p->photopage,
     );
 
   }
@@ -375,7 +375,14 @@ function flickrrippr_image($node, $size) {
     return;
   }
   $src = flickrrippr_path($node, $size);
-  return theme('image', $src, $node->title, $node->title, array(), FALSE);
+  return theme('image',
+    array(
+      'src' => $src,
+      'alt' => $node->title,
+      'title' => $node->title,
+      'getsize' => FALSE
+      )
+  );
 }
 
 function flickrrippr_user_avatar($a) {
