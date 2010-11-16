@@ -16,22 +16,10 @@ function flickrgeo_views_api() {
 function flickrgeo_timeline_page() {
 return '';
 }
-
-function flickrgeo_nodeapi(&$node, $op) {
-  if ($node->type != 'flickrrippr_photo') {
-    return;
-  }
-  switch($op) {
-    case 'view':
-      flickrgeo_view($node);
-    case 'update':
-    case 'insert':
-      flickrgeo_save($node);
-    break;
-    case 'delete':
-      db_query('DELETE FROM {flickrgeo} WHERE nid = %d', $node->nid);
-    break;
-  }
+function flickrgeo_node_delete($node) {
+  db_delete('flickrgeo')
+    ->condition('nid', array($node->nid))
+    ->execute();
 }
 
 function flickrgeo_block($op = 'list', $delta = 0, $edit = array()) {
@@ -69,7 +57,7 @@ function flickrgeo_block_view() {
   );
 }
 
-function flickrgeo_view(&$node) {
+function flickrgeo_node_view(&$node) {
   $cached = flickrgeo_get_geo($node->flickr_photo['flickrphoto_id']);
   if (!$cached) {
     return;
@@ -107,7 +95,15 @@ function flickrgeo_view(&$node) {
   //$result->results = array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode)
 }
 
-function flickrgeo_save($node) {
+function flickrgeo_node_insert($node) {
+  flickrgeo_node_save($node);
+}
+function flickrgeo_node_update($node) {
+  flickrgeo_node_save($node)
+}
+
+function flickrgeo_node_save($node) {
+  drupal_set_message(__FUNCTION__);
   if(empty($node->flickr_photo)) {
     return;
   }
