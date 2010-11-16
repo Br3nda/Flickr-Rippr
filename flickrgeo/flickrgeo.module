@@ -1,0 +1,178 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function flickrgeo_perm() {
+  return array('view flickr timeline');
+}
+
+function flickrgeo_views_api() {
+  return array(
+    'api' => 2,
+  );
+}
+
+function flickrgeo_timeline_page() {
+return '';
+}
+
+function flickrgeo_nodeapi(&$node, $op) {
+  if ($node->type != 'flickrrippr_photo') {
+    return;
+  }
+  switch($op) {
+    case 'view':
+      flickrgeo_view($node);
+    case 'update':
+    case 'insert':
+      flickrgeo_save($node);
+    break;
+    case 'delete':
+      db_query('DELETE FROM {flickrgeo} WHERE nid = %d', $node->nid);
+    break;
+  }
+}
+
+function flickrgeo_block($op = 'list', $delta = 0, $edit = array()) {
+  switch($op) {
+    case 'view': return flickrgeo_block_view();
+    break;
+    case 'list': return array(array('info' => t('Map of latest flickr photos')));
+    break;
+  }
+}
+
+function flickrgeo_block_view() {
+  $map = array_merge(gmap_defaults());
+  
+  $map['zoom'] = 1;
+//   $map['markermode'] = 1;
+  $map['width'] = '100%';
+  $map['height'] = '500px';
+
+
+  $result = db_query("SELECT * FROM {flickrgeo} g INNER JOIN {flickrphotos} p ON g.nid = p.nid ORDER BY p.date_taken DESC LIMIT 500");
+  while($cached = db_fetch_object($result)) {
+    $newmarker['latitude'] = $cached->latitude;
+    $newmarker['longitude'] = $cached->longitude;
+    $newmarker['markername'] = 'drupal';
+    $newmarker['opts']['title'] = check_plain($cached->title);
+    $newmarker['link'] = url('node/'. $cached->nid);
+    $map['markers'][] = $newmarker;
+    $map['latlong'] = ceil($cached->latitude) .','. ceil($cached->longitude);
+  }
+  
+  return array(
+    'subject' => t('Map of Photos'),
+    'content' => theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')),
+  );
+}
+
+function flickrgeo_view(&$node) {
+  $cached = flickrgeo_get_geo($node->flickr_photo['flickrphoto_id']);
+  if (!$cached) {
+    return;
+  }
+  $map = array_merge(gmap_defaults());
+  $map['latlong'] = ceil($cached->latitude) .','. ceil($cached->longitude);
+  $map['zoom'] = 8;
+  $map['markermode'] = 1;
+  $map['width'] = '100%';
+//   $mode = $usermap['markermode'];
+  
+//   $map['rmtcallback'] = url('map/user/load');
+//   $map['markermode'] = $usermap['markermode'];
+
+  $newmarker['latitude'] = $cached->latitude;
+  $newmarker['longitude'] = $cached->longitude;
+  $newmarker['markername'] = 'drupal';
+  $newmarker['opts']['title'] = check_plain($node->title);
+  $map['markers'][] = $newmarker;
+  
+  $node->content['flickrmap'] = array(
+    '#value' => '<div class="flickrmap">'. theme('gmap',  array('#settings' => $map, '#type'=> 'gmap')) .'</div>',
+    '#weight' => 1,
+  );
+
+
+//   $query = array('lat' => $cached->latitude, 'lng' => $cached->longitude);
+//   $options = array('columns' => array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode) );
+//   $result = geonames_query('findNearestAddress', $query, $options);
+//   
+//   $node->content['flickr_nearest_address'] = array(
+//     '#value' => print_r($result, 1),
+//     '#weight' => -3
+//   );
+  //$result->results = array(street, streetnumber, lat, lng, distance, postalcode, placename, admincode2, adminname2, admincode1, adminname1, countrycode)
+}
+
+function flickrgeo_save($node) {
+  if(empty($node->flickr_photo)) {
+    return;
+  }
+  $photo_id = $node->flickr_photo['flickrphoto_id'];
+  $geo = flickrgeo_fetch_geo_from_flickr($photo_id);
+//     drupal_set_message(print_r($geo, 1));
+
+  if (!$geo) {
+    return;
+  }
+  $record->flickrphoto_id = $photo_id;
+  $record->nid = $node->nid;
+  foreach(array('latitude', 'longitude', 'accuracy', 'context', 'place_id') as $key) {
+    $record->$key = $geo['location'][$key];
+  }
+
+  foreach(array('locality', 'county', 'region') as $a) {
+    foreach(array('content', 'place_id', 'woe_id') as $b) {
+      $key = $a .'_'. $b;
+      
+      $record->$key = isset($geo['location'][$a]["_$b"]) ? $geo['location'][$a]["_$b"] : null;
+    }
+  }
+/*      'longitude' => array('type' => 'float', 'not null' => TRUE),
+      'accuracy' => array('type' => 'int', 'not null' => TRUE),
+      'context' => array('type' => 'text'),
+      'locality_content' => array('type' => 'text'),
+      'locality_place_id' => array('type' => 'text'),
+      'locality_woeid' => array('type' => 'text'),
+      'county_content' => array('type' => 'text'),
+      'county_place_id' => array('type' => 'text'),
+      'county_woeid' => array('type' => 'text'),
+      'region_content' => array('type' => 'text'),
+      'region_place_id' => array('type' => 'text'),
+      'region_woeid' => array('type' => 'text'),
+      'country_content' => array('type' => 'text'),
+      'country_place_id' => array('type' => 'text'),
+      'country_woeid' => array('type' => 'text'), 
+      'place_id' => array('type' => 'text'),
+      'woeid' => array('type' => 'text'),*/
+//           drupal_set_message(print_r($record, 1));
+
+  $cached = flickrgeo_get_geo($photo_id);
+  if ($cached) {
+      drupal_write_record('flickrgeo', $record, array('nid', 'flickrphoto_id'));
+  }
+  else {
+    drupal_write_record('flickrgeo', $record);
+  }
+}
+
+function flickrgeo_get_geo($photo_id) {
+  return db_fetch_object(db_query("SELECT * FROM {flickrgeo} WHERE flickrphoto_id=%d", $photo_id));
+}
+
+/**
+ * Get the geo info for a public photo on flickr
+ */
+function flickrgeo_fetch_geo_from_flickr($photo_id) {
+  $flickr = flickrapi_phpFlickr();
+  if (!$flickr) {
+    drupal_set_message(t("Unable to query flickr.com, library is missing."), 'error');
+    return FALSE;
+  }
+  return $flickr->photos_geo_getLocation($photo_id);
+}
+
+
