@@ -219,7 +219,7 @@ function flickrrippr_get_flickruser($uid, $flickrid) {
     ->fetch();
     
   if ($cached) {
-    drupal_set_message(print_r($cached, 1));
+//     drupal_set_message(print_r($cached, 1));
     return $cached;
   }
   drupal_set_message("fetching info on $flickrid");
@@ -229,8 +229,7 @@ function flickrrippr_get_flickruser($uid, $flickrid) {
   $flickruser->uid = 0;
   include_once(drupal_get_path('module', 'flickrrippr').  '/flickrrippr.user.inc');
   flickrrippr_fetch_user_info_and_save($flickruser, true);
-  
-//   drupal_set_message(print_r($user_info, 1));
+ 
 }
 
 /**
@@ -392,8 +391,15 @@ function flickrrippr_image($node, $size) {
 
 function flickrrippr_user_avatar($a) {
   if (isset($a->flickravatar) && !empty($a->flickravatar) && !preg_match('!farm0!', $a->flickravatar)) {
+  
     //make image
-    $avatar = theme('image', check_plain($a->flickravatar), check_plain($a->flickrusername), check_plain($a->flickrusername), array(), FALSE);
+    $avatar = theme('image', array(
+      'path' => check_plain($a->flickravatar),
+      'alt' => check_plain($a->flickrusername),
+      'title' => check_plain($a->flickrusername),
+      'getsize' => FALSE
+      )
+    );
     //and put link around it
     $avatar = l($avatar, $a->flickrphotosurl, array('html' => TRUE));
   }
@@ -403,7 +409,7 @@ function flickrrippr_user_avatar($a) {
   return $avatar;
 }
 
-function flickrrippr_user_fetch_now($v, $uid, $flickrid, $dest='') {
+function flickrrippr_user_fetch_now($a, $uid, $flickrid, $dest='') {
   $form = array();
   $form['flickrid'] = array('#type' => 'hidden', '#value' => $flickrid);
   $form['uid'] = array('#type' => 'hidden', '#value' => $uid);

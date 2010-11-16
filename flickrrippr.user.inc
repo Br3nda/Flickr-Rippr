@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.29 2010/11/16 01:17:50 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.30 2010/11/16 01:21:51 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -41,7 +41,7 @@ function flickrrippr_user_settings($uid = NULL) {
       }
     }
 
-    $avatar = ''; //flickrrippr_user_avatar($a);
+    $avatar = flickrrippr_user_avatar($a);
     $rows[] = array(
       $avatar,
       check_plain($a->flickrid),
