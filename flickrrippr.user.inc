@@ -1,5 +1,5 @@
 <?php
-// $Id: flickrrippr.user.inc,v 1.3.2.14.2.10 2010/11/15 03:04:57 taniwha Exp $
+// $Id: flickrrippr.user.inc,v 1.3.2.14.2.11 2010/11/18 03:15:39 taniwha Exp $
 /**
  * @file functions related to users of flickr rippr
  */
@@ -232,7 +232,7 @@ function flickrrippr_user_settings_form_submit($form, &$form_state) {
   //this fetches from flickr.com
   $flickr_details = flickrrippr_user_fetch_user_from_flickr($form_state['values']['flickr_username']);
  
-  $flickr_account->flickr_tag = $form_state['values']['flickr_tag'];
+  $flickr_account->tag = $form_state['values']['flickr_tag'];
   $flickr_account->date_field = $form_state['values']['date_field'];
   
   if (isset($flickr_account->flickrusername)) {
