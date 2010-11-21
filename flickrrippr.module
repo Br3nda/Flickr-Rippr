@@ -350,7 +350,7 @@ function flickrrippr_cron() {
   //get missing flickrids
 //   flickrrippr_add_missing_flickrids();
 
-  $result = db_query("SELECT * FROM {flickrusers} WHERE uid IS NOT NULL ORDER BY uid");
+  $result = db_query("SELECT * FROM {flickrusers} WHERE uid IS NOT NULL AND uid <>0 ORDER BY uid");
 
   while ($fuser = db_fetch_object($result)) {
     flickrrippr_check_latest_for_user($fuser->uid);
